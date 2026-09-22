@@ -70,6 +70,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
 .card .num { font-size: 32px; }
 .card .name { font-size: 11px; line-height: 1.5; }
 .card .status { font-size: 10px; }
+.card .lock { font-family: system-ui, sans-serif; font-size: 26px; }
 .panel .card:disabled { filter: grayscale(0.9) brightness(0.6); cursor: not-allowed; }
 
 .hidden { opacity: 0; pointer-events: none; }

@@ -70,7 +70,7 @@ export class Overlay {
     const cards = this.levels.map((level, i) => {
       const locked = !progress.isUnlocked(i);
       const best = progress.best(level.name);
-      const status = locked ? '🔒' : best !== undefined ? `⏱ ${formatTime(best)}` : 'Neu!';
+      const status = locked ? '<span class="lock">🔒</span>' : best !== undefined ? `⏱ ${formatTime(best)}` : 'Neu!';
       return `
         <button type="button" class="card" data-level="${i}" ${locked ? 'disabled' : ''} style="--biome: ${level.biome.color}">
           <span class="num">${i + 1}</span>
