@@ -6,6 +6,7 @@ export interface OverlayActions {
   restart(): void;
   next(): void;
   menu(): void;
+  toggleSound(): void;
 }
 
 export type FadeKind = 'fall' | 'lava';
@@ -20,9 +21,20 @@ export class Overlay {
   private readonly toastEl = el('div', 'toast');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
+  private readonly soundButton = el('button', 'sound-toggle') as HTMLButtonElement;
 
   constructor(parent: HTMLElement, private readonly levels: Level[], private readonly actions: OverlayActions) {
-    parent.append(this.fade, this.hint, this.banner, this.toastEl, this.win, this.menuPanel);
+    this.soundButton.type = 'button';
+    this.soundButton.addEventListener('click', () => {
+      this.soundButton.blur();
+      actions.toggleSound();
+    });
+    parent.append(this.fade, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
+  }
+
+  setSoundIcon(muted: boolean): void {
+    this.soundButton.textContent = muted ? '🔇' : '🔊';
+    this.soundButton.title = muted ? 'Ton an (M)' : 'Ton aus (M)';
   }
 
   setFade(dark: boolean, kind: FadeKind = 'fall'): void {

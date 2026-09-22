@@ -73,6 +73,13 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
 .card .lock { font-family: system-ui, sans-serif; font-size: 26px; }
 .panel .card:disabled { filter: grayscale(0.9) brightness(0.6); cursor: not-allowed; }
 
+.sound-toggle {
+  position: absolute; top: 12px; right: 12px; width: 44px; height: 44px;
+  font-size: 22px; line-height: 1; cursor: pointer;
+  background: rgb(0 0 0 / 0.35); border: 2px solid rgb(255 255 255 / 0.6); border-radius: 6px;
+}
+.sound-toggle:hover { background: rgb(0 0 0 / 0.55); }
+
 .hidden { opacity: 0; pointer-events: none; }
 
 @media (max-width: 600px) {

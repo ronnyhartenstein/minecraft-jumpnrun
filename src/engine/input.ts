@@ -8,9 +8,13 @@ export class Input {
   private readonly down = new Set<string>();
   private jumpQueued = false;
   private readonly listeners = new Map<string, () => void>();
+  /** Wird bei jeder Eingabe aufgerufen, z. B. um den Ton freizuschalten. */
+  onAnyInput: () => void = () => {};
 
   constructor() {
+    window.addEventListener('pointerdown', () => this.onAnyInput());
     window.addEventListener('keydown', (e) => {
+      this.onAnyInput();
       if (GAME_KEYS.has(e.code)) e.preventDefault();
       if (!e.repeat) {
         if (JUMP.includes(e.code)) this.jumpQueued = true;

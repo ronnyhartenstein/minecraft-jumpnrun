@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Sound } from '../audio/sound';
 import type { Input } from '../engine/input';
 import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
@@ -29,6 +30,7 @@ export class Game {
   private readonly cameraRig: CameraRig;
   private readonly overlay: Overlay;
   private readonly progress = new Progress();
+  private readonly sound = new Sound();
   private state: State = 'menu';
   private stateTimer = 0;
   private playTime = 0;
@@ -46,7 +48,10 @@ export class Game {
       restart: () => this.restart(),
       next: () => this.next(),
       menu: () => this.showMenu(),
+      toggleSound: () => this.toggleSound(),
     });
+    this.overlay.setSoundIcon(this.sound.muted);
+    input.onAnyInput = () => this.sound.unlock();
     this.lantern.position.set(0, 1.6, 1);
     this.character.object.add(this.lantern);
     stage.scene.add(this.character.object);
@@ -64,6 +69,7 @@ export class Game {
   private bindKeys() {
     const { input } = this;
     input.onKey('KeyR', () => this.state !== 'menu' && this.restart());
+    input.onKey('KeyM', () => this.toggleSound());
     input.onKey('Escape', () => this.state !== 'menu' && this.showMenu());
     input.onKey('Enter', () => {
       if (this.state === 'won') this.hasNext ? this.next() : this.restart();
@@ -72,6 +78,10 @@ export class Game {
     this.levels.forEach((_, i) => {
       input.onKey(`Digit${i + 1}`, () => this.state === 'menu' && this.progress.isUnlocked(i) && this.start(i));
     });
+  }
+
+  private toggleSound() {
+    this.overlay.setSoundIcon(this.sound.toggleMute());
   }
 
   /** Das erste noch nicht geschaffte Level, sonst das letzte. */
@@ -118,6 +128,7 @@ export class Game {
     this.player = new Player(this.scene.world);
     this.cameraRig.setLevel(level.width, level.start.y + 1);
     this.lantern.visible = level.biome.playerLight;
+    this.sound.playMusic(level.biome.id);
   }
 
   private resetCheckpoints() {
@@ -135,12 +146,14 @@ export class Game {
     this.state = 'respawning';
     this.stateTimer = FADE_TIME;
     this.overlay.setFade(true, kind);
+    this.sound.play(kind);
   }
 
   private win() {
     this.state = 'won';
     const best = this.progress.best(this.level.name);
     const record = this.progress.finish(this.index, this.level.name, this.playTime);
+    this.sound.play('win');
     this.overlay.showWin(this.index, this.playTime, best, record);
   }
 
@@ -151,6 +164,7 @@ export class Game {
       ? { left: this.input.left, right: this.input.right, jumpHeld: this.input.jumpHeld, jumpPressed }
       : NO_INPUT;
     this.player.update(dt, input);
+    if (this.player.jumped) this.sound.play('jump');
     this.scene.update(dt);
 
     const { pos } = this.player;
@@ -163,6 +177,7 @@ export class Game {
           cp.activate();
           this.spawnPoint = cp.at;
           this.overlay.toast('Checkpoint ✔');
+          this.sound.play('checkpoint');
         }
         if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');

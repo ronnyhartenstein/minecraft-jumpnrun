@@ -49,6 +49,8 @@ export class Player {
   readonly prevPos = new THREE.Vector2();
   readonly vel = new THREE.Vector2();
   onGround = false;
+  /** Ist Steve in diesem Schritt abgesprungen? (für den Sound) */
+  jumped = false;
   /** Der Block, auf dem Steve zuletzt gelandet ist. */
   ground: BlockId | null = null;
   facing: 1 | -1 = 1;
@@ -70,6 +72,7 @@ export class Player {
 
   update(dt: number, input: PlayerInput): void {
     this.prevPos.copy(this.pos);
+    this.jumped = false;
     this.walk(dt, input);
     this.jump(dt, input);
 
@@ -111,6 +114,7 @@ export class Player {
       this.coyote = 0;
       this.jumpCutDone = false;
       this.jumpStartY = this.pos.y;
+      this.jumped = true;
     }
     // Variable Sprunghöhe: kurz tippen = kleiner Sprung, aber nie niedriger als minJumpHeight
     const minReached = this.pos.y - this.jumpStartY >= PHYSICS.minJumpHeight;

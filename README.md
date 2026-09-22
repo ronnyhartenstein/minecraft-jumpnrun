@@ -13,6 +13,7 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 | R | Level neu starten |
 | Esc | Levelauswahl |
 | Enter | Nach dem Ziel: nächstes Level |
+| M | Ton an/aus |
 
 ## Level
 
