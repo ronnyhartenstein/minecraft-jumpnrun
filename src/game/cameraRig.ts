@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 
-const DISTANCE = 14;
+/** Normaler Abstand der Kamera zur Spielebene. */
+export const BASE_DISTANCE = 14;
+/** So viele Blöcke breit soll man mindestens sehen. Hochkant auf dem Handy zoomt die Kamera dafür weiter heraus. */
+const MIN_VIEW_WIDTH = 12;
 const HEIGHT = 2.5;
 const LOOK_AHEAD = 2;
 /** Die Kamera schaut etwas über Steve, damit mehr Himmel und weniger Erde zu sehen ist. */
@@ -40,9 +43,15 @@ export class CameraRig {
     this.apply();
   }
 
+  /** Abstand der Kamera: normal, oder weiter weg, wenn der Bildschirm schmal ist. */
+  get distance(): number {
+    const tan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    return Math.max(BASE_DISTANCE, MIN_VIEW_WIDTH / 2 / (tan * this.camera.aspect));
+  }
+
   /** Halbe sichtbare Breite auf der Spielebene. */
   private halfViewWidth(): number {
-    return Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * DISTANCE * this.camera.aspect;
+    return Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.distance * this.camera.aspect;
   }
 
   private clampX(x: number): number {
@@ -53,7 +62,7 @@ export class CameraRig {
 
   private apply() {
     this.focus.set(this.x, this.y, 0);
-    this.camera.position.set(this.x, this.y + HEIGHT, DISTANCE);
+    this.camera.position.set(this.x, this.y + HEIGHT, this.distance);
     this.camera.lookAt(this.x, this.y, 0);
   }
 }

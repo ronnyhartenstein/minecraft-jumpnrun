@@ -8,6 +8,8 @@ export interface Stage {
   camera: THREE.PerspectiveCamera;
   /** Stellt Himmel, Nebel und Licht auf ein Biom ein. */
   applyBiome(biome: Biome): void;
+  /** Rückt den Nebel nach hinten, wenn die Kamera weiter weg ist (z. B. hochkant auf dem Handy). */
+  setFogOffset(extra: number): void;
   /** Setzt Sonne und Schattenbereich auf die Stelle, an der gerade gespielt wird. */
   followSun(target: THREE.Vector3): void;
 }
@@ -23,6 +25,7 @@ export function createStage(container: HTMLElement): Stage {
   const scene = new THREE.Scene();
   const fog = new THREE.Fog('#ffffff', 30, 85);
   scene.fog = fog;
+  let fogBase = { near: 30, far: 85 };
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
 
@@ -54,6 +57,7 @@ export function createStage(container: HTMLElement): Stage {
       (scene.background as THREE.Texture | null)?.dispose();
       scene.background = skyGradient(biome.sky);
       fog.color.set(biome.fog.color);
+      fogBase = biome.fog;
       fog.near = biome.fog.near;
       fog.far = biome.fog.far;
       ambient.color.set(biome.ambient.sky);
@@ -64,6 +68,10 @@ export function createStage(container: HTMLElement): Stage {
         sun.color.set(biome.sun.color);
         sun.intensity = biome.sun.intensity;
       }
+    },
+    setFogOffset(extra) {
+      fog.near = fogBase.near + extra;
+      fog.far = fogBase.far + extra;
     },
     followSun(target) {
       sun.target.position.copy(target);

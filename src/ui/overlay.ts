@@ -28,7 +28,6 @@ export class Overlay {
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
   private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
-  private readonly rotateHint = el('div', 'rotate-hint', '<span>📱↻</span>Bitte das Handy quer halten');
 
   constructor(parent: HTMLElement, private readonly levels: Level[], private readonly actions: OverlayActions) {
     this.soundButton.type = 'button';
@@ -44,7 +43,7 @@ export class Overlay {
     });
     parent.append(
       this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl,
-      this.win, this.menuPanel, this.soundButton, this.menuButton, this.rotateHint,
+      this.win, this.menuPanel, this.soundButton, this.menuButton,
     );
   }
 

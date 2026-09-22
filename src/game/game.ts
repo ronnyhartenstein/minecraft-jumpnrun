@@ -4,7 +4,7 @@ import type { Input } from '../engine/input';
 import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
-import { CameraRig } from './cameraRig';
+import { BASE_DISTANCE, CameraRig } from './cameraRig';
 import { BLAST_RADIUS } from './enemy';
 import { BoxSteve, type Character } from './character';
 import { LevelScene } from './levelScene';
@@ -289,6 +289,7 @@ export class Game {
     });
     // Beim Herunterfallen bleibt die Kamera oben, Steve fällt aus dem Bild
     if (this.state !== 'respawning') this.cameraRig.update(dt, pos, p.facing, Math.abs(p.vel.x) > 0.5);
+    this.stage.setFogOffset(this.cameraRig.distance - BASE_DISTANCE);
     this.stage.followSun(this.cameraRig.focus);
     this.stage.renderer.render(this.stage.scene, this.stage.camera);
   }
