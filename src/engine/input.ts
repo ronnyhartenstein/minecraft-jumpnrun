@@ -1,9 +1,10 @@
-const LEFT = ['ArrowLeft', 'KeyA'];
-const RIGHT = ['ArrowRight', 'KeyD'];
-const JUMP = ['Space', 'KeyW', 'ArrowUp'];
+// Neben echten Tasten gibt es „virtuelle“ für die Touch-Buttons auf Handy und Tablet
+const LEFT = ['ArrowLeft', 'KeyA', 'TouchLeft'];
+const RIGHT = ['ArrowRight', 'KeyD', 'TouchRight'];
+const JUMP = ['Space', 'KeyW', 'ArrowUp', 'TouchJump'];
 const GAME_KEYS = new Set([...LEFT, ...RIGHT, ...JUMP, 'ArrowDown']);
 
-/** Tastatur-Eingabe. Ein Sprung-Tastendruck wird gemerkt, bis das Spiel ihn abholt. */
+/** Tastatur und Touch. Ein Sprung-Tastendruck wird gemerkt, bis das Spiel ihn abholt. */
 export class Input {
   private readonly down = new Set<string>();
   private jumpQueued = false;
@@ -46,6 +47,16 @@ export class Input {
 
   release(code: string): void {
     this.down.delete(code);
+  }
+
+  /** Virtuelle Taste an- oder ausschalten, nur bei Änderung. */
+  setVirtual(code: string, on: boolean): void {
+    if (on && !this.down.has(code)) {
+      this.onAnyInput();
+      this.press(code);
+    } else if (!on && this.down.has(code)) {
+      this.release(code);
+    }
   }
 
   /** Liefert true, wenn seit dem letzten Aufruf Springen gedrückt wurde. */

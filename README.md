@@ -15,6 +15,8 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 | Enter | Nach dem Ziel: nächstes Level |
 | M | Ton an/aus |
 
+**Auf Handy und Tablet** (quer halten): links ◀ ▶ zum Laufen, rechts ⬆ zum Springen, ☰ oben rechts öffnet die Levelauswahl. Zum Ausprobieren am Rechner `?touch` an die Adresse hängen.
+
 ## Level
 
 Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils das schwerste Level.

@@ -3,10 +3,18 @@ import { startLoop } from './engine/loop';
 import { Game } from './game/game';
 import { createStage } from './game/scene';
 import { LEVELS } from './levels';
+import { createTouchControls, isTouchDevice } from './ui/touch';
 
 const stage = createStage(document.getElementById('app')!);
 const input = new Input();
 const game = new Game(stage, input, LEVELS);
+
+if (isTouchDevice) {
+  document.body.classList.add('touch');
+  createTouchControls(document.getElementById('app')!, input);
+}
+// Safari: Zoomen per Zwei-Finger-Geste im Spiel verhindern
+document.addEventListener('gesturestart', (e) => e.preventDefault());
 
 // Direkt-Link zu einem Level, z. B. #level=2-3 oder #level=E1
 const code = /level=([\w-]+)/.exec(location.hash)?.[1];

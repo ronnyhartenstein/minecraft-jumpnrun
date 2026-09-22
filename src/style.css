@@ -1,4 +1,10 @@
-html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: #8ec5ff;
+  /* Auf dem Handy: nicht scrollen, zoomen oder Text markieren */
+  touch-action: none; overscroll-behavior: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+button { touch-action: manipulation; }
 #app { position: fixed; inset: 0; font-family: 'Press Start 2P', monospace; color: #fff; }
 #app canvas { display: block; }
 
@@ -106,14 +112,73 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
 .hud .gem { font-size: 22px; vertical-align: -3px; }
 .panel .gems { color: #7df3ff; }
 
-.sound-toggle {
-  position: absolute; top: 12px; right: 12px; width: 44px; height: 44px;
-  font-size: 22px; line-height: 1; cursor: pointer;
+.corner-button {
+  position: absolute; top: max(12px, env(safe-area-inset-top)); width: 44px; height: 44px; padding: 0;
+  font-size: 22px; line-height: 1; color: #fff; cursor: pointer;
   background: rgb(0 0 0 / 0.35); border: 2px solid rgb(255 255 255 / 0.6); border-radius: 6px;
 }
-.sound-toggle:hover { background: rgb(0 0 0 / 0.55); }
+.corner-button:hover { background: rgb(0 0 0 / 0.55); }
+.sound-toggle { right: max(12px, env(safe-area-inset-right)); }
+.menu-button { right: calc(max(12px, env(safe-area-inset-right)) + 54px); font-family: system-ui, sans-serif; }
+body[data-screen='menu'] .menu-button { display: none; }
+
+/* Touch-Steuerung, nur auf Handy und Tablet */
+.touch-controls { display: none; }
+body.touch .touch-controls { display: block; }
+body.touch[data-screen='menu'] .touch-controls,
+body.touch[data-screen='win'] .touch-controls { display: none; }
+.touch-move, .touch-jump {
+  position: absolute; bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: center;
+  font-family: system-ui, sans-serif; color: rgb(255 255 255 / 0.9); touch-action: none;
+}
+.touch-move { left: max(16px, env(safe-area-inset-left)); width: 200px; height: 96px; gap: 8px; }
+.touch-move span, .touch-jump {
+  display: flex; align-items: center; justify-content: center;
+  background: rgb(0 0 0 / 0.3); border: 3px solid rgb(255 255 255 / 0.5); border-radius: 14px;
+}
+.touch-move span { flex: 1; height: 100%; font-size: 36px; }
+.touch-jump { right: max(16px, env(safe-area-inset-right)); width: 104px; height: 104px; border-radius: 50%; font-size: 44px; }
+.touch-move span.active, .touch-jump.active { background: rgb(255 255 255 / 0.35); }
+/* Auf dem Handy liegt der Tastenhinweis über den Knöpfen */
+body.touch .hint { bottom: auto; top: 30%; }
+
+/* Hochkant auf dem Handy: bitte drehen */
+.rotate-hint { display: none; }
+@media (orientation: portrait) {
+  body.touch .rotate-hint {
+    position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center;
+    font-size: 16px; line-height: 1.6; background: rgb(0 0 0 / 0.75);
+  }
+  .rotate-hint span { font-family: system-ui, sans-serif; font-size: 56px; }
+}
+
+/* Menü und Level-Prüfung lassen sich auf dem Handy wischen */
+.menu, .checker { touch-action: pan-y; }
 
 .hidden { opacity: 0; pointer-events: none; }
+
+/* Kleine Bildschirme, z. B. ein Handy quer */
+@media (max-height: 500px) {
+  .menu { padding: 12px 16px; }
+  .menu h1 { font-size: 16px; margin-bottom: 8px; }
+  .menu .card { width: 100px; height: 60px; padding: 4px; }
+  .menu .card .num { font-size: 14px; }
+  .menu .card .name { font-size: 8px; }
+  .menu .card .status { font-size: 8px; line-height: 1.4; }
+  .world { gap: 6px; }
+  .world h3 { font-size: 9px; }
+  .menu .keys { margin-top: 8px; }
+  .panel { padding: 16px 24px; }
+  .panel h1 { font-size: 20px; margin-bottom: 10px; }
+  .panel p { margin-bottom: 10px; font-size: 12px; }
+  .panel .trophy { font-size: 32px; }
+  .banner { top: 12%; font-size: 20px; }
+  .hud { top: 10px; left: 10px; font-size: 12px; padding: 6px 10px; }
+  .touch-move { height: 80px; width: 180px; }
+  .touch-jump { width: 88px; height: 88px; }
+}
 
 @media (max-width: 600px) {
   .hint { font-size: 10px; }

@@ -1,5 +1,6 @@
 import type { Level } from '../levels/format';
 import type { Progress } from '../game/progress';
+import { isTouchDevice } from './touch';
 
 export interface OverlayActions {
   start(index: number): void;
@@ -16,14 +17,18 @@ export const formatTime = (seconds: number) => `${seconds.toFixed(1).replace('.'
 /** Alles, was als HTML über dem 3D-Bild liegt: Menü, Überblendung, Hinweise, Ziel-Anzeige. */
 export class Overlay {
   private readonly fade = el('div', 'fade');
-  private readonly hint = el('div', 'hint hidden', '<span class="keys">← →</span> laufen &nbsp;·&nbsp; Leertaste springen');
+  private readonly hint = el('div', 'hint hidden', isTouchDevice
+    ? 'Links <span class="keys">◀ ▶</span> laufen &nbsp;·&nbsp; rechts <span class="keys">⬆</span> springen'
+    : '<span class="keys">← →</span> laufen &nbsp;·&nbsp; Leertaste springen');
   private readonly banner = el('div', 'banner');
   private readonly toastEl = el('div', 'toast');
   private readonly hud = el('div', 'hud hidden');
   private readonly warningBox = el('div', 'warnings hidden');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
-  private readonly soundButton = el('button', 'sound-toggle') as HTMLButtonElement;
+  private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
+  private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
+  private readonly rotateHint = el('div', 'rotate-hint', '<span>📱↻</span>Bitte das Handy quer halten');
 
   constructor(parent: HTMLElement, private readonly levels: Level[], private readonly actions: OverlayActions) {
     this.soundButton.type = 'button';
@@ -31,7 +36,16 @@ export class Overlay {
       this.soundButton.blur();
       actions.toggleSound();
     });
-    parent.append(this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
+    this.menuButton.type = 'button';
+    this.menuButton.title = 'Levelauswahl (Esc)';
+    this.menuButton.addEventListener('click', () => {
+      this.menuButton.blur();
+      actions.menu();
+    });
+    parent.append(
+      this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl,
+      this.win, this.menuPanel, this.soundButton, this.menuButton, this.rotateHint,
+    );
   }
 
   setSoundIcon(muted: boolean): void {
@@ -48,7 +62,13 @@ export class Overlay {
   }
 
   /** Beim Start eines Levels: Titel einblenden, Tastenhinweis nur im ersten Level. */
+  /** Welcher Bildschirm gerade zu sehen ist; danach richten sich z. B. die Touch-Knöpfe. */
+  private setScreen(screen: 'menu' | 'play' | 'win') {
+    document.body.dataset.screen = screen;
+  }
+
   levelStarted(index: number): void {
+    this.setScreen('play');
     this.win.classList.add('hidden');
     this.menuPanel.classList.add('hidden');
     this.hint.classList.toggle('hidden', index > 0);
@@ -109,6 +129,7 @@ export class Overlay {
         <button type="button" data-action="menu">Levelauswahl <small>(Esc)</small></button>
       </div>`;
     this.bindButtons(this.win);
+    this.setScreen('win');
     this.hint.classList.add('hidden');
     this.warningBox.classList.add('hidden');
     this.win.classList.remove('hidden');
@@ -147,6 +168,7 @@ export class Overlay {
       <h1>Minecraft Jump 'n' Run</h1>
       <div class="worlds">${columns.join('')}</div>
       <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
+    this.setScreen('menu');
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();

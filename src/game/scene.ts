@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { Biome } from '../levels/biomes';
+import { isTouchDevice } from '../ui/touch';
 
 export interface Stage {
   renderer: THREE.WebGLRenderer;
@@ -13,7 +14,8 @@ export interface Stage {
 
 export function createStage(container: HTMLElement): Stage {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Handys und Tablets schonen: etwas geringere Auflösung und kleinere Schatten
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouchDevice ? 1.5 : 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
@@ -28,7 +30,7 @@ export function createStage(container: HTMLElement): Stage {
   scene.add(ambient);
 
   const sun = new THREE.DirectionalLight();
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.setScalar(isTouchDevice ? 1024 : 2048);
   sun.shadow.bias = -0.0005;
   sun.shadow.normalBias = 0.02;
   Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 18, bottom: -18, near: 1, far: 80 });
