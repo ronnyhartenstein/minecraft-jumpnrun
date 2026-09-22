@@ -1,0 +1,3 @@
+html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; }
