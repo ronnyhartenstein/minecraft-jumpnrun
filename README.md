@@ -32,7 +32,7 @@ In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige 
 Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
 Direkt zu einem Level springen: `#level=3` an die Adresse anhängen.
 
-Die Level sind Text-Raster in `src/levels/`. Welches Zeichen welcher Block ist, steht in `src/levels/format.ts`.
+**Eigene Level bauen:** Die Level sind einfache Textdateien im Ordner `levels/`. Eigene Level kommen nach `levels/eigene/` und erscheinen automatisch im Menü unter „Eigene Level“. Die Anleitung mit allen Zeichen steht in [LEVELS.md](LEVELS.md).
 
 ## Entwickeln
 
@@ -59,6 +59,7 @@ src/
   engine/    Game-Loop, Tastatur
   game/      Szene, Welt, Steve, Spieler-Physik, Kamera, Partikel
   ui/        Menü, Hinweise, Ziel-Anzeige
-  levels/    Level als Text-Raster und Biome
+  levels/    Level-Format, Biome, Laden der Level-Dateien
   textures/  Pixel-Texturen, im Code erzeugt
+levels/      Die Level als Textdateien, eigene Level in levels/eigene/
 ```

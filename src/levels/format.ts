@@ -3,6 +3,7 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
 
 /**
  * Level-Format: ein Text-Raster, eine Zeile = eine Blockreihe, oben ist oben.
+ * Die Level liegen als Textdateien im Ordner `levels/`, die Anleitung dazu steht in LEVELS.md.
  *
  *   .  Luft
  *   G  Boden oben   (je nach Biom: Gras, Sand, Schneegras, Stein, Netherrack)
@@ -58,6 +59,10 @@ export interface EnemySpawn extends Point {
 
 export interface Level {
   name: string;
+  /** Selbst gebautes Level aus `levels/eigene/`: immer spielbar, eigene Reihe im Menü. */
+  custom: boolean;
+  /** Hinweise auf Fehler im Level, die im Spiel angezeigt werden. */
+  warnings: string[];
   biome: Biome;
   width: number;
   height: number;
@@ -72,11 +77,53 @@ export interface Level {
   torches: Point[];
 }
 
-export function parseLevel(name: string, biomeId: BiomeId, text: string): Level {
+/** Biom-Namen, wie man sie in eine Level-Datei schreiben kann. */
+const BIOME_NAMES: Record<string, BiomeId> = {
+  wiese: 'meadow',
+  wüste: 'desert',
+  wueste: 'desert',
+  höhle: 'cave',
+  hoehle: 'cave',
+  schnee: 'snow',
+  schneeberge: 'snow',
+  nether: 'nether',
+};
+
+/**
+ * Liest eine Level-Datei: oben ein paar Zeilen wie `Name: Die Wiese` und `Biom: Wiese`,
+ * nach einer Leerzeile das Raster.
+ */
+export function parseLevelFile(fileText: string, fileName: string, custom: boolean): Level {
+  const lines = fileText.replace(/\r/g, '').split('\n');
+  const header: Record<string, string> = {};
+  let i = 0;
+  for (; i < lines.length; i++) {
+    const match = /^\s*([A-Za-zÄÖÜäöüß]+)\s*:\s*(.*)$/.exec(lines[i]);
+    if (!match) break;
+    header[match[1].toLowerCase()] = match[2].trim();
+  }
+  const warnings: string[] = [];
+  const name = header.name || fileName.replace(/\.txt$/, '');
+  const biomeName = (header.biom ?? 'wiese').toLowerCase();
+  const biome = BIOME_NAMES[biomeName];
+  if (!biome) warnings.push(`Unbekanntes Biom „${header.biom}“. Erlaubt sind: Wiese, Wüste, Höhle, Schnee, Nether.`);
+  const level = parseLevel(name, biome ?? 'meadow', lines.slice(i).join('\n'), { custom, firstLine: i + 1 });
+  level.warnings.unshift(...warnings);
+  return level;
+}
+
+export function parseLevel(
+  name: string,
+  biomeId: BiomeId,
+  text: string,
+  { custom = false, firstLine = 1 }: { custom?: boolean; firstLine?: number } = {},
+): Level {
   const biome = BIOMES[biomeId];
   const raw = text.split('\n').map((line) => line.trimEnd());
   // Leere Zeilen am Anfang und Ende ignorieren
-  const lines = raw.slice(raw.findIndex((l) => l !== ''), raw.findLastIndex((l) => l !== '') + 1);
+  const skipped = raw.findIndex((l) => l !== '');
+  const lines = raw.slice(skipped, raw.findLastIndex((l) => l !== '') + 1);
+  const warnings: string[] = [];
 
   const height = lines.length;
   const width = Math.max(...lines.map((l) => l.length));
@@ -102,10 +149,15 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
       else if (ch === 's') enemies.push({ kind: 'slime', x, y });
       else if (ch === 't') deco.push({ x, y });
       else if (ch === 'f') torches.push({ x, y });
-      else if (ch !== '.' && ch !== ' ') console.warn(`Level "${name}": unbekanntes Zeichen "${ch}" bei ${x},${y}`);
+      else if (ch !== '.' && ch !== ' ') {
+        warnings.push(`Zeile ${firstLine + skipped + row}, Spalte ${x + 1}: unbekanntes Zeichen „${ch}“`);
+      }
     });
   });
 
   checkpoints.sort((a, b) => a.x - b.x);
-  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, enemies, deco, torches };
+  if (!start) warnings.push('Kein Start „S“ gefunden – Steve startet oben links.');
+  if (!goal) warnings.push('Keine Ziel-Fahne „Z“ gefunden – das Level kann man nicht schaffen.');
+  for (const w of warnings) console.warn(`Level „${name}“: ${w}`);
+  return { name, custom, warnings, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, enemies, deco, torches };
 }

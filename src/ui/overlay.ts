@@ -20,6 +20,7 @@ export class Overlay {
   private readonly banner = el('div', 'banner');
   private readonly toastEl = el('div', 'toast');
   private readonly hud = el('div', 'hud hidden');
+  private readonly warningBox = el('div', 'warnings hidden');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly soundButton = el('button', 'sound-toggle') as HTMLButtonElement;
@@ -30,7 +31,7 @@ export class Overlay {
       this.soundButton.blur();
       actions.toggleSound();
     });
-    parent.append(this.fade, this.hud, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
+    parent.append(this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
   }
 
   setSoundIcon(muted: boolean): void {
@@ -52,8 +53,18 @@ export class Overlay {
     this.menuPanel.classList.add('hidden');
     this.hint.classList.toggle('hidden', index > 0);
     this.setFade(false);
-    this.banner.innerHTML = `<small>Level ${index + 1}</small>${this.levels[index].name}`;
+    const level = this.levels[index];
+    this.banner.innerHTML = `<small>${level.custom ? 'Eigenes Level' : `Level ${index + 1}`}</small>${level.name}`;
     restartAnimation(this.banner, 'show');
+    this.showWarnings(level.warnings);
+  }
+
+  /** Fehler im Level gut sichtbar anzeigen, damit man sie beim Level-Bauen sofort findet. */
+  private showWarnings(warnings: string[]) {
+    this.warningBox.classList.toggle('hidden', warnings.length === 0);
+    const shown = warnings.slice(0, 5).map((w) => `<li>${escapeHtml(w)}</li>`).join('');
+    const more = warnings.length > 5 ? `<li>… und ${warnings.length - 5} weitere</li>` : '';
+    this.warningBox.innerHTML = `<strong>⚠ Im Level stimmt etwas nicht:</strong><ul>${shown}${more}</ul>`;
   }
 
   /** Diamanten-Zähler oben links, `null` blendet ihn aus. */
@@ -73,8 +84,9 @@ export class Overlay {
     restartAnimation(this.toastEl, 'show');
   }
 
-  showWin(index: number, seconds: number, best: number | undefined, record: boolean, diamonds: number, total: number): void {
-    const last = index === this.levels.length - 1;
+  showWin(index: number, seconds: number, best: number | undefined, record: boolean, diamonds: number, total: number, hasNext: boolean): void {
+    // Pokal nach der letzten Welt, nicht nach eigenen Leveln
+    const last = !hasNext && !this.levels[index].custom;
     const gems = total === 0 ? '' : diamonds === total
       ? `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total} &nbsp;Alle gefunden! ⭐</p>`
       : `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total}</p>`;
@@ -85,18 +97,20 @@ export class Overlay {
       ${gems}
       <p class="best">${record ? '⭐ Neue Bestzeit! ⭐' : best !== undefined ? `Bestzeit: ${formatTime(best)}` : ''}</p>
       <div class="buttons">
-        ${last ? '' : '<button type="button" data-action="next" class="primary">Weiter <small>(Enter)</small></button>'}
+        ${hasNext ? '<button type="button" data-action="next" class="primary">Weiter <small>(Enter)</small></button>' : ''}
         <button type="button" data-action="restart">Nochmal <small>(R)</small></button>
         <button type="button" data-action="menu">Levelauswahl <small>(Esc)</small></button>
       </div>`;
     this.bindButtons(this.win);
     this.hint.classList.add('hidden');
+    this.warningBox.classList.add('hidden');
     this.win.classList.remove('hidden');
   }
 
   showMenu(progress: Progress): void {
-    const cards = this.levels.map((level, i) => {
-      const locked = !progress.isUnlocked(i);
+    const firstOwn = this.levels.findIndex((l) => l.custom);
+    const card = (level: Level, i: number) => {
+      const locked = !level.custom && !progress.isUnlocked(i);
       const best = progress.best(level.name);
       const total = level.diamonds.length;
       const found = progress.diamonds(level.name);
@@ -106,15 +120,19 @@ export class Overlay {
         : best !== undefined ? `⏱ ${formatTime(best)}<br>${gems}` : 'Neu!';
       return `
         <button type="button" class="card" data-level="${i}" ${locked ? 'disabled' : ''} style="--biome: ${level.biome.color}">
-          <span class="num">${i + 1}</span>
-          <span class="name">${level.name}</span>
+          <span class="num">${level.custom ? `E${i - firstOwn + 1}` : i + 1}</span>
+          <span class="name">${escapeHtml(level.name)}</span>
           <span class="status">${status}</span>
         </button>`;
-    });
+    };
+    const cards = this.levels.map(card);
+    const worlds = cards.filter((_, i) => !this.levels[i].custom);
+    const own = cards.filter((_, i) => this.levels[i].custom);
     this.menuPanel.innerHTML = `
       <h1>Minecraft<br>Jump 'n' Run</h1>
-      <div class="cards">${cards.join('')}</div>
-      <p class="keys">Level anklicken oder Taste 1–${this.levels.length}</p>`;
+      <div class="cards">${worlds.join('')}</div>
+      <p class="keys">Level anklicken oder Taste 1–${worlds.length}</p>
+      ${own.length ? `<h2>Eigene Level</h2><div class="cards">${own.join('')}</div>` : ''}`;
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();
@@ -124,6 +142,7 @@ export class Overlay {
     this.win.classList.add('hidden');
     this.hint.classList.add('hidden');
     this.hud.classList.add('hidden');
+    this.warningBox.classList.add('hidden');
     this.banner.classList.remove('show');
     this.setFade(false);
     this.menuPanel.classList.remove('hidden');
@@ -137,6 +156,10 @@ export class Overlay {
       });
     });
   }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 }
 
 function restartAnimation(node: HTMLElement, className: string) {

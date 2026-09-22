@@ -68,8 +68,10 @@ export class Game {
     return this.levels[this.index];
   }
 
+  /** Weiter geht es nur innerhalb der Welten bzw. innerhalb der eigenen Level. */
   private get hasNext(): boolean {
-    return this.index + 1 < this.levels.length;
+    const next = this.levels[this.index + 1];
+    return next !== undefined && next.custom === this.level.custom;
   }
 
   private bindKeys() {
@@ -81,7 +83,8 @@ export class Game {
       if (this.state === 'won') this.hasNext ? this.next() : this.restart();
       else if (this.state === 'menu') this.start(this.firstOpenLevel());
     });
-    this.levels.forEach((_, i) => {
+    this.levels.forEach((level, i) => {
+      if (level.custom || i > 8) return;
       input.onKey(`Digit${i + 1}`, () => this.state === 'menu' && this.progress.isUnlocked(i) && this.start(i));
     });
   }
@@ -170,7 +173,7 @@ export class Game {
     const best = this.progress.best(this.level.name);
     const record = this.progress.finish(this.index, this.level.name, this.playTime, this.diamonds);
     this.sound.play('win');
-    this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length);
+    this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length, this.hasNext);
   }
 
   /**
