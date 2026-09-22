@@ -7,7 +7,6 @@ import level from './levels/wiese';
 const stage = createStage(document.getElementById('app')!);
 const input = new Input();
 const game = new Game(stage, input, level);
-input.onKey('KeyR', () => game.restart());
 
 startLoop(
   (dt) => game.update(dt),
