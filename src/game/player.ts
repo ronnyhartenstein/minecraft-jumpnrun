@@ -28,6 +28,8 @@ export const PHYSICS = {
   iceDecel: 3,
   /** Auf Seelensand läuft Steve langsamer. */
   soulSandSpeed: 0.45,
+  /** So stark federt Steve nach dem Draufspringen auf einen Gegner ab. */
+  stompBounce: 10,
 };
 
 export interface PlayerInput {
@@ -87,6 +89,12 @@ export class Player {
       this.moveX(dx / steps);
       this.moveY(dy / steps);
     }
+  }
+
+  /** Abfedern nach dem Draufspringen auf einen Gegner. */
+  bounce(): void {
+    this.vel.y = PHYSICS.stompBounce;
+    this.jumpCutDone = true;
   }
 
   private walk(dt: number, input: PlayerInput) {

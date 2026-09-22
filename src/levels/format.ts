@@ -17,6 +17,9 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   Z  Ziel-Fahne
  *   X  Checkpoint (nach einem Sturz geht es hier weiter)
  *   *  Diamant zum Einsammeln
+ *   c  Creeper (läuft hin und her)
+ *   s  Slime (hüpft, im Nether ein Magmawürfel)
+ *      Gegner besiegt man, indem man von oben draufspringt.
  *   t  Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Stalagmit, …)
  *   f  Fackel (leuchtet, nur Deko)
  *
@@ -49,6 +52,10 @@ export interface Point {
   y: number;
 }
 
+export interface EnemySpawn extends Point {
+  kind: 'creeper' | 'slime';
+}
+
 export interface Level {
   name: string;
   biome: Biome;
@@ -60,6 +67,7 @@ export interface Level {
   goal: Point | null;
   checkpoints: Point[];
   diamonds: Point[];
+  enemies: EnemySpawn[];
   deco: Point[];
   torches: Point[];
 }
@@ -79,6 +87,7 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
   const checkpoints: Point[] = [];
   const torches: Point[] = [];
   const diamonds: Point[] = [];
+  const enemies: EnemySpawn[] = [];
   const chars: Record<string, BlockId> = { ...BLOCK_CHARS, G: biome.surface, D: biome.subsoil };
 
   lines.forEach((line, row) => {
@@ -89,6 +98,8 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
       else if (ch === 'Z') goal = { x, y };
       else if (ch === 'X') checkpoints.push({ x, y });
       else if (ch === '*') diamonds.push({ x, y });
+      else if (ch === 'c') enemies.push({ kind: 'creeper', x, y });
+      else if (ch === 's') enemies.push({ kind: 'slime', x, y });
       else if (ch === 't') deco.push({ x, y });
       else if (ch === 'f') torches.push({ x, y });
       else if (ch !== '.' && ch !== ' ') console.warn(`Level "${name}": unbekanntes Zeichen "${ch}" bei ${x},${y}`);
@@ -96,5 +107,5 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
   });
 
   checkpoints.sort((a, b) => a.x - b.x);
-  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, deco, torches };
+  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, enemies, deco, torches };
 }

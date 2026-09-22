@@ -11,7 +11,7 @@ export default parseLevel('Die Höhle', 'cave', `
 .................................................................................###...##
 ................*..........*.....*...................................*...........................*........tf..t.X..f.........t
 .*...........................................................................*...........................GGGGGGGGGGGG3G...GGGGGG
-...S..f..t......#.....t.f...........tf.....................X..tf........t..........t.f..................GDDDDDDDDDDDDDD...DDDDDDG....ft...........t...f....Z...t
+...S..f..t......#.....t.f...........tfs....................X..tf.c......t..........t.f..................GDDDDDDDDDDDDDD...DDDDDDG....fts..........tc..f....Z...t
 GGGGGGG3GGGGGGG1G11GGGGGG2G~~1GG~~~GGGGGG........*.......GGGGGGGGGGGG..11G..PPPPGGGGGGGGGGG~~GGG~~~GG~~GDDDDDDDDD2DDDDD...D1DD1DDGGGGG2GGG~~GG11GGGGG3GGGGGGGGGGGG
 D1DD2DDDDDDDDDDDDDDDDDD1D1D~~DDD~~~DDDDDD....*..........1DD2DDDDDDDDD..DDD......DDDDDDDDDDD~~DDD~~~D3~~DDDDDDDDDDDDDDDD...DDDDDDDD2DDD1DDD~~DDDDDDDD31DD4DDDDD1DD2
 D2DDD1DDDDDDD2D1D2DDDDDDDDD~~DDD~~~DDDDDD...f.t........GDD1DDD2DDDDDD..DDD......DD2DDDDDD1D~~DDD~~~D2~~DDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDD~~DDDD1DDDD11DDDDDDDD3DD

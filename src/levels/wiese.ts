@@ -9,7 +9,7 @@ export default parseLevel('Die Wiese', 'meadow', `
 .................*............................................*......................*................................*
 ..........*......................................................................................*
 .*....*...................C........t...............##......................C.............................GGG
-...S...t..#...t........t..C....GGGGGGGGG.......P..####...t...PPP....t..C...C....t.............t.HH..t.GGGDDDGGG...t.......t..Z...t
+...S...t..#...t.......st..C....GGGGGGGGG.......P..####...t...PPP....t..C...C...st.............t.HH..t.GGGDDDGGG...t.......t..Z...t
 GGGGGGGGGGGGGGGGG..GGGGGGGGGGGGDDDDDDDDDGG...GGGGGGGGGGGGGGG.....GGGGGGGGGGGGGGGGGGG..GGG..GGGGGGGGGGGDDDDDDDDDGGGGGG..GGGGGGGGGGGGG
 DDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD.....DDDDDDDDDDDDDDDDDDD..DDD..DDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDD
 DDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD.....DDDDDDDDDDDDDDDDDDD..DDD..DDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDD

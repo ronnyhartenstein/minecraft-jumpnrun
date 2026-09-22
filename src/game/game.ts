@@ -15,6 +15,8 @@ import type { Stage } from './scene';
 const FALL_LIMIT = -4;
 /** Dauer der Abblende beim Respawn, passend zur CSS-Transition. */
 const FADE_TIME = 0.3;
+/** So lange können Gegner Steve nach einem Neustart nichts anhaben. */
+const INVULNERABLE_TIME = 1.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
@@ -38,6 +40,7 @@ export class Game {
   private spawnPoint: Point = { x: 0, y: 0 };
   /** Gesammelte Diamanten bleiben nach einem Sturz erhalten, erst ein Neustart setzt sie zurück. */
   private diamonds = 0;
+  private invulnerable = 0;
 
   constructor(
     private readonly stage: Stage,
@@ -137,6 +140,7 @@ export class Game {
     this.spawnPoint = this.level.start;
     for (const cp of this.scene!.checkpoints) cp.reset();
     for (const d of this.scene!.diamonds) d.reset();
+    for (const e of this.scene!.enemies) e.reset();
     this.diamonds = 0;
     this.updateHud();
   }
@@ -147,6 +151,7 @@ export class Game {
   }
 
   private respawn() {
+    this.invulnerable = 0;
     this.player.spawn(this.spawnPoint);
     this.cameraRig.snap(this.player.pos);
     this.input.consumeJump();
@@ -165,6 +170,26 @@ export class Game {
     const record = this.progress.finish(this.index, this.level.name, this.playTime, this.diamonds);
     this.sound.play('win');
     this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length);
+  }
+
+  /** Von oben draufspringen besiegt einen Gegner, seitlich berühren heißt Neustart. */
+  private checkEnemies() {
+    const p = this.player;
+    for (const e of this.scene!.enemies) {
+      if (!e.alive) continue;
+      const overlaps = p.pos.x + 0.3 > e.pos.x - e.halfWidth && p.pos.x - 0.3 < e.pos.x + e.halfWidth
+        && p.pos.y + 1.8 > e.pos.y && p.pos.y < e.pos.y + e.height;
+      if (!overlaps) continue;
+      const fromAbove = p.vel.y < 0 && p.prevPos.y >= e.pos.y + e.height * 0.5;
+      if (fromAbove) {
+        e.stomp();
+        p.bounce();
+        this.sound.play('stomp');
+      } else if (this.invulnerable <= 0) {
+        this.die('hurt');
+        return;
+      }
+    }
   }
 
   update(dt: number): void {
@@ -197,6 +222,9 @@ export class Game {
           this.overlay.bumpDiamonds();
           this.sound.play('diamond');
         }
+        this.invulnerable -= dt;
+        this.checkEnemies();
+        if (this.state !== 'playing') break;
         if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');
         else if (this.scene.goal?.reached(pos.x)) this.win();
@@ -205,6 +233,7 @@ export class Game {
         this.stateTimer -= dt;
         if (this.stateTimer <= 0) {
           this.respawn();
+          this.invulnerable = INVULNERABLE_TIME;
           this.overlay.setFade(false);
           this.state = 'playing';
         }
@@ -218,6 +247,8 @@ export class Game {
     const p = this.player;
     const pos = p.prevPos.clone().lerp(p.pos, alpha);
     this.character.object.position.set(pos.x, pos.y, 0);
+    // Nach dem Neustart kurz blinken, solange Steve unverwundbar ist
+    this.character.object.visible = this.state !== 'playing' || this.invulnerable <= 0 || Math.floor(this.invulnerable * 10) % 2 === 0;
     this.character.update(dt, {
       speed: Math.abs(p.vel.x),
       maxSpeed: PHYSICS.maxSpeed,

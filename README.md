@@ -25,6 +25,8 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 | 4 | Die Schneeberge | Rutschiges Eis, viel Klettern |
 | 5 | Der Nether | Seelensand, Lavameer, Nether-Festung |
 
+Creeper und Slimes (im Nether Magmawürfel) laufen oder hüpfen herum. Von oben draufspringen besiegt sie, seitlich berühren heißt zurück zum Checkpoint.
+
 In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen, und einer ist gut versteckt.
 
 Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
