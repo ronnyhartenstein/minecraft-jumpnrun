@@ -35,8 +35,10 @@ export class Game {
     private readonly input: Input,
     private readonly level: Level,
   ) {
+    stage.applyBiome(level.biome);
     this.world = new World(level);
     this.clouds = new Clouds(level.width, level.height);
+    this.clouds.object.visible = level.biome.clouds;
     this.player = new Player(this.world);
     this.cameraRig = new CameraRig(stage.camera, level.width, level.start.y + 1);
     this.goal = level.goal ? new GoalFlag(level.goal) : null;

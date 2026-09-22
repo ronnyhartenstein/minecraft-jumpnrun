@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-
-const SKY_TOP = '#5fa8ff';
-const SKY_HORIZON = '#cfe7ff';
+import type { Biome } from '../levels/biomes';
 
 export interface Stage {
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
+  /** Stellt Himmel, Nebel und Licht auf ein Biom ein. */
+  applyBiome(biome: Biome): void;
   /** Setzt Sonne und Schattenbereich auf die Stelle, an der gerade gespielt wird. */
   followSun(target: THREE.Vector3): void;
 }
@@ -19,15 +19,15 @@ export function createStage(container: HTMLElement): Stage {
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = skyGradient();
-  scene.fog = new THREE.Fog(SKY_HORIZON, 30, 85);
+  const fog = new THREE.Fog('#ffffff', 30, 85);
+  scene.fog = fog;
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
 
-  scene.add(new THREE.HemisphereLight('#dcefff', '#7a6440', 1.4));
+  const ambient = new THREE.HemisphereLight();
+  scene.add(ambient);
 
-  const sun = new THREE.DirectionalLight('#fff3dc', 2.4);
-  sun.castShadow = true;
+  const sun = new THREE.DirectionalLight();
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.bias = -0.0005;
   sun.shadow.normalBias = 0.02;
@@ -41,13 +41,28 @@ export function createStage(container: HTMLElement): Stage {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
-  window.addEventListener('resize', resize);
+  new ResizeObserver(resize).observe(container);
   resize();
 
   return {
     renderer,
     scene,
     camera,
+    applyBiome(biome) {
+      (scene.background as THREE.Texture | null)?.dispose();
+      scene.background = skyGradient(biome.sky);
+      fog.color.set(biome.fog.color);
+      fog.near = biome.fog.near;
+      fog.far = biome.fog.far;
+      ambient.color.set(biome.ambient.sky);
+      ambient.groundColor.set(biome.ambient.ground);
+      ambient.intensity = biome.ambient.intensity;
+      sun.visible = sun.castShadow = biome.sun !== null;
+      if (biome.sun) {
+        sun.color.set(biome.sun.color);
+        sun.intensity = biome.sun.intensity;
+      }
+    },
     followSun(target) {
       sun.target.position.copy(target);
       sun.position.copy(target).add(sunOffset);
@@ -55,15 +70,15 @@ export function createStage(container: HTMLElement): Stage {
   };
 }
 
-function skyGradient(): THREE.CanvasTexture {
+function skyGradient([top, horizon, bottom]: [string, string, string]): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = 2;
   canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
   const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-  gradient.addColorStop(0, SKY_TOP);
-  gradient.addColorStop(0.75, SKY_HORIZON);
-  gradient.addColorStop(1, '#eef6ff');
+  gradient.addColorStop(0, top);
+  gradient.addColorStop(0.75, horizon);
+  gradient.addColorStop(1, bottom);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 2, 256);
   const texture = new THREE.CanvasTexture(canvas);
