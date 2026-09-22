@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Level } from '../levels/format';
 import { Checkpoint } from './checkpoint';
 import { Clouds } from './clouds';
+import { Diamond } from './diamond';
 import { GoalFlag } from './goal';
 import { lavaSparks, netherAsh, Particles, snowfall } from './particles';
 import { World } from './world';
@@ -12,6 +13,7 @@ export class LevelScene {
   readonly world: World;
   readonly goal: GoalFlag | null;
   readonly checkpoints: Checkpoint[];
+  readonly diamonds: Diamond[];
   private readonly clouds: Clouds | null;
   private readonly particles: Particles[] = [];
 
@@ -29,6 +31,9 @@ export class LevelScene {
     this.checkpoints = level.checkpoints.map((at) => new Checkpoint(at));
     for (const cp of this.checkpoints) this.object.add(cp.object);
 
+    this.diamonds = level.diamonds.map((at) => new Diamond(at));
+    for (const d of this.diamonds) this.object.add(d.object);
+
     if (this.world.lavaSurfaces.size > 0) this.particles.push(lavaSparks(this.world.lavaSurfaces, focus));
     if (level.biome.particles === 'snow') this.particles.push(snowfall(focus));
     if (level.biome.particles === 'ash') this.particles.push(netherAsh(focus));
@@ -39,6 +44,7 @@ export class LevelScene {
     this.clouds?.update(dt);
     this.goal?.update(dt);
     for (const cp of this.checkpoints) cp.update(dt);
+    for (const d of this.diamonds) d.update(dt);
     for (const p of this.particles) p.update(dt);
   }
 

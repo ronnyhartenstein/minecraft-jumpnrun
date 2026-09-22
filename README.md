@@ -25,7 +25,9 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 | 4 | Die Schneeberge | Rutschiges Eis, viel Klettern |
 | 5 | Der Nether | Seelensand, Lavameer, Nether-Festung |
 
-Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten merkt sich der Browser.
+In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen, und einer ist gut versteckt.
+
+Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
 Direkt zu einem Level springen: `#level=3` an die Adresse anhängen.
 
 Die Level sind Text-Raster in `src/levels/`. Welches Zeichen welcher Block ist, steht in `src/levels/format.ts`.

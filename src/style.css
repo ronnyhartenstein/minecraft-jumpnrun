@@ -69,9 +69,21 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
 }
 .card .num { font-size: 32px; }
 .card .name { font-size: 11px; line-height: 1.5; }
-.card .status { font-size: 10px; }
+.card .status { font-size: 10px; line-height: 1.8; }
 .card .lock { font-family: system-ui, sans-serif; font-size: 26px; }
 .panel .card:disabled { filter: grayscale(0.9) brightness(0.6); cursor: not-allowed; }
+
+.hud {
+  position: absolute; top: 16px; left: 16px; padding: 10px 14px;
+  font-size: 16px; text-shadow: 2px 2px #000;
+  background: rgb(0 0 0 / 0.35); border-radius: 6px; transition: opacity 0.3s;
+}
+.hud.bump { animation: bump 0.35s ease-out; }
+@keyframes bump { 40% { transform: scale(1.25); } }
+/* Die Pixel-Schrift hat keine Emojis */
+.gem { font-family: system-ui, sans-serif; }
+.hud .gem { font-size: 22px; vertical-align: -3px; }
+.panel .gems { color: #7df3ff; }
 
 .sound-toggle {
   position: absolute; top: 12px; right: 12px; width: 44px; height: 44px;

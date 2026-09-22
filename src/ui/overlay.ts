@@ -19,6 +19,7 @@ export class Overlay {
   private readonly hint = el('div', 'hint hidden', '<span class="keys">← →</span> laufen &nbsp;·&nbsp; Leertaste springen');
   private readonly banner = el('div', 'banner');
   private readonly toastEl = el('div', 'toast');
+  private readonly hud = el('div', 'hud hidden');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly soundButton = el('button', 'sound-toggle') as HTMLButtonElement;
@@ -29,7 +30,7 @@ export class Overlay {
       this.soundButton.blur();
       actions.toggleSound();
     });
-    parent.append(this.fade, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
+    parent.append(this.fade, this.hud, this.hint, this.banner, this.toastEl, this.win, this.menuPanel, this.soundButton);
   }
 
   setSoundIcon(muted: boolean): void {
@@ -55,18 +56,33 @@ export class Overlay {
     restartAnimation(this.banner, 'show');
   }
 
+  /** Diamanten-Zähler oben links, `null` blendet ihn aus. */
+  setDiamonds(text: string | null): void {
+    this.hud.classList.toggle('hidden', text === null);
+    if (text !== null) this.hud.innerHTML = `<span class="gem">💎</span> ${text}`;
+  }
+
+  /** Kleiner Hüpfer des Zählers beim Einsammeln. */
+  bumpDiamonds(): void {
+    restartAnimation(this.hud, 'bump');
+  }
+
   /** Kurze Meldung oben, z. B. beim Checkpoint. */
   toast(text: string): void {
     this.toastEl.textContent = text;
     restartAnimation(this.toastEl, 'show');
   }
 
-  showWin(index: number, seconds: number, best: number | undefined, record: boolean): void {
+  showWin(index: number, seconds: number, best: number | undefined, record: boolean, diamonds: number, total: number): void {
     const last = index === this.levels.length - 1;
+    const gems = total === 0 ? '' : diamonds === total
+      ? `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total} &nbsp;Alle gefunden! ⭐</p>`
+      : `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total}</p>`;
     this.win.innerHTML = `
       <h1>${last ? 'Alle Level geschafft!' : 'Geschafft!'}</h1>
       ${last ? '<p class="trophy">🏆</p>' : ''}
       <p class="time">Zeit: ${formatTime(seconds)}</p>
+      ${gems}
       <p class="best">${record ? '⭐ Neue Bestzeit! ⭐' : best !== undefined ? `Bestzeit: ${formatTime(best)}` : ''}</p>
       <div class="buttons">
         ${last ? '' : '<button type="button" data-action="next" class="primary">Weiter <small>(Enter)</small></button>'}
@@ -82,7 +98,12 @@ export class Overlay {
     const cards = this.levels.map((level, i) => {
       const locked = !progress.isUnlocked(i);
       const best = progress.best(level.name);
-      const status = locked ? '<span class="lock">🔒</span>' : best !== undefined ? `⏱ ${formatTime(best)}` : 'Neu!';
+      const total = level.diamonds.length;
+      const found = progress.diamonds(level.name);
+      const gems = total ? `<span class="gem">💎</span> ${found}/${total}${found === total ? ' ⭐' : ''}` : '';
+      const status = locked
+        ? '<span class="lock">🔒</span>'
+        : best !== undefined ? `⏱ ${formatTime(best)}<br>${gems}` : 'Neu!';
       return `
         <button type="button" class="card" data-level="${i}" ${locked ? 'disabled' : ''} style="--biome: ${level.biome.color}">
           <span class="num">${i + 1}</span>
@@ -102,6 +123,7 @@ export class Overlay {
     });
     this.win.classList.add('hidden');
     this.hint.classList.add('hidden');
+    this.hud.classList.add('hidden');
     this.banner.classList.remove('show');
     this.setFade(false);
     this.menuPanel.classList.remove('hidden');

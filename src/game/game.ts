@@ -36,6 +36,8 @@ export class Game {
   private playTime = 0;
   /** Hier startet Steve nach einem Sturz: am Levelstart oder am letzten Checkpoint. */
   private spawnPoint: Point = { x: 0, y: 0 };
+  /** Gesammelte Diamanten bleiben nach einem Sturz erhalten, erst ein Neustart setzt sie zurück. */
+  private diamonds = 0;
 
   constructor(
     private readonly stage: Stage,
@@ -134,6 +136,14 @@ export class Game {
   private resetCheckpoints() {
     this.spawnPoint = this.level.start;
     for (const cp of this.scene!.checkpoints) cp.reset();
+    for (const d of this.scene!.diamonds) d.reset();
+    this.diamonds = 0;
+    this.updateHud();
+  }
+
+  private updateHud() {
+    const total = this.scene!.diamonds.length;
+    this.overlay.setDiamonds(this.state === 'menu' || total === 0 ? null : `${this.diamonds}/${total}`);
   }
 
   private respawn() {
@@ -152,9 +162,9 @@ export class Game {
   private win() {
     this.state = 'won';
     const best = this.progress.best(this.level.name);
-    const record = this.progress.finish(this.index, this.level.name, this.playTime);
+    const record = this.progress.finish(this.index, this.level.name, this.playTime, this.diamonds);
     this.sound.play('win');
-    this.overlay.showWin(this.index, this.playTime, best, record);
+    this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length);
   }
 
   update(dt: number): void {
@@ -178,6 +188,14 @@ export class Game {
           this.spawnPoint = cp.at;
           this.overlay.toast('Checkpoint ✔');
           this.sound.play('checkpoint');
+        }
+        for (const d of this.scene.diamonds) {
+          if (!d.touches(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) continue;
+          d.collect();
+          this.diamonds++;
+          this.updateHud();
+          this.overlay.bumpDiamonds();
+          this.sound.play('diamond');
         }
         if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');

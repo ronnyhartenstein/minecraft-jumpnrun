@@ -16,6 +16,7 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   S  Start von Steve
  *   Z  Ziel-Fahne
  *   X  Checkpoint (nach einem Sturz geht es hier weiter)
+ *   *  Diamant zum Einsammeln
  *   t  Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Stalagmit, …)
  *   f  Fackel (leuchtet, nur Deko)
  *
@@ -58,6 +59,7 @@ export interface Level {
   start: Point;
   goal: Point | null;
   checkpoints: Point[];
+  diamonds: Point[];
   deco: Point[];
   torches: Point[];
 }
@@ -76,6 +78,7 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
   const deco: Point[] = [];
   const checkpoints: Point[] = [];
   const torches: Point[] = [];
+  const diamonds: Point[] = [];
   const chars: Record<string, BlockId> = { ...BLOCK_CHARS, G: biome.surface, D: biome.subsoil };
 
   lines.forEach((line, row) => {
@@ -85,6 +88,7 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
       else if (ch === 'S') start = { x, y };
       else if (ch === 'Z') goal = { x, y };
       else if (ch === 'X') checkpoints.push({ x, y });
+      else if (ch === '*') diamonds.push({ x, y });
       else if (ch === 't') deco.push({ x, y });
       else if (ch === 'f') torches.push({ x, y });
       else if (ch !== '.' && ch !== ' ') console.warn(`Level "${name}": unbekanntes Zeichen "${ch}" bei ${x},${y}`);
@@ -92,5 +96,5 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
   });
 
   checkpoints.sort((a, b) => a.x - b.x);
-  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, deco, torches };
+  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, deco, torches };
 }
