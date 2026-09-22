@@ -15,7 +15,9 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   ~  Lava (heiß! Wer sie berührt, fängt neu an)
  *   S  Start von Steve
  *   Z  Ziel-Fahne
+ *   X  Checkpoint (nach einem Sturz geht es hier weiter)
  *   t  Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Stalagmit, …)
+ *   f  Fackel (leuchtet, nur Deko)
  *
  * Zeilen dürfen unterschiedlich lang sein, fehlende Stellen sind Luft.
  */
@@ -55,7 +57,9 @@ export interface Level {
   blocks: (BlockId | null)[][];
   start: Point;
   goal: Point | null;
+  checkpoints: Point[];
   deco: Point[];
+  torches: Point[];
 }
 
 export function parseLevel(name: string, biomeId: BiomeId, text: string): Level {
@@ -70,6 +74,8 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
   let start: Point | null = null;
   let goal: Point | null = null;
   const deco: Point[] = [];
+  const checkpoints: Point[] = [];
+  const torches: Point[] = [];
   const chars: Record<string, BlockId> = { ...BLOCK_CHARS, G: biome.surface, D: biome.subsoil };
 
   lines.forEach((line, row) => {
@@ -78,10 +84,13 @@ export function parseLevel(name: string, biomeId: BiomeId, text: string): Level 
       if (ch in chars) blocks[y][x] = chars[ch];
       else if (ch === 'S') start = { x, y };
       else if (ch === 'Z') goal = { x, y };
+      else if (ch === 'X') checkpoints.push({ x, y });
       else if (ch === 't') deco.push({ x, y });
+      else if (ch === 'f') torches.push({ x, y });
       else if (ch !== '.' && ch !== ' ') console.warn(`Level "${name}": unbekanntes Zeichen "${ch}" bei ${x},${y}`);
     });
   });
 
-  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, deco };
+  checkpoints.sort((a, b) => a.x - b.x);
+  return { name, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, deco, torches };
 }

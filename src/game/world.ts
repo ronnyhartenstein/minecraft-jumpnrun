@@ -7,8 +7,10 @@ import { blockMaterials, type BlockId } from '../textures/blocks';
 const DECO_DEPTH = 6;
 /** Unter dem Level wird der Boden sichtbar weitergeführt (nur Deko). */
 const UNDERGROUND = 6;
-/** In Höhlen liegt so viel Fels über dem Level. */
+/** In Höhlen liegt so viel Fels über dem Level … */
 const ROCK_ABOVE = 6;
+/** … und so viel links und rechts davon, damit man am Rand nicht ins Leere schaut. */
+const ROCK_SIDES = 8;
 /** Deko steht so weit hinten, dass sie nicht in die Spielebene ragt. */
 const DECO_Z = -3;
 /** Die Lava-Oberfläche liegt etwas tiefer als ein voller Block … */
@@ -21,6 +23,7 @@ const SEA_MARGIN = 30;
 const SEA_DEPTH = 30;
 /** Mehr Lichter machen das Rendern langsam. */
 const MAX_LAVA_LIGHTS = 8;
+const MAX_TORCH_LIGHTS = 8;
 
 /** `h` ist die Höhe des Blocks, nur bei Lava kleiner als 1. */
 type AddBlock = (id: BlockId, x: number, y: number, z: number, h?: number) => void;
@@ -55,10 +58,12 @@ export class World {
       if (level.biome.enclosed) this.extendCave(add, x);
       else this.extendGround(add, x);
     }
+    if (level.biome.enclosed) this.addCaveSides(add);
 
     for (const point of level.deco) this.addDeco(add, level.biome.deco, point);
     if (level.biome.lavaSea !== null) this.addLavaSea(add, level.biome.lavaSea);
     this.addLavaLights();
+    level.torches.slice(0, MAX_TORCH_LIGHTS).forEach((p) => this.addTorch(p));
 
     const materials = blockMaterials();
     const matrix = new THREE.Matrix4();
@@ -79,9 +84,9 @@ export class World {
     add(id, x, y, z, id === 'lava' && !lavaAbove ? LAVA_TOP : 1);
   }
 
-  /** Höhe des durchgehenden Bodens ab der untersten Reihe (0 = Abgrund). Lava zählt dazu, so entstehen Lavaseen. */
+  /** Höhe des durchgehenden Bodens ab der untersten Reihe (0 = Abgrund). Lava und Eis zählen dazu, so entstehen Seen. */
   groundHeight(x: number): number {
-    const ground: (BlockId | null)[] = [this.level.biome.surface, this.level.biome.subsoil, 'lava'];
+    const ground: (BlockId | null)[] = [this.level.biome.surface, this.level.biome.subsoil, 'lava', 'ice', 'soulSand'];
     let y = 0;
     while (y < this.level.height && ground.includes(this.level.blocks[y][x])) y++;
     return y;
@@ -140,6 +145,7 @@ export class World {
       const island = x >= 0 && x < this.level.width && this.groundHeight(x) > y;
       for (let z = 1; z >= -SEA_DEPTH; z--) {
         if (island && z <= 0 && z >= -DECO_DEPTH) continue;
+        if (z === 0 && this.isSolid(x, y)) continue; // z. B. Festungsmauern, die im Lavameer stehen
         add('lava', x, y, z, LAVA_TOP);
       }
     }
@@ -162,6 +168,31 @@ export class World {
       const light = new THREE.PointLight('#ff7a1a', 8 + (x1 - x0) * 2, 8, 1);
       light.position.set((x0 + x1 + 1) / 2, y + 1.5, 0.8);
       this.object.add(light);
+    }
+  }
+
+  /** Fackel: Holzstiel mit leuchtender Flamme, etwas hinter der Spielebene. */
+  private addTorch({ x, y }: Point) {
+    const torch = new THREE.Group();
+    const stick = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.6, 0.12), new THREE.MeshLambertMaterial({ color: '#6b5230' }));
+    stick.position.y = 0.3;
+    const flame = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), new THREE.MeshBasicMaterial({ color: '#ffd35a' }));
+    flame.position.y = 0.66;
+    const light = new THREE.PointLight('#ffb45a', 10, 9, 1);
+    light.position.set(0, 0.9, 0.6);
+    torch.add(stick, flame, light);
+    torch.position.set(x + 0.5, y, -0.4);
+    this.object.add(torch);
+  }
+
+  private addCaveSides(add: AddBlock) {
+    const { width, height } = this.level;
+    for (const x0 of [-ROCK_SIDES, width]) {
+      for (let x = x0; x < x0 + ROCK_SIDES; x++) {
+        for (let z = -DECO_DEPTH; z <= 0; z++) {
+          for (let y = -UNDERGROUND; y < height + ROCK_ABOVE; y++) add('stone', x, y, z);
+        }
+      }
     }
   }
 

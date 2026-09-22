@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { Input } from '../engine/input';
-import type { Level } from '../levels/format';
+import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
 import { CameraRig } from './cameraRig';
@@ -32,6 +32,8 @@ export class Game {
   private state: State = 'menu';
   private stateTimer = 0;
   private playTime = 0;
+  /** Hier startet Steve nach einem Sturz: am Levelstart oder am letzten Checkpoint. */
+  private spawnPoint: Point = { x: 0, y: 0 };
 
   constructor(
     private readonly stage: Stage,
@@ -81,6 +83,7 @@ export class Game {
   showMenu(): void {
     this.load(this.scene ? this.index : 0);
     this.state = 'menu';
+    this.resetCheckpoints();
     this.respawn();
     this.overlay.showMenu(this.progress);
     history.replaceState(null, '', location.pathname);
@@ -95,6 +98,7 @@ export class Game {
   restart(): void {
     this.state = 'playing';
     this.playTime = 0;
+    this.resetCheckpoints();
     this.respawn();
     this.overlay.levelStarted(this.index);
   }
@@ -116,8 +120,13 @@ export class Game {
     this.lantern.visible = level.biome.playerLight;
   }
 
+  private resetCheckpoints() {
+    this.spawnPoint = this.level.start;
+    for (const cp of this.scene!.checkpoints) cp.reset();
+  }
+
   private respawn() {
-    this.player.spawn(this.level.start);
+    this.player.spawn(this.spawnPoint);
     this.cameraRig.snap(this.player.pos);
     this.input.consumeJump();
   }
@@ -149,6 +158,12 @@ export class Game {
       case 'playing':
         this.playTime += dt;
         if (pos.x > this.level.start.x + 4) this.overlay.hideHint();
+        for (const cp of this.scene.checkpoints) {
+          if (cp.active || !cp.reached(pos.x) || !this.player.onGround) continue;
+          cp.activate();
+          this.spawnPoint = cp.at;
+          this.overlay.toast('Checkpoint ✔');
+        }
         if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');
         else if (this.scene.goal?.reached(pos.x)) this.win();

@@ -25,6 +25,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
 }
 .banner small { display: block; margin-bottom: 14px; font-size: 14px; color: #ffe14d; }
 .banner.show { animation: banner 2.8s ease-out forwards; }
+.toast {
+  position: absolute; left: 50%; top: 12%; transform: translateX(-50%);
+  font-size: 16px; color: #7dff7d; text-shadow: 2px 2px #000; opacity: 0; pointer-events: none;
+}
+.toast.show { animation: banner 1.6s ease-out forwards; }
 @keyframes banner {
   0% { opacity: 0; transform: translate(-50%, -12px); }
   15%, 70% { opacity: 1; transform: translate(-50%, 0); }

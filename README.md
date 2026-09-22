@@ -11,6 +11,23 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 | A / D oder ← / → | Laufen |
 | Leertaste, W oder ↑ | Springen (länger halten = höher) |
 | R | Level neu starten |
+| Esc | Levelauswahl |
+| Enter | Nach dem Ziel: nächstes Level |
+
+## Level
+
+| # | Level | Neu in diesem Level |
+| --- | --- | --- |
+| 1 | Die Wiese | Laufen, Springen, Lücken |
+| 2 | Die Wüste | Lava |
+| 3 | Die Höhle | Decken, Lavaseen mit Trittsteinen, Fackeln |
+| 4 | Die Schneeberge | Rutschiges Eis, viel Klettern |
+| 5 | Der Nether | Seelensand, Lavameer, Nether-Festung |
+
+Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten merkt sich der Browser.
+Direkt zu einem Level springen: `#level=3` an die Adresse anhängen.
+
+Die Level sind Text-Raster in `src/levels/`. Welches Zeichen welcher Block ist, steht in `src/levels/format.ts`.
 
 ## Entwickeln
 
@@ -35,7 +52,8 @@ Jeder Push auf `main` wird automatisch auf GitHub Pages veröffentlicht.
 ```
 src/
   engine/    Game-Loop, Tastatur
-  game/      Szene, Welt, Steve, Spieler-Physik, Kamera
-  levels/    Level als Text-Raster
+  game/      Szene, Welt, Steve, Spieler-Physik, Kamera, Partikel
+  ui/        Menü, Hinweise, Ziel-Anzeige
+  levels/    Level als Text-Raster und Biome
   textures/  Pixel-Texturen, im Code erzeugt
 ```

@@ -17,11 +17,12 @@ export class Overlay {
   private readonly fade = el('div', 'fade');
   private readonly hint = el('div', 'hint hidden', '<span class="keys">← →</span> laufen &nbsp;·&nbsp; Leertaste springen');
   private readonly banner = el('div', 'banner');
+  private readonly toastEl = el('div', 'toast');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
 
   constructor(parent: HTMLElement, private readonly levels: Level[], private readonly actions: OverlayActions) {
-    parent.append(this.fade, this.hint, this.banner, this.win, this.menuPanel);
+    parent.append(this.fade, this.hint, this.banner, this.toastEl, this.win, this.menuPanel);
   }
 
   setFade(dark: boolean, kind: FadeKind = 'fall'): void {
@@ -39,10 +40,13 @@ export class Overlay {
     this.hint.classList.toggle('hidden', index > 0);
     this.setFade(false);
     this.banner.innerHTML = `<small>Level ${index + 1}</small>${this.levels[index].name}`;
-    // Animation neu starten
-    this.banner.classList.remove('show');
-    void this.banner.offsetWidth;
-    this.banner.classList.add('show');
+    restartAnimation(this.banner, 'show');
+  }
+
+  /** Kurze Meldung oben, z. B. beim Checkpoint. */
+  toast(text: string): void {
+    this.toastEl.textContent = text;
+    restartAnimation(this.toastEl, 'show');
   }
 
   showWin(index: number, seconds: number, best: number | undefined, record: boolean): void {
@@ -99,6 +103,12 @@ export class Overlay {
       });
     });
   }
+}
+
+function restartAnimation(node: HTMLElement, className: string) {
+  node.classList.remove(className);
+  void node.offsetWidth; // erzwingt, dass die CSS-Animation von vorn beginnt
+  node.classList.add(className);
 }
 
 function el(tag: string, className: string, html = ''): HTMLElement {

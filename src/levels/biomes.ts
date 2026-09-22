@@ -75,7 +75,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
     underground: ['stone', 'stone'],
     sky: ['#050506', '#0b0b0e', '#101014'],
     fog: { color: '#0b0b0e', near: 18, far: 45 },
-    ambient: { sky: '#8a8fa8', ground: '#3a3530', intensity: 0.9 },
+    ambient: { sky: '#9aa0bc', ground: '#4a443c', intensity: 1.5 },
     sun: null,
     clouds: false,
     deco: 'stalagmite',

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { Point } from '../levels/format';
+import type { BlockId } from '../textures/blocks';
 import type { World } from './world';
 
 /** Alle Stellschrauben fürs Spielgefühl an einem Ort. Einheiten: Blöcke und Sekunden. */
@@ -22,6 +23,11 @@ export const PHYSICS = {
   coyoteTime: 0.1,
   /** So lange wird ein zu früher Sprung-Tastendruck vor der Landung gemerkt. */
   jumpBuffer: 0.12,
+  /** Auf Eis kommt Steve nur langsam in Fahrt und rutscht lange nach. */
+  iceAccel: 14,
+  iceDecel: 3,
+  /** Auf Seelensand läuft Steve langsamer. */
+  soulSandSpeed: 0.45,
 };
 
 export interface PlayerInput {
@@ -43,6 +49,8 @@ export class Player {
   readonly prevPos = new THREE.Vector2();
   readonly vel = new THREE.Vector2();
   onGround = false;
+  /** Der Block, auf dem Steve zuletzt gelandet ist. */
+  ground: BlockId | null = null;
   facing: 1 | -1 = 1;
   private coyote = 0;
   private buffer = 0;
@@ -82,11 +90,13 @@ export class Player {
     const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (dir !== 0) this.facing = dir as 1 | -1;
 
-    const accel = this.onGround ? PHYSICS.groundAccel : PHYSICS.airAccel;
-    const decel = this.onGround ? PHYSICS.groundDecel : PHYSICS.airDecel;
+    const onIce = this.onGround && this.ground === 'ice';
+    const onSoulSand = this.onGround && this.ground === 'soulSand';
+    const accel = onIce ? PHYSICS.iceAccel : this.onGround ? PHYSICS.groundAccel : PHYSICS.airAccel;
+    const decel = onIce ? PHYSICS.iceDecel : this.onGround ? PHYSICS.groundDecel : PHYSICS.airDecel;
     const turning = dir !== 0 && Math.sign(this.vel.x) === -dir;
     const rate = dir === 0 ? decel : turning ? accel + decel : accel;
-    const target = dir * PHYSICS.maxSpeed;
+    const target = dir * PHYSICS.maxSpeed * (onSoulSand ? PHYSICS.soulSandSpeed : 1);
     const diff = target - this.vel.x;
     this.vel.x += Math.sign(diff) * Math.min(Math.abs(diff), rate * dt);
   }
@@ -143,6 +153,9 @@ export class Player {
         if (dy < 0) {
           this.pos.y = row + 1;
           this.onGround = true;
+          // Maßgeblich ist der Block unter Steves Mitte, sonst der, auf dem er gerade noch steht
+          const center = Math.floor(this.pos.x);
+          this.ground = this.world.isSolid(center, row) ? this.world.blockAt(center, row) : this.world.blockAt(x, row);
         } else {
           this.pos.y = row - HEIGHT - EPS;
           this.jumpCutDone = true;
