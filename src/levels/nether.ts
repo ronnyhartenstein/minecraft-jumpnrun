@@ -1,0 +1,19 @@
+import { parseLevel } from './format';
+
+// Level 5: Der Nether. Das Finale über dem Lavameer, am Ende die Nether-Festung.
+export default parseLevel('Der Nether', 'nether', `
+.
+.
+.
+.
+.
+.
+............................................................................................................t........t
+...........................................................................................................GGGG...GGGGG..................................................N...N...N...Z....N
+..............................................................................N.........................GGGDDDD...DDDDDG............................................NNNNNNNNNNNNNNNNNNNNNNNNNN
+...S..t....t........t.......N.t................t............X.t..t..........t.N...t.........NN....X.tGGGDDDDDDD...DDDDDDG....t........t..........X..t............t.NNNNNNNNNNNNNNNNNNNNNNNNNNN
+GGGGGGGGGGGGG..GGGWWWWW..GGGGGGGG..NNN..GGG~~GGGGGG..NNN..GGGGGGGGGWWWWWW...GGGGGGGGG..NNN..GG..GGGGGDDDDDDDDDD...DDDDDDDGGGGGGGG~~~GGGGWWWWW..GGGGGGGG..NNN..GGGGGNNNNNNNNNNNNNNNNNNNNNNNNNNN
+DDDDDDDDDODDD..DDDDDDDD..DDDDDDDD..DDD..DDDDDDODDDD..DDD..DDDDDODDDDDDDDD...DDDDDDDDD..DDD..DD..DDDODDDDDDDDDDD...DDDDDDDDDDDDODD~~~DDDDDDDDD..DDDDODDD..DDD..DDDDDNNNNNNNNNNNNNNNNNNNNNNNNNNN
+DDDDDDDDDDDDD..DDDDDDDD..DDDDDDDD..DDD..DDDDDDDDDDD..DDD..DDDDDDDDDDDDDDD...DDDDDDDDD..DDD..DD..DDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD~~~DDDDDDDDD..DDDDDDDD..DDD..DDDDDNNNNNNNNNNNNNNNNNNNNNNNNNNN
+DDDDDDDDDDDDD..DDDDDDDD..DDDDDDDD..DDD..DDDDDDDDDDD..DDD..DDDDDDDDDDDDDDD...DDDDDDDDD..DDD..DD..DDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDD..DDD..DDDDDNNNNNNNNNNNNNNNNNNNNNNNNNNN
+`);
