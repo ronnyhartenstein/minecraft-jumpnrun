@@ -174,8 +174,8 @@ export class Game {
   }
 
   /**
-   * Von oben draufspringen besiegt einen Gegner. Slimes seitlich berühren heißt Neustart,
-   * Creeper sind harmlos, bis sie explodieren.
+   * Von oben draufspringen besiegt einen Gegner. Slimes seitlich berühren heißt Neustart.
+   * Creeper sind fest wie eine Wand und gefährlich erst, wenn sie explodieren.
    */
   private checkEnemies() {
     const p = this.player;
@@ -198,7 +198,12 @@ export class Game {
         e.stomp();
         p.bounce();
         this.sound.play('stomp');
-      } else if (e.kind !== 'creeper' && this.invulnerable <= 0) {
+      } else if (e.kind === 'creeper') {
+        // Nicht durchlaufen: Steve an die Seite schieben, von der er kam
+        const left = p.prevPos.x < e.pos.x;
+        p.pos.x = left ? e.pos.x - e.halfWidth - 0.3 - 0.001 : e.pos.x + e.halfWidth + 0.3 + 0.001;
+        p.vel.x = 0;
+      } else if (this.invulnerable <= 0) {
         this.die('hurt');
         return;
       }

@@ -12,9 +12,7 @@ const HOP_SPEED_Y = 7.5;
 const HOP_PAUSE = 0.9;
 /** Creeper: So nah muss Steve kommen, damit er zündet … */
 const FUSE_TRIGGER = 2;
-/** … so weit muss Steve weglaufen, damit er es sich anders überlegt … */
-const FUSE_CANCEL = 3.5;
-/** … und so lange dauert es bis zur Explosion (wie im Original 1,5 s). */
+/** … und so lange dauert es dann bis zur Explosion (wie im Original 1,5 s). Einmal gezündet, gibt es kein Zurück. */
 const FUSE_TIME = 1.5;
 /** Wer näher als das an der Explosion steht, fängt neu an. */
 export const BLAST_RADIUS = 2.8;
@@ -159,12 +157,6 @@ export class Enemy {
     const distance = Math.hypot(target.x - this.pos.x, target.y - this.pos.y);
     if (this.fuse === null) {
       if (distance < FUSE_TRIGGER) this.fuse = 0;
-      return;
-    }
-    if (distance > FUSE_CANCEL) {
-      this.fuse = null;
-      this.setFlash(false);
-      this.model.scale.set(1, 1, 1);
       return;
     }
     this.fuse += dt;
