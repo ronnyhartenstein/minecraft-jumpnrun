@@ -7,6 +7,8 @@ export type DecoKind = 'oak' | 'cactus' | 'spruce' | 'stalagmite' | 'nether';
 
 export interface Biome {
   id: BiomeId;
+  /** Name für Menü und Anzeigen. */
+  name: string;
   /** Farbe für die Levelauswahl. */
   color: string;
   /** `G` im Level-Raster wird zu diesem Block … */
@@ -35,6 +37,7 @@ export interface Biome {
 export const BIOMES: Record<BiomeId, Biome> = {
   meadow: {
     id: 'meadow',
+    name: 'Wiese',
     color: '#67ad3c',
     surface: 'grass',
     subsoil: 'dirt',
@@ -52,6 +55,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   desert: {
     id: 'desert',
+    name: 'Wüste',
     color: '#e0c872',
     surface: 'sand',
     subsoil: 'sandstone',
@@ -69,6 +73,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   cave: {
     id: 'cave',
+    name: 'Höhle',
     color: '#6b6b73',
     surface: 'stone',
     subsoil: 'stone',
@@ -86,6 +91,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   snow: {
     id: 'snow',
+    name: 'Schneeberge',
     color: '#dfe9f5',
     surface: 'snowGrass',
     subsoil: 'dirt',
@@ -103,6 +109,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   nether: {
     id: 'nether',
+    name: 'Nether',
     color: '#8a2a1e',
     surface: 'netherrack',
     subsoil: 'netherrack',

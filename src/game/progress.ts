@@ -1,9 +1,9 @@
+import type { Level } from '../levels/format';
+
 const KEY = 'minecraft-jumpnrun';
 
 interface Saved {
-  /** So viele Level sind freigeschaltet (mindestens 1). */
-  unlocked: number;
-  /** Bestzeiten in Sekunden, nach Level-Name. */
+  /** Bestzeiten in Sekunden, nach Level-Name. Wer eine Bestzeit hat, hat das Level geschafft. */
   best: Record<string, number>;
   /** Meiste gesammelte Diamanten in einem Durchlauf, nach Level-Name. */
   diamonds: Record<string, number>;
@@ -11,21 +11,29 @@ interface Saved {
 
 /** Fortschritt und Bestzeiten, im Browser gespeichert. Geht das nicht (privates Fenster), gilt er nur bis zum Neuladen. */
 export class Progress {
-  private data: Saved = { unlocked: 1, best: {}, diamonds: {} };
+  private data: Saved = { best: {}, diamonds: {} };
 
   constructor() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Partial<Saved> | null;
-      if (saved) {
-        this.data = { unlocked: Math.max(1, saved.unlocked ?? 1), best: saved.best ?? {}, diamonds: saved.diamonds ?? {} };
-      }
+      if (saved) this.data = { best: saved.best ?? {}, diamonds: saved.diamonds ?? {} };
     } catch {
       // Ohne Speicher geht es trotzdem
     }
   }
 
-  isUnlocked(index: number): boolean {
-    return index < this.data.unlocked;
+  /**
+   * Offen ist ein Level, wenn es das erste ist, das vorige geschafft wurde oder man es selbst schon geschafft hat.
+   * Eigene Level sind immer offen.
+   */
+  isUnlocked(levels: Level[], index: number): boolean {
+    const level = levels[index];
+    if (level.custom || index === 0 || this.finished(level.name)) return true;
+    return this.finished(levels[index - 1].name);
+  }
+
+  finished(levelName: string): boolean {
+    return this.data.best[levelName] !== undefined;
   }
 
   best(levelName: string): number | undefined {
@@ -37,12 +45,11 @@ export class Progress {
   }
 
   /** Merkt sich ein geschafftes Level. Liefert true bei neuer Bestzeit. */
-  finish(index: number, levelName: string, seconds: number, diamonds: number): boolean {
+  finish(levelName: string, seconds: number, diamonds: number): boolean {
     const previous = this.data.best[levelName];
     const record = previous === undefined || seconds < previous;
     if (record) this.data.best[levelName] = seconds;
     this.data.diamonds[levelName] = Math.max(this.diamonds(levelName), diamonds);
-    this.data.unlocked = Math.max(this.data.unlocked, index + 2);
     try {
       localStorage.setItem(KEY, JSON.stringify(this.data));
     } catch {

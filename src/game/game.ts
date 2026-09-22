@@ -21,7 +21,7 @@ const INVULNERABLE_TIME = 1.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
-type State = 'menu' | 'playing' | 'respawning' | 'won';
+export type State = 'menu' | 'playing' | 'respawning' | 'won';
 
 export class Game {
   player!: Player;
@@ -42,6 +42,8 @@ export class Game {
   /** Gesammelte Diamanten bleiben nach einem Sturz erhalten, erst ein Neustart setzt sie zurück. */
   private diamonds = 0;
   private invulnerable = 0;
+  /** Beim automatischen Prüfen der Level wird kein Fortschritt gespeichert. */
+  testMode = false;
 
   constructor(
     private readonly stage: Stage,
@@ -68,6 +70,19 @@ export class Game {
     return this.levels[this.index];
   }
 
+  /** Für die Level-Prüfung: Zustand, geladenes Level und gesammelte Diamanten. */
+  get status(): State {
+    return this.state;
+  }
+
+  get levelScene(): LevelScene | null {
+    return this.scene;
+  }
+
+  get collectedDiamonds(): number {
+    return this.diamonds;
+  }
+
   /** Weiter geht es nur innerhalb der Welten bzw. innerhalb der eigenen Level. */
   private get hasNext(): boolean {
     const next = this.levels[this.index + 1];
@@ -83,10 +98,6 @@ export class Game {
       if (this.state === 'won') this.hasNext ? this.next() : this.restart();
       else if (this.state === 'menu') this.start(this.firstOpenLevel());
     });
-    this.levels.forEach((level, i) => {
-      if (level.custom || i > 8) return;
-      input.onKey(`Digit${i + 1}`, () => this.state === 'menu' && this.progress.isUnlocked(i) && this.start(i));
-    });
   }
 
   private toggleSound() {
@@ -95,7 +106,7 @@ export class Game {
 
   /** Das erste noch nicht geschaffte Level, sonst das letzte. */
   private firstOpenLevel(): number {
-    const open = this.levels.findIndex((level, i) => this.progress.isUnlocked(i) && this.progress.best(level.name) === undefined);
+    const open = this.levels.findIndex((level, i) => this.progress.isUnlocked(this.levels, i) && !this.progress.finished(level.name));
     return open === -1 ? this.levels.length - 1 : open;
   }
 
@@ -105,13 +116,13 @@ export class Game {
     this.resetCheckpoints();
     this.respawn();
     this.overlay.showMenu(this.progress);
-    history.replaceState(null, '', location.pathname);
+    history.replaceState(null, '', location.pathname + location.search);
   }
 
   start(index: number): void {
     this.load(index);
     this.restart();
-    history.replaceState(null, '', `#level=${index + 1}`);
+    history.replaceState(null, '', `#level=${this.level.code}`);
   }
 
   restart(): void {
@@ -171,7 +182,7 @@ export class Game {
   private win() {
     this.state = 'won';
     const best = this.progress.best(this.level.name);
-    const record = this.progress.finish(this.index, this.level.name, this.playTime, this.diamonds);
+    const record = this.testMode ? false : this.progress.finish(this.level.name, this.playTime, this.diamonds);
     this.sound.play('win');
     this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length, this.hasNext);
   }

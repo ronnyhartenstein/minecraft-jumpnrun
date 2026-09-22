@@ -59,6 +59,10 @@ export interface EnemySpawn extends Point {
 
 export interface Level {
   name: string;
+  /** Kurzer Name wie „2-3“ (Welt 2, drittes Level) oder „E1“ für eigene Level. */
+  code: string;
+  /** Die Welt, zu der das Level gehört, aus dem Dateinamen (`2-3-tempel.txt` → 2). */
+  world: number | null;
   /** Selbst gebautes Level aus `levels/eigene/`: immer spielbar, eigene Reihe im Menü. */
   custom: boolean;
   /** Hinweise auf Fehler im Level, die im Spiel angezeigt werden. */
@@ -159,5 +163,5 @@ export function parseLevel(
   if (!start) warnings.push('Kein Start „S“ gefunden – Steve startet oben links.');
   if (!goal) warnings.push('Keine Ziel-Fahne „Z“ gefunden – das Level kann man nicht schaffen.');
   for (const w of warnings) console.warn(`Level „${name}“: ${w}`);
-  return { name, custom, warnings, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, enemies, deco, torches };
+  return { name, code: '', world: null, custom, warnings, biome, width, height, blocks, start: start ?? { x: 1, y: height - 1 }, goal, checkpoints, diamonds, enemies, deco, torches };
 }

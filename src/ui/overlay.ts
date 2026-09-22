@@ -54,7 +54,8 @@ export class Overlay {
     this.hint.classList.toggle('hidden', index > 0);
     this.setFade(false);
     const level = this.levels[index];
-    this.banner.innerHTML = `<small>${level.custom ? 'Eigenes Level' : `Level ${index + 1}`}</small>${level.name}`;
+    const label = level.custom ? 'Eigenes Level' : level.world !== null ? `Welt ${level.code}` : `Level ${level.code}`;
+    this.banner.innerHTML = `<small>${label}</small>${escapeHtml(level.name)}`;
     restartAnimation(this.banner, 'show');
     this.showWarnings(level.warnings);
   }
@@ -85,14 +86,20 @@ export class Overlay {
   }
 
   showWin(index: number, seconds: number, best: number | undefined, record: boolean, diamonds: number, total: number, hasNext: boolean): void {
+    const level = this.levels[index];
+    const next = hasNext ? this.levels[index + 1] : undefined;
     // Pokal nach der letzten Welt, nicht nach eigenen Leveln
-    const last = !hasNext && !this.levels[index].custom;
+    const last = !hasNext && !level.custom;
+    const worldDone = level.world !== null && !last && next?.world !== level.world;
+    const title = last ? 'Alle Welten geschafft!' : worldDone ? `Welt ${level.world} geschafft!` : 'Geschafft!';
+    const nextWorld = worldDone && next ? `<p class="next-world">Weiter geht's in Welt ${next.world}: ${next.biome.name}</p>` : '';
     const gems = total === 0 ? '' : diamonds === total
       ? `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total} &nbsp;Alle gefunden! ⭐</p>`
       : `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total}</p>`;
     this.win.innerHTML = `
-      <h1>${last ? 'Alle Level geschafft!' : 'Geschafft!'}</h1>
+      <h1>${title}</h1>
       ${last ? '<p class="trophy">🏆</p>' : ''}
+      ${nextWorld}
       <p class="time">Zeit: ${formatTime(seconds)}</p>
       ${gems}
       <p class="best">${record ? '⭐ Neue Bestzeit! ⭐' : best !== undefined ? `Bestzeit: ${formatTime(best)}` : ''}</p>
@@ -108,9 +115,8 @@ export class Overlay {
   }
 
   showMenu(progress: Progress): void {
-    const firstOwn = this.levels.findIndex((l) => l.custom);
     const card = (level: Level, i: number) => {
-      const locked = !level.custom && !progress.isUnlocked(i);
+      const locked = !progress.isUnlocked(this.levels, i);
       const best = progress.best(level.name);
       const total = level.diamonds.length;
       const found = progress.diamonds(level.name);
@@ -120,19 +126,26 @@ export class Overlay {
         : best !== undefined ? `⏱ ${formatTime(best)}<br>${gems}` : 'Neu!';
       return `
         <button type="button" class="card" data-level="${i}" ${locked ? 'disabled' : ''} style="--biome: ${level.biome.color}">
-          <span class="num">${level.custom ? `E${i - firstOwn + 1}` : i + 1}</span>
+          <span class="num">${level.code}</span>
           <span class="name">${escapeHtml(level.name)}</span>
           <span class="status">${status}</span>
         </button>`;
     };
-    const cards = this.levels.map(card);
-    const worlds = cards.filter((_, i) => !this.levels[i].custom);
-    const own = cards.filter((_, i) => this.levels[i].custom);
+    // Eine Spalte pro Welt, darin die Level untereinander
+    const worlds = new Map<string, string[]>();
+    const own: string[] = [];
+    this.levels.forEach((level, i) => {
+      if (level.custom) return own.push(card(level, i));
+      const key = level.world !== null ? `<small>Welt ${level.world}</small>${level.biome.name}` : '<small>Weitere</small>Level';
+      if (!worlds.has(key)) worlds.set(key, []);
+      worlds.get(key)!.push(card(level, i));
+    });
+    const columns = [...worlds].map(([title, cards]) => `<div class="world"><h3>${title}</h3>${cards.join('')}</div>`);
     this.menuPanel.innerHTML = `
-      <h1>Minecraft<br>Jump 'n' Run</h1>
-      <div class="cards">${worlds.join('')}</div>
-      <p class="keys">Level anklicken oder Taste 1–${worlds.length}</p>
-      ${own.length ? `<h2>Eigene Level</h2><div class="cards">${own.join('')}</div>` : ''}`;
+      <h1>Minecraft Jump 'n' Run</h1>
+      <div class="worlds">${columns.join('')}</div>
+      ${own.length ? `<h2>Eigene Level</h2><div class="cards">${own.join('')}</div>` : ''}
+      <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();

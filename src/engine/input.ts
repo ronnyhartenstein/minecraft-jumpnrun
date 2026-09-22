@@ -38,6 +38,16 @@ export class Input {
     return JUMP.some((k) => this.down.has(k));
   }
 
+  /** Tasten per Programm drücken und loslassen (für die automatische Level-Prüfung). */
+  press(code: string): void {
+    if (JUMP.includes(code) && !this.down.has(code)) this.jumpQueued = true;
+    this.down.add(code);
+  }
+
+  release(code: string): void {
+    this.down.delete(code);
+  }
+
   /** Liefert true, wenn seit dem letzten Aufruf Springen gedrückt wurde. */
   consumeJump(): boolean {
     const queued = this.jumpQueued;
