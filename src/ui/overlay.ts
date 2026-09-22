@@ -1,7 +1,7 @@
 /** Alles, was als HTML über dem 3D-Bild liegt: Überblendung, Hinweis, Ziel-Anzeige. */
 export class Overlay {
   private readonly fade = el('div', 'fade');
-  private readonly hint = el('div', 'hint', '← → laufen &nbsp;·&nbsp; Leertaste springen');
+  private readonly hint = el('div', 'hint', '<span class="keys">← →</span> laufen &nbsp;·&nbsp; Leertaste springen');
   private readonly win = el('div', 'win hidden');
 
   constructor(parent: HTMLElement, onRestart: () => void) {

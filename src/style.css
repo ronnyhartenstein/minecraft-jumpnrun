@@ -14,6 +14,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
   background: rgb(0 0 0 / 0.45); border-radius: 6px; text-shadow: 2px 2px #000;
   transition: opacity 0.8s;
 }
+/* Die Pixel-Schrift hat keine Pfeile */
+.hint .keys { font-family: system-ui, sans-serif; font-size: 20px; font-weight: bold; vertical-align: -2px; }
 
 .win {
   position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
