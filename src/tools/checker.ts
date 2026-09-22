@@ -17,6 +17,8 @@ const MAX_GAP = 3;
 const MAX_STEP = 2;
 const MIN_RUNWAY = 5;
 const MIN_HEADROOM = 5;
+/** Platz zwischen einem kleinen Hindernis und der nächsten Lücke. */
+const MIN_OBSTACLE_GAP = 4;
 /** So nah hinter einem Sprung sollte kein Gegner stehen. */
 const ENEMY_DISTANCE = 3;
 const STEP = 1 / 60;
@@ -85,6 +87,14 @@ export function checkRules(level: Level): string[] {
         }
       }
       for (let k = x + 1; k <= x + ENEMY_DISTANCE && k < width; k++) landing.add(k);
+    } else if (next !== undefined && tops[x] - tops[next] === 1 && tops[x] > tops[x - 1]) {
+      // Auch hinter einem kleinen Hindernis (links und rechts niedriger) landet man ein Stück weiter
+      for (let k = x + 1; k <= x + MIN_OBSTACLE_GAP && k < width; k++) {
+        if (hazard(k)) {
+          hints.push(`x=${x}: Direkt hinter dem Hindernis kommt bei x=${k} ${what(k)}. Wer drüberspringt, landet darin – lass mindestens ${MIN_OBSTACLE_GAP} Blöcke Platz.`);
+          break;
+        }
+      }
     }
   }
   for (const enemy of level.enemies) {

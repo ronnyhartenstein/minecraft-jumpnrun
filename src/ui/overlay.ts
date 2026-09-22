@@ -140,11 +140,12 @@ export class Overlay {
       if (!worlds.has(key)) worlds.set(key, []);
       worlds.get(key)!.push(card(level, i));
     });
+    // Eigene Level stehen als eigene Spalte neben den Welten
+    if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
     const columns = [...worlds].map(([title, cards]) => `<div class="world"><h3>${title}</h3>${cards.join('')}</div>`);
     this.menuPanel.innerHTML = `
       <h1>Minecraft Jump 'n' Run</h1>
       <div class="worlds">${columns.join('')}</div>
-      ${own.length ? `<h2>Eigene Level</h2><div class="cards">${own.join('')}</div>` : ''}
       <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {

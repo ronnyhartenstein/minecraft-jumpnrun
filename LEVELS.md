@@ -29,7 +29,7 @@ DDDDDDDDDDDDDD..DDDDDDDDD
 2. **Kopiere** die Datei und gib ihr einen neuen Namen, zum Beispiel `drachenburg.txt`.
 3. Ändere oben die Zeile `Name:`, zum Beispiel `Name: Die Drachenburg`.
 4. Starte das Spiel mit `docker compose up` und öffne http://localhost:5173/minecraft-jumpnrun/
-5. In der Levelauswahl siehst du unten **Eigene Level**. Da ist dein Level!
+5. In der Levelauswahl siehst du ganz rechts die Spalte **Eigene**. Da ist dein Level!
 6. Ändere etwas in der Datei und **speichere**. Das Spiel lädt sofort neu und du kannst es ausprobieren.
 
 ## Der Kopf der Datei
@@ -100,6 +100,20 @@ Alles, was höher oder weiter ist, schafft er nicht!
 - **Checkpoints:** Ist dein Level lang oder schwer, setze ein oder zwei `X` hinein.
 - **Selbst testen:** Spiel dein Level mehrmals. Schaffst du es? Dann schafft es auch jemand anders!
 
+## Der Prüf-Roboter 🤖
+
+Öffne das Spiel mit `?pruefen` am Ende der Adresse:
+
+http://localhost:5173/minecraft-jumpnrun/?pruefen
+
+Dann passiert zweierlei:
+
+1. Das Spiel prüft die **Regeln** von oben (Anlauf, Lückenbreite, Stufenhöhe, Platz nach oben, Gegner hinter Sprüngen) und zeigt, an welcher Stelle (`x=…`, gezählt von links) etwas nicht passt.
+2. Ein **Roboter** spielt jedes Level durch. Er läuft immer nach rechts und springt, wenn etwas im Weg ist.
+   Schafft er dein Level, ist es auf jeden Fall schaffbar. Stirbt er, steht dabei, an welcher Stelle.
+
+Grün heißt: alles in Ordnung. Gelb heißt: schau dir die Stelle nochmal an.
+
 ## Wenn etwas nicht stimmt
 
 Hast du ein Zeichen benutzt, das es nicht gibt, oder den Start vergessen, zeigt das Spiel oben einen **gelben Kasten** an.
@@ -107,9 +121,10 @@ Dort steht, in welcher Zeile und Spalte der Fehler ist.
 
 ## Die großen Level
 
-Die fünf Welten des Spiels liegen im Ordner `levels/` (`1-wiese.txt` bis `5-nether.txt`).
+Die Welten des Spiels liegen im Ordner `levels/`, drei Level pro Welt: von `1-1-wiese.txt` bis `5-3-netherfestung.txt`.
+Die Zahlen am Anfang des Dateinamens sind **Welt und Level**: `2-3-wuestentempel.txt` ist das dritte Level in Welt 2.
 Du kannst sie dir anschauen und lernen, wie sie gebaut sind.
-Neue Dateien in diesem Ordner werden automatisch als weitere Welt eingereiht, sortiert nach dem Dateinamen.
+Eine neue Datei `6-1-irgendwas.txt` würde automatisch als Welt 6 im Menü erscheinen.
 
 ## Dein Level für alle
 
