@@ -9,7 +9,7 @@ export interface OverlayActions {
   toggleSound(): void;
 }
 
-export type FadeKind = 'fall' | 'lava' | 'hurt';
+export type FadeKind = 'fall' | 'lava' | 'hurt' | 'boom';
 
 export const formatTime = (seconds: number) => `${seconds.toFixed(1).replace('.', ',')} s`;
 

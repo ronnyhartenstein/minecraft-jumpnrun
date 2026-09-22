@@ -5,6 +5,7 @@ import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
 import { CameraRig } from './cameraRig';
+import { BLAST_RADIUS } from './enemy';
 import { BoxSteve, type Character } from './character';
 import { LevelScene } from './levelScene';
 import { PHYSICS, Player, type PlayerInput } from './player';
@@ -161,7 +162,7 @@ export class Game {
     this.state = 'respawning';
     this.stateTimer = FADE_TIME;
     this.overlay.setFade(true, kind);
-    this.sound.play(kind);
+    if (kind !== 'boom') this.sound.play(kind);
   }
 
   private win() {
@@ -172,10 +173,22 @@ export class Game {
     this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length);
   }
 
-  /** Von oben draufspringen besiegt einen Gegner, seitlich berühren heißt Neustart. */
+  /**
+   * Von oben draufspringen besiegt einen Gegner. Slimes seitlich berühren heißt Neustart,
+   * Creeper sind harmlos, bis sie explodieren.
+   */
   private checkEnemies() {
     const p = this.player;
     for (const e of this.scene!.enemies) {
+      if (e.fuse !== null && e.fuse === 0) this.sound.play('fuse');
+      if (e.exploded) {
+        this.sound.play('boom');
+        const distance = Math.hypot(p.pos.x - e.pos.x, p.pos.y + 0.9 - (e.pos.y + 0.8));
+        if (distance < BLAST_RADIUS && this.invulnerable <= 0) {
+          this.die('boom');
+          return;
+        }
+      }
       if (!e.alive) continue;
       const overlaps = p.pos.x + 0.3 > e.pos.x - e.halfWidth && p.pos.x - 0.3 < e.pos.x + e.halfWidth
         && p.pos.y + 1.8 > e.pos.y && p.pos.y < e.pos.y + e.height;
@@ -185,7 +198,7 @@ export class Game {
         e.stomp();
         p.bounce();
         this.sound.play('stomp');
-      } else if (this.invulnerable <= 0) {
+      } else if (e.kind !== 'creeper' && this.invulnerable <= 0) {
         this.die('hurt');
         return;
       }
@@ -200,7 +213,7 @@ export class Game {
       : NO_INPUT;
     this.player.update(dt, input);
     if (this.player.jumped) this.sound.play('jump');
-    this.scene.update(dt);
+    this.scene.update(dt, this.player.pos);
 
     const { pos } = this.player;
     switch (this.state) {

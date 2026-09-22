@@ -13,7 +13,7 @@ export default parseLevel('Die Schneeberge', 'snow', `
 .....................................................................................................tM..GGGGGGDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ......................................................................................t............GGGGGGDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 .................................................................*...............GGGGGGGG..EEEEEE..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-............................................*.......t.........................ts.DDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+............................................*.......t.........................t..DDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ...............................................GGGGGGGGGX...t.........t.....GGGGGDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ...............................*............M..DDDDDDDDDGEEEEEEEEEEEEEEEEEEGDDDDDDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 .......................................GGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD

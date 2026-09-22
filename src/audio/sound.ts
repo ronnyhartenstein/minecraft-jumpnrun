@@ -1,7 +1,7 @@
 import type { BiomeId } from '../levels/biomes';
 import { noteFrequency, THEMES, type Theme } from './music';
 
-export type Sfx = 'jump' | 'diamond' | 'checkpoint' | 'lava' | 'fall' | 'win' | 'stomp' | 'hurt';
+export type Sfx = 'jump' | 'diamond' | 'checkpoint' | 'lava' | 'fall' | 'win' | 'stomp' | 'hurt' | 'fuse' | 'boom';
 
 const STORAGE_KEY = 'minecraft-jumpnrun-sound';
 const SFX_VOLUME = 0.8;
@@ -98,6 +98,14 @@ export class Sound {
         break;
       case 'hurt':
         this.tone(t, 0.3, 'sawtooth', 0.12, 420, 140);
+        break;
+      case 'fuse':
+        // Zischen wie eine Zündschnur
+        this.noise(t, 1.4, 0.18, 6000, 3000);
+        break;
+      case 'boom':
+        this.noise(t, 1.2, 0.6, 1800, 60);
+        this.tone(t, 0.8, 'sine', 0.5, 110, 30);
         break;
     }
   }

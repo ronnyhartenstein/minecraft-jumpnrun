@@ -46,12 +46,13 @@ export class LevelScene {
     for (const p of this.particles) this.object.add(p.object);
   }
 
-  update(dt: number): void {
+  /** `player` ist Steves Position (für die Creeper). */
+  update(dt: number, player: THREE.Vector2): void {
     this.clouds?.update(dt);
     this.goal?.update(dt);
     for (const cp of this.checkpoints) cp.update(dt);
     for (const d of this.diamonds) d.update(dt);
-    for (const e of this.enemies) e.update(dt);
+    for (const e of this.enemies) e.update(dt, player);
     for (const p of this.particles) p.update(dt);
   }
 

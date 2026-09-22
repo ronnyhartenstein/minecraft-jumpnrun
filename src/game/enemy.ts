@@ -10,6 +10,14 @@ const CREEPER_SPEED = 1.3;
 const HOP_SPEED_X = 2.4;
 const HOP_SPEED_Y = 7.5;
 const HOP_PAUSE = 0.9;
+/** Creeper: So nah muss Steve kommen, damit er zündet … */
+const FUSE_TRIGGER = 2;
+/** … so weit muss Steve weglaufen, damit er es sich anders überlegt … */
+const FUSE_CANCEL = 3.5;
+/** … und so lange dauert es bis zur Explosion (wie im Original 1,5 s). */
+const FUSE_TIME = 1.5;
+/** Wer näher als das an der Explosion steht, fängt neu an. */
+export const BLAST_RADIUS = 2.8;
 const EPS = 1e-4;
 
 const SIZE: Record<EnemyKind, { halfWidth: number; height: number }> = {
@@ -43,6 +51,24 @@ function slimeSkin(magma: boolean) {
   return pixelTexture(8, 8, magma ? 15 : 14, (ctx, rng) => noiseRect(ctx, rng, 0, 0, 8, 8, skin));
 }
 
+/** Explosion: ein heller Blitz in der Mitte und graue Rauchwürfel, die nach außen fliegen. */
+function explosionEffect(): THREE.Group {
+  const group = new THREE.Group();
+  const flash = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), new THREE.MeshBasicMaterial({ color: '#fff6d0', transparent: true }));
+  flash.userData.dir = new THREE.Vector3();
+  group.add(flash);
+  for (let i = 0; i < 24; i++) {
+    const gray = 0.55 + Math.random() * 0.4;
+    const puff = new THREE.Mesh(
+      new THREE.BoxGeometry(0.5, 0.5, 0.5),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(gray, gray, gray), transparent: true }),
+    );
+    puff.userData.dir = new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.8, Math.random() - 0.5).normalize();
+    group.add(puff);
+  }
+  return group;
+}
+
 const lambert = (map: THREE.Texture, extra: THREE.MeshLambertMaterialParameters = {}) => new THREE.MeshLambertMaterial({ map, ...extra });
 
 /** Gegner laufen oder hüpfen hin und her und drehen an Wänden, Kanten und Lava um. */
@@ -53,12 +79,19 @@ export class Enemy {
   readonly halfWidth: number;
   readonly height: number;
   alive = true;
+  /** Wird für genau einen Schritt true, wenn der Creeper explodiert. */
+  exploded = false;
+  /** Creeper: Sekunden seit dem Zünden, `null` = nicht gezündet. */
+  fuse: number | null = null;
   private dir: 1 | -1 = -1;
   private onGround = false;
   private timer = 0;
   private dying = 0;
   private readonly model = new THREE.Group();
   private readonly legs: THREE.Object3D[] = [];
+  private readonly flashMaterials: THREE.MeshLambertMaterial[] = [];
+  private blast: THREE.Group | null = null;
+  private blastTime = 0;
 
   constructor(readonly kind: EnemyKind, private readonly start: Point, private readonly world: World) {
     ({ halfWidth: this.halfWidth, height: this.height } = SIZE[kind]);
@@ -74,8 +107,14 @@ export class Enemy {
     this.dir = -1;
     this.alive = true;
     this.dying = 0;
+    this.fuse = null;
+    this.exploded = false;
+    this.setFlash(false);
+    this.blast?.removeFromParent();
+    this.blast = null;
     this.timer = Math.random() * HOP_PAUSE;
     this.object.visible = true;
+    this.model.visible = true;
     this.model.scale.set(1, 1, 1);
   }
 
@@ -83,18 +122,30 @@ export class Enemy {
   stomp(): void {
     this.alive = false;
     this.dying = 0.3;
+    this.fuse = null;
+    this.setFlash(false);
   }
 
-  update(dt: number): void {
+  /** `target` ist Steves Position, damit der Creeper zünden kann. */
+  update(dt: number, target: THREE.Vector2): void {
+    this.exploded = false;
+    if (this.blast) this.updateBlast(dt);
     if (!this.alive) {
+      if (this.blast) return;
       this.dying -= dt;
       this.model.scale.set(1 + (0.3 - this.dying), Math.max(0.1, this.dying / 0.3), 1 + (0.3 - this.dying));
       this.object.visible = this.dying > 0;
       return;
     }
     this.timer += dt;
-    if (this.kind === 'creeper') this.walk();
-    else this.hop();
+    if (this.kind === 'creeper') {
+      this.updateFuse(dt, target);
+      if (!this.alive) return;
+      if (this.fuse === null) this.walk();
+      else this.vel.x = 0;
+    } else {
+      this.hop();
+    }
 
     this.vel.y = Math.max(this.vel.y - GRAVITY * dt, -20);
     this.moveX(this.vel.x * dt);
@@ -102,6 +153,67 @@ export class Enemy {
     this.moveY(this.vel.y * dt);
     if (this.onGround && this.kind !== 'creeper') this.vel.x = 0;
     this.animate(dt);
+  }
+
+  private updateFuse(dt: number, target: THREE.Vector2) {
+    const distance = Math.hypot(target.x - this.pos.x, target.y - this.pos.y);
+    if (this.fuse === null) {
+      if (distance < FUSE_TRIGGER) this.fuse = 0;
+      return;
+    }
+    if (distance > FUSE_CANCEL) {
+      this.fuse = null;
+      this.setFlash(false);
+      this.model.scale.set(1, 1, 1);
+      return;
+    }
+    this.fuse += dt;
+    // Immer schneller weiß blinken und dabei anschwellen
+    this.setFlash(Math.sin(this.fuse * this.fuse * 14) > 0);
+    const swell = 1 + (this.fuse / FUSE_TIME) * 0.25;
+    this.model.scale.set(swell, 1 + (swell - 1) * 0.5, swell);
+    if (this.fuse >= FUSE_TIME) this.explode();
+  }
+
+  private explode() {
+    this.alive = false;
+    this.exploded = true;
+    this.dying = 0;
+    this.object.visible = true;
+    this.model.visible = false;
+    this.blast = explosionEffect();
+    this.blast.position.set(0, 0.8, 0);
+    this.object.add(this.blast);
+    this.blastTime = 0;
+  }
+
+  private updateBlast(dt: number) {
+    this.blastTime += dt;
+    const t = this.blastTime / 0.8;
+    this.blast!.children.forEach((puff, i) => {
+      const dir = puff.userData.dir as THREE.Vector3;
+      // Der Blitz ist schnell groß und schnell weg, der Rauch fliegt weit und wird langsam kleiner
+      const out = 1 - (1 - t) ** 3;
+      puff.position.copy(dir).multiplyScalar(i === 0 ? 0 : 0.6 + out * 3.2);
+      puff.scale.setScalar(i === 0 ? 1 + out * 5 : Math.max(0.01, 1.4 - t));
+      const material = (puff as THREE.Mesh).material as THREE.MeshBasicMaterial;
+      material.opacity = i === 0 ? Math.max(0, 1 - t * 2.5) : Math.max(0, 1 - t);
+    });
+    if (t >= 1) {
+      this.blast!.removeFromParent();
+      this.blast!.traverse((node) => {
+        if (!(node instanceof THREE.Mesh)) return;
+        node.geometry.dispose();
+        (node.material as THREE.Material).dispose();
+      });
+      this.blast = null;
+      this.object.visible = false;
+      this.model.visible = true;
+    }
+  }
+
+  private setFlash(on: boolean) {
+    for (const m of this.flashMaterials) m.emissive.setScalar(on ? 0.9 : 0);
   }
 
   private walk() {
@@ -174,6 +286,7 @@ export class Enemy {
     const skin = pixelTexture(8, 8, 10, (ctx, rng) => noiseRect(ctx, rng, 0, 0, 8, 8, CREEPER_GREEN));
     const body = lambert(skin);
     const face = lambert(creeperFace());
+    this.flashMaterials.push(body, face);
     const box = (w: number, h: number, d: number, mat: THREE.Material | THREE.Material[]) => {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(w * P, h * P, d * P), mat);
       mesh.castShadow = true;

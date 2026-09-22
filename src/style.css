@@ -7,6 +7,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8ec5ff; }
   pointer-events: none; transition: opacity 0.3s;
 }
 .fade.lava { background: radial-gradient(circle, #ffb030, #d42a00 70%); }
+.fade.boom { background: radial-gradient(circle, #ffffff, #cfcfcf 70%); }
 .fade.dark { opacity: 1; }
 
 .hint {
