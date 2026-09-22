@@ -1,0 +1,20 @@
+Name: Der Canyon
+Biom: Wüste
+Info: Tafelberge zum Hinaufklettern und tiefe Lavagräben.
+
+.
+.
+.
+.
+.
+..............................*
+...................................................................................................*
+.............................t............*
+........................*..GGGGGG...................................................................t..........*.......*
+.......................t...DDDDDD...t........X.t..c............*.......*..................*.......GGGG
+.......*.............GGGGGGDDDDDDGGGGGGGG~~~GGGGGGGGGG...........................Y..........t.GGGGDDDD...t..........t.......t..t..Z..t
+...S.t....t...t.K..t.DDDDDDDDDDDDDDDDDDDD~~~DDDDDDDDDD...t.........t......t..s...Y...t..GGGGGGDDDDDDDDGGGGGGGG~~~GGGGGG..GGGGGGGGGGGGGG
+GGGGGGGGGGGG~GGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGG...GGGGG~~GGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDD~~~DDDDDD..DDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDD
