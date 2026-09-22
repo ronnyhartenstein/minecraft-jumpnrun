@@ -1,0 +1,20 @@
+Name: Das Dorf
+Biom: Wiese
+Info: Häuser zum Drüberklettern, ein hoher Turm und der erste Creeper.
+
+.
+.
+.
+.
+.
+.
+................................*..........................................................................*
+................*
+................................HH.........................*...............................................C
+................PP..............PP.......*............................*...................................CC.t.............*
+.........*.....PCCP............HPPH........................PP.......................*........PP....t....GGGGGGGG................*
+...S...t...t..PCCCCP..t.....st.PPPP..t.......X.t....c..t..PCCP..t..........t..PPP..t.....st.PCCPGGGGGGGGDDDDDDDD....t..............t...t..Z...t
+GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGG
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDD
