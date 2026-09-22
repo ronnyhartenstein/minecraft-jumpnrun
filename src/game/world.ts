@@ -11,8 +11,19 @@ const UNDERGROUND = 6;
 const ROCK_ABOVE = 6;
 /** Deko steht so weit hinten, dass sie nicht in die Spielebene ragt. */
 const DECO_Z = -3;
+/** Die Lava-Oberfläche liegt etwas tiefer als ein voller Block … */
+const LAVA_TOP = 0.875;
+/** … und gefährlich ist sie erst ein Stück darunter, damit knappe Sprünge gut gehen. */
+const LAVA_DEADLY_TOP = 0.7;
+const LAVA_DEADLY_INSET = 0.1;
+/** Das Lavameer reicht so weit links, rechts und nach hinten über das Level hinaus. */
+const SEA_MARGIN = 30;
+const SEA_DEPTH = 30;
+/** Mehr Lichter machen das Rendern langsam. */
+const MAX_LAVA_LIGHTS = 8;
 
-type AddBlock = (id: BlockId, x: number, y: number, z: number) => void;
+/** `h` ist die Höhe des Blocks, nur bei Lava kleiner als 1. */
+type AddBlock = (id: BlockId, x: number, y: number, z: number, h?: number) => void;
 
 const BOX = new THREE.BoxGeometry(1, 1, 1);
 BOX.userData.shared = true;
@@ -23,16 +34,22 @@ BOX.userData.shared = true;
  */
 export class World {
   readonly object = new THREE.Group();
+  /** Lava-Oberflächen nahe der Spielebene, nach x-Spalte sortiert. Dort steigen Funken auf. */
+  readonly lavaSurfaces = new Map<number, THREE.Vector3[]>();
 
   constructor(readonly level: Level) {
-    const positions = new Map<BlockId, THREE.Vector3[]>();
-    const add: AddBlock = (id, x, y, z) => {
+    const positions = new Map<BlockId, THREE.Vector4[]>();
+    const add: AddBlock = (id, x, y, z, h = 1) => {
       if (!positions.has(id)) positions.set(id, []);
-      positions.get(id)!.push(new THREE.Vector3(x + 0.5, y + 0.5, z));
+      positions.get(id)!.push(new THREE.Vector4(x, y, z, h));
+      if (id === 'lava' && h < 1 && z >= -3) {
+        if (!this.lavaSurfaces.has(x)) this.lavaSurfaces.set(x, []);
+        this.lavaSurfaces.get(x)!.push(new THREE.Vector3(x + 0.5, y + h, z));
+      }
     };
 
     // Spielebene
-    level.blocks.forEach((row, y) => row.forEach((id, x) => id && add(id, x, y, 0)));
+    level.blocks.forEach((row, y) => row.forEach((id, x) => id && this.addFront(add, id, x, y, 0)));
 
     for (let x = 0; x < level.width; x++) {
       if (level.biome.enclosed) this.extendCave(add, x);
@@ -40,23 +57,33 @@ export class World {
     }
 
     for (const point of level.deco) this.addDeco(add, level.biome.deco, point);
+    if (level.biome.lavaSea !== null) this.addLavaSea(add, level.biome.lavaSea);
+    this.addLavaLights();
 
     const materials = blockMaterials();
     const matrix = new THREE.Matrix4();
     for (const [id, list] of positions) {
       const mesh = new THREE.InstancedMesh(BOX, materials[id], list.length);
-      list.forEach((p, i) => mesh.setMatrixAt(i, matrix.makeTranslation(p)));
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+      list.forEach(({ x, y, z, w: h }, i) => {
+        mesh.setMatrixAt(i, matrix.makeScale(1, h, 1).setPosition(x + 0.5, y + h / 2, z));
+      });
+      // Lava leuchtet selbst und wirft keinen Schatten
+      mesh.castShadow = mesh.receiveShadow = id !== 'lava';
       this.object.add(mesh);
     }
   }
 
-  /** Höhe des durchgehenden Bodens ab der untersten Reihe (0 = Abgrund). */
+  /** Blöcke aus der Spielebene; Lava ist oben etwas niedriger, außer es liegt Lava darüber. */
+  private addFront(add: AddBlock, id: BlockId, x: number, y: number, z: number) {
+    const lavaAbove = this.blockAt(x, y + 1) === 'lava';
+    add(id, x, y, z, id === 'lava' && !lavaAbove ? LAVA_TOP : 1);
+  }
+
+  /** Höhe des durchgehenden Bodens ab der untersten Reihe (0 = Abgrund). Lava zählt dazu, so entstehen Lavaseen. */
   groundHeight(x: number): number {
-    const { surface, subsoil } = this.level.biome;
+    const ground: (BlockId | null)[] = [this.level.biome.surface, this.level.biome.subsoil, 'lava'];
     let y = 0;
-    while (y < this.level.height && [surface, subsoil].includes(this.level.blocks[y][x]!)) y++;
+    while (y < this.level.height && ground.includes(this.level.blocks[y][x])) y++;
     return y;
   }
 
@@ -68,7 +95,21 @@ export class World {
   /** Links und rechts vom Level ist eine unsichtbare Wand, nach unten geht es ins Leere. */
   isSolid(x: number, y: number): boolean {
     if (x < 0 || x >= this.level.width) return true;
-    return this.blockAt(x, y) !== null;
+    const id = this.blockAt(x, y);
+    return id !== null && id !== 'lava';
+  }
+
+  /** Berührt ein Rechteck (Steves Hitbox) die gefährliche Zone eines Lava-Blocks? */
+  touchesLava(minX: number, minY: number, maxX: number, maxY: number): boolean {
+    for (let y = Math.floor(minY); y <= Math.floor(maxY); y++) {
+      for (let x = Math.floor(minX); x <= Math.floor(maxX); x++) {
+        if (this.blockAt(x, y) !== 'lava') continue;
+        const top = this.blockAt(x, y + 1) === 'lava' ? 1 : LAVA_DEADLY_TOP;
+        if (maxX > x + LAVA_DEADLY_INSET && minX < x + 1 - LAVA_DEADLY_INSET && minY < y + top && maxY > y) return true;
+      }
+    }
+    const sea = this.level.biome.lavaSea;
+    return sea !== null && minY < sea + LAVA_DEADLY_TOP;
   }
 
   /** Draußen: Boden nach hinten und nach unten fortsetzen, Hindernisse bleiben vorne. */
@@ -76,7 +117,7 @@ export class World {
     const ground = this.groundHeight(x);
     if (ground === 0) return;
     for (let z = -DECO_DEPTH; z <= 0; z++) {
-      if (z < 0) for (let y = 0; y < ground; y++) add(this.level.blocks[y][x]!, x, y, z);
+      if (z < 0) for (let y = 0; y < ground; y++) this.addFront(add, this.level.blocks[y][x]!, x, y, z);
       this.addUnderground(add, x, z);
     }
   }
@@ -86,11 +127,42 @@ export class World {
     const { height, blocks } = this.level;
     const top = height + ROCK_ABOVE;
     for (let z = -DECO_DEPTH + 1; z <= 0; z++) {
-      if (z < 0) for (let y = 0; y < height; y++) if (blocks[y][x]) add(blocks[y][x]!, x, y, z);
+      if (z < 0) for (let y = 0; y < height; y++) if (blocks[y][x]) this.addFront(add, blocks[y][x]!, x, y, z);
       for (let y = height; y < top; y++) add('stone', x, y, z);
       if (blocks[0][x]) this.addUnderground(add, x, z);
     }
     for (let y = -UNDERGROUND; y < top; y++) add('stone', x, y, -DECO_DEPTH);
+  }
+
+  /** Ein Meer aus Lava rund um das Level, nur dort, wo kein Boden höher liegt. */
+  private addLavaSea(add: AddBlock, y: number) {
+    for (let x = -SEA_MARGIN; x < this.level.width + SEA_MARGIN; x++) {
+      const island = x >= 0 && x < this.level.width && this.groundHeight(x) > y;
+      for (let z = 1; z >= -SEA_DEPTH; z--) {
+        if (island && z <= 0 && z >= -DECO_DEPTH) continue;
+        add('lava', x, y, z, LAVA_TOP);
+      }
+    }
+  }
+
+  /** Ein warmes Licht über jeder zusammenhängenden Lavafläche in der Spielebene. */
+  private addLavaLights() {
+    const runs: { x0: number; x1: number; y: number }[] = [];
+    this.level.blocks.forEach((row, y) => {
+      row.forEach((id, x) => {
+        if (id !== 'lava' || this.blockAt(x, y + 1) === 'lava') return;
+        const last = runs.at(-1);
+        if (last && last.y === y && last.x1 === x - 1) last.x1 = x;
+        else runs.push({ x0: x, x1: x, y });
+      });
+    });
+    const step = Math.max(1, Math.ceil(runs.length / MAX_LAVA_LIGHTS));
+    for (let i = 0; i < runs.length; i += step) {
+      const { x0, x1, y } = runs[i];
+      const light = new THREE.PointLight('#ff7a1a', 8 + (x1 - x0) * 2, 8, 1);
+      light.position.set((x0 + x1 + 1) / 2, y + 1.5, 0.8);
+      this.object.add(light);
+    }
   }
 
   private addUnderground(add: AddBlock, x: number, z: number) {
@@ -158,10 +230,16 @@ export class World {
     if (ceiling < this.level.height) for (let dy = 1; dy <= 1 + (x % 2); dy++) add('stone', x, ceiling - dy, z);
   }
 
-  /** Nether: Netherrack-Säule mit leuchtendem Glowstone obendrauf. */
+  /** Nether: abwechselnd eine Säule mit Glowstone oder ein Lavafall aus dem Nichts. */
   private addNetherDeco(add: AddBlock, x: number, ground: number) {
-    const h = 3 + (x % 3);
-    for (let dy = 0; dy < h; dy++) add('netherrack', x, ground + dy, DECO_Z);
-    add('glowstone', x, ground + h, DECO_Z);
+    if (x % 2 === 0) {
+      const h = 3 + (x % 3);
+      for (let dy = 0; dy < h; dy++) add('netherrack', x, ground + dy, DECO_Z);
+      add('glowstone', x, ground + h, DECO_Z);
+    } else {
+      const top = this.level.height + 4;
+      add('netherrack', x, top, DECO_Z - 1);
+      for (let y = ground; y < top; y++) add('lava', x, y, DECO_Z - 1);
+    }
   }
 }

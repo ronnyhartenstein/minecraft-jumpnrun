@@ -11,15 +11,20 @@ const damp = (current: number, target: number, rate: number, dt: number) =>
 
 /** Kamera folgt Steve weich von der Seite und bleibt innerhalb des Levels. */
 export class CameraRig {
+  /** Der Punkt auf der Spielebene, auf den die Kamera schaut. */
+  readonly focus = new THREE.Vector3();
   private x = 0;
   private y = 0;
   private ahead = 0;
+  private levelWidth = 0;
+  private minY = 0;
 
-  constructor(
-    private readonly camera: THREE.PerspectiveCamera,
-    private readonly levelWidth: number,
-    private readonly minY: number,
-  ) {}
+  constructor(private readonly camera: THREE.PerspectiveCamera) {}
+
+  setLevel(levelWidth: number, minY: number): void {
+    this.levelWidth = levelWidth;
+    this.minY = minY;
+  }
 
   snap(target: THREE.Vector2): void {
     this.ahead = 0;
@@ -35,10 +40,6 @@ export class CameraRig {
     this.apply();
   }
 
-  get focus(): THREE.Vector3 {
-    return new THREE.Vector3(this.x, this.y, 0);
-  }
-
   /** Halbe sichtbare Breite auf der Spielebene. */
   private halfViewWidth(): number {
     return Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * DISTANCE * this.camera.aspect;
@@ -51,6 +52,7 @@ export class CameraRig {
   }
 
   private apply() {
+    this.focus.set(this.x, this.y, 0);
     this.camera.position.set(this.x, this.y + HEIGHT, DISTANCE);
     this.camera.lookAt(this.x, this.y, 0);
   }

@@ -26,6 +26,10 @@ export interface Biome {
   enclosed: boolean;
   /** Steve trägt ein kleines Licht mit sich (für dunkle Level). */
   playerLight: boolean;
+  /** Ein Lavameer unter dem ganzen Level, in dieser Blockreihe. Wer hineinfällt, fängt neu an. */
+  lavaSea: number | null;
+  /** Partikel in der Luft. */
+  particles: 'snow' | 'ash' | null;
 }
 
 export const BIOMES: Record<BiomeId, Biome> = {
@@ -43,6 +47,8 @@ export const BIOMES: Record<BiomeId, Biome> = {
     deco: 'oak',
     enclosed: false,
     playerLight: false,
+    lavaSea: null,
+    particles: null,
   },
   desert: {
     id: 'desert',
@@ -58,6 +64,8 @@ export const BIOMES: Record<BiomeId, Biome> = {
     deco: 'cactus',
     enclosed: false,
     playerLight: false,
+    lavaSea: null,
+    particles: null,
   },
   cave: {
     id: 'cave',
@@ -73,6 +81,8 @@ export const BIOMES: Record<BiomeId, Biome> = {
     deco: 'stalagmite',
     enclosed: true,
     playerLight: true,
+    lavaSea: null,
+    particles: null,
   },
   snow: {
     id: 'snow',
@@ -88,6 +98,8 @@ export const BIOMES: Record<BiomeId, Biome> = {
     deco: 'spruce',
     enclosed: false,
     playerLight: false,
+    lavaSea: null,
+    particles: 'snow',
   },
   nether: {
     id: 'nether',
@@ -103,5 +115,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
     deco: 'nether',
     enclosed: false,
     playerLight: false,
+    lavaSea: 2,
+    particles: 'ash',
   },
 };

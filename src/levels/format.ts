@@ -12,6 +12,7 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   M  Schnee       E  Eis (rutschig!)
  *   1  Kohle-Erz    2  Eisen-Erz    3  Gold-Erz     4  Diamant-Erz
  *   R  Netherrack   N  Nether-Ziegel  O  Glowstone  W  Seelensand (langsam!)
+ *   ~  Lava (heiß! Wer sie berührt, fängt neu an)
  *   S  Start von Steve
  *   Z  Ziel-Fahne
  *   t  Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Stalagmit, …)
@@ -37,6 +38,7 @@ export const BLOCK_CHARS: Record<string, BlockId> = {
   N: 'netherBricks',
   O: 'glowstone',
   W: 'soulSand',
+  '~': 'lava',
 };
 
 export interface Point {

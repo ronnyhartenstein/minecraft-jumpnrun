@@ -6,7 +6,8 @@ export type BlockId =
   | 'sand' | 'sandstone' | 'cactus'
   | 'snowGrass' | 'snow' | 'ice' | 'spruceLog' | 'spruceLeaves'
   | 'coalOre' | 'ironOre' | 'goldOre' | 'diamondOre'
-  | 'netherrack' | 'netherBricks' | 'glowstone' | 'soulSand';
+  | 'netherrack' | 'netherBricks' | 'glowstone' | 'soulSand'
+  | 'lava';
 
 type Draw = (ctx: CanvasRenderingContext2D, rng: Rng) => void;
 
@@ -186,7 +187,7 @@ const soulSand: Draw = (ctx, rng) => {
 
 type Faces = { side: Draw; top?: Draw; bottom?: Draw };
 
-const DESIGNS: Record<BlockId, Faces> = {
+const DESIGNS: Record<Exclude<BlockId, 'lava'>, Faces> = {
   grass: { side: topped(GRASS, 3), top: noise(GRASS), bottom: dirt },
   dirt: { side: dirt },
   stone: { side: stone },
@@ -222,6 +223,30 @@ const OPTIONS: Partial<Record<BlockId, THREE.MeshLambertMaterialParameters>> = {
 /** Leuchtende Blöcke brauchen kein Licht, sie sind selbst hell. */
 const GLOWING = new Set<BlockId>(['glowstone']);
 
+/** Lava: ein hoher Streifen, der langsam durch den Block fließt. */
+function lavaTexture(): THREE.CanvasTexture {
+  const texture = pixelTexture(S, S * 4, 99, (ctx, rng) => {
+    noiseRect(ctx, rng, 0, 0, S, S * 4, ['#e05a00', '#ff7a00', '#ff8c10', '#cc4400']);
+    for (let i = 0; i < 18; i++) {
+      const x = Math.floor(rng() * S);
+      const y = Math.floor(rng() * S * 4);
+      const len = 3 + Math.floor(rng() * 5);
+      for (let k = 0; k < len; k++) px(ctx, x, (y + k) % (S * 4), rng() < 0.5 ? '#ffb52e' : '#ffd04a');
+    }
+    speckle(ctx, rng, 20, '#a83000');
+  });
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 0.25);
+  return texture;
+}
+
+let lava: THREE.MeshBasicMaterial | null = null;
+
+/** Lässt die Lava fließen. Einmal pro Frame aufrufen. */
+export function animateBlocks(dt: number): void {
+  if (lava?.map) lava.map.offset.y = (lava.map.offset.y + dt * 0.06) % 1;
+}
+
 let cache: Record<BlockId, THREE.Material[]> | null = null;
 
 /**
@@ -233,12 +258,18 @@ export function blockMaterials(): Record<BlockId, THREE.Material[]> {
   let seed = 1;
   const make = (draw: Draw, id: BlockId) => {
     const map = pixelTexture(S, S, seed++, draw);
-    return GLOWING.has(id)
+    const material = GLOWING.has(id)
       ? new THREE.MeshBasicMaterial({ map })
       : new THREE.MeshLambertMaterial({ map, ...OPTIONS[id] });
+    // Wird von allen Leveln geteilt und beim Levelwechsel nicht freigegeben
+    material.userData.shared = true;
+    return material;
   };
   cache = {} as Record<BlockId, THREE.Material[]>;
-  for (const [id, faces] of Object.entries(DESIGNS) as [BlockId, Faces][]) {
+  lava = new THREE.MeshBasicMaterial({ map: lavaTexture() });
+  lava.userData.shared = true;
+  cache.lava = [lava, lava, lava, lava, lava, lava];
+  for (const [id, faces] of Object.entries(DESIGNS) as [Exclude<BlockId, 'lava'>, Faces][]) {
     const side = make(faces.side, id);
     const top = faces.top ? make(faces.top, id) : side;
     const bottom = faces.bottom ? make(faces.bottom, id) : top;
