@@ -1,31 +1,25 @@
-import * as THREE from 'three';
 import { startLoop } from './engine/loop';
+import { Clouds } from './game/clouds';
+import { createStage } from './game/scene';
+import { World } from './game/world';
+import level from './levels/wiese';
 
-const container = document.getElementById('app')!;
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-container.appendChild(renderer.domElement);
+const stage = createStage(document.getElementById('app')!);
+const world = new World(level);
+const clouds = new Clouds(level.width, level.height);
+stage.scene.add(world.object, clouds.object);
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
-camera.position.set(0, 0, 10);
-
-const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
-scene.add(cube);
-
-function resize() {
-  const { clientWidth: w, clientHeight: h } = container;
-  renderer.setSize(w, h);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-}
-window.addEventListener('resize', resize);
-resize();
-
+// Vorläufig: Kamera fährt langsam durchs Level
+let camX = 8;
 startLoop(
   (dt) => {
-    cube.rotation.x += dt;
-    cube.rotation.y += dt * 0.7;
+    camX = (camX + dt * 4) % level.width;
+    clouds.update(dt);
   },
-  () => renderer.render(scene, camera),
+  () => {
+    stage.camera.position.set(camX, 8, 16);
+    stage.camera.lookAt(camX, 5, 0);
+    stage.followSun(stage.camera.position.clone().setZ(0));
+    stage.renderer.render(stage.scene, stage.camera);
+  },
 );
