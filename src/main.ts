@@ -1,8 +1,10 @@
+import { GamepadInput } from './engine/gamepad';
 import { Input } from './engine/input';
 import { startLoop } from './engine/loop';
 import { Game } from './game/game';
 import { createStage } from './game/scene';
 import { LEVELS } from './levels';
+import { confirmFocus, moveFocus } from './ui/focus';
 import { createTouchControls, isTouchDevice } from './ui/touch';
 
 const stage = createStage(document.getElementById('app')!);
@@ -13,6 +15,15 @@ if (isTouchDevice) {
   document.body.classList.add('touch');
   createTouchControls(document.getElementById('app')!, input);
 }
+// Gamepad: im Spiel laufen und springen, in Menüs auswählen und bestätigen
+const inMenu = () => document.body.dataset.screen !== 'play';
+const gamepad = new GamepadInput(input, {
+  navigate: (direction) => inMenu() && moveFocus(direction),
+  confirm: () => inMenu() && !confirmFocus() && input.trigger('Enter'),
+  menu: () => input.trigger('Escape'),
+  connected: () => game.notify('🎮 Gamepad verbunden'),
+});
+
 // Safari: Zoomen per Zwei-Finger-Geste im Spiel verhindern
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
@@ -28,9 +39,12 @@ if (new URLSearchParams(location.search).has('pruefen')) {
 }
 
 startLoop(
-  (dt) => game.update(dt),
+  (dt) => {
+    gamepad.poll();
+    game.update(dt);
+  },
   (dt, alpha) => game.render(dt, alpha),
 );
 
 // Zum Ausprobieren in der Browser-Konsole (nur beim Entwickeln)
-if (import.meta.env.DEV) Object.assign(window, { game });
+if (import.meta.env.DEV) Object.assign(window, { game, gamepad });

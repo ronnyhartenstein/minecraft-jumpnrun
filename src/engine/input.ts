@@ -1,10 +1,10 @@
-// Neben echten Tasten gibt es „virtuelle“ für die Touch-Buttons auf Handy und Tablet
-const LEFT = ['ArrowLeft', 'KeyA', 'TouchLeft'];
-const RIGHT = ['ArrowRight', 'KeyD', 'TouchRight'];
-const JUMP = ['Space', 'KeyW', 'ArrowUp', 'TouchJump'];
+// Neben echten Tasten gibt es „virtuelle“ für Touch-Buttons (Touch…) und Gamepads (Pad…)
+const LEFT = ['ArrowLeft', 'KeyA', 'TouchLeft', 'PadLeft'];
+const RIGHT = ['ArrowRight', 'KeyD', 'TouchRight', 'PadRight'];
+const JUMP = ['Space', 'KeyW', 'ArrowUp', 'TouchJump', 'PadJump'];
 const GAME_KEYS = new Set([...LEFT, ...RIGHT, ...JUMP, 'ArrowDown']);
 
-/** Tastatur und Touch. Ein Sprung-Tastendruck wird gemerkt, bis das Spiel ihn abholt. */
+/** Tastatur, Touch und Gamepad. Ein Sprung-Tastendruck wird gemerkt, bis das Spiel ihn abholt. */
 export class Input {
   private readonly down = new Set<string>();
   private jumpQueued = false;
@@ -57,6 +57,11 @@ export class Input {
     } else if (!on && this.down.has(code)) {
       this.release(code);
     }
+  }
+
+  /** Löst aus, was sonst ein Tastendruck auslöst, z. B. „Enter“ über die A-Taste am Gamepad. */
+  trigger(code: string): void {
+    this.listeners.get(code)?.();
   }
 
   /** Liefert true, wenn seit dem letzten Aufruf Springen gedrückt wurde. */

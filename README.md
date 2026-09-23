@@ -17,6 +17,8 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 
 **Auf Handy und Tablet** (quer oder hochkant): links ◀ ▶ zum Laufen, rechts ⬆ zum Springen, ☰ oben rechts öffnet die Levelauswahl. Zum Ausprobieren am Rechner `?touch` an die Adresse hängen.
 
+**Mit Gamepad** (Xbox, PlayStation, Switch …): Stick oder Steuerkreuz laufen, A springt. In Menüs wählt das Steuerkreuz aus und A bestätigt, Start öffnet die Levelauswahl.
+
 ## Level
 
 Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils das schwerste Level.

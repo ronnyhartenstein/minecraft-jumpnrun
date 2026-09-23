@@ -100,6 +100,11 @@ export class Game {
     });
   }
 
+  /** Kurze Meldung oben im Bild. */
+  notify(text: string): void {
+    this.overlay.toast(text);
+  }
+
   private toggleSound() {
     this.overlay.setSoundIcon(this.sound.toggleMute());
   }

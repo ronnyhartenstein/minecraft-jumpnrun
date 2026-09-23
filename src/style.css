@@ -33,7 +33,7 @@ button { touch-action: manipulation; }
 .banner small { display: block; margin-bottom: 14px; font-size: 14px; color: #ffe14d; }
 .banner.show { animation: banner 2.8s ease-out forwards; }
 .toast {
-  position: absolute; left: 50%; top: 12%; transform: translateX(-50%);
+  position: absolute; left: 50%; top: 12%; transform: translateX(-50%); z-index: 5; white-space: nowrap;
   font-size: 16px; color: #7dff7d; text-shadow: 2px 2px #000; opacity: 0; pointer-events: none;
 }
 .toast.show { animation: banner 1.6s ease-out forwards; }
@@ -64,6 +64,8 @@ button { touch-action: manipulation; }
   box-shadow: inset -3px -3px #4a4a4a, inset 3px 3px #999;
 }
 .panel button:hover:not(:disabled) { filter: brightness(1.15); }
+/* Mit dem Gamepad ausgewählter Knopf */
+.panel button.pad-focus { outline: 4px solid #ffe14d; outline-offset: 2px; filter: brightness(1.2); }
 .panel button.primary { background: #5c9e35; border-color: #2f5a17; box-shadow: inset -3px -3px #3f7a22, inset 3px 3px #86c95a; }
 .panel button small { font-size: 9px; opacity: 0.8; }
 
