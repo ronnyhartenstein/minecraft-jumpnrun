@@ -1,4 +1,15 @@
-# Minecraft Jump 'n' Run
+# Steves Pixel Sprint
+
+**Ein Fan-Jump-'n'-Run für Minecraft-Fans**
+
+> **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**
+>
+> Kein offizielles Minecraft-Produkt, nicht von Mojang oder Microsoft genehmigt und nicht mit ihnen verbunden. Minecraft ist eine Marke von Mojang Synergies AB.
+> Das Spiel ist kostenlos, ohne Werbung und ohne Käufe. Alle Grafiken, Figuren, Sounds und die Musik sind selbst gemacht bzw. werden im Code erzeugt – es werden keine Dateien aus Minecraft verwendet.
+> Es folgt den [Minecraft-Nutzungsrichtlinien](https://www.minecraft.net/en-us/usage-guidelines).
+> Die Pixel-Schrift „Press Start 2P“ (The Press Start 2P Project Authors) steht unter der SIL Open Font License, siehe `src/fonts/OFL.txt`.
+>
+> Verantwortlich: Ronny Hartenstein · Kontakt: [Impressum](https://blog.rh-flow.de/impressum/)
 
 Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](https://threejs.org/).
 

@@ -1,3 +1,11 @@
+/* Pixel-Schrift direkt mitgeliefert (SIL Open Font License, siehe src/fonts/OFL.txt),
+   damit beim Spielen keine Verbindung zu Google Fonts nötig ist */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('./fonts/press-start-2p-latin.woff2') format('woff2');
+  font-display: swap;
+}
+
 html, body {
   margin: 0; height: 100%; overflow: hidden; background: #8ec5ff;
   /* Auf dem Handy: nicht scrollen, zoomen oder Text markieren */
@@ -71,13 +79,23 @@ button { touch-action: manipulation; }
 .panel button small { font-size: 9px; opacity: 0.8; }
 
 .menu { top: 50%; max-height: calc(100vh - 32px); overflow-y: auto; padding: 20px 28px; }
-.menu h1 { font-size: 22px; margin-bottom: 14px; }
+.menu h1 { font-size: 22px; margin-bottom: 12px; }
+.menu h1 small { display: block; margin-top: 6px; font-size: 10px; color: #fff; text-shadow: 2px 2px #000; }
+.menu .disclaimer { margin: -6px 0 12px; font-family: system-ui, sans-serif; font-size: 10px; opacity: 0.8; }
+.menu .info-button { padding: 2px 8px; font-family: system-ui, sans-serif; font-size: 11px; }
+
+/* Info-Seite */
+.panel.info { max-width: min(640px, calc(100vw - 32px)); width: auto; text-align: left; max-height: calc(100vh - 32px); overflow-y: auto; }
+.panel.info h1 { text-align: center; }
+.panel.info p { font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+.panel.info .disclaimer-big { font-weight: bold; color: #ffe14d; }
+.panel.info a { color: #7df3ff; }
 .menu h2 { margin: 14px 0 8px; font-size: 13px; color: #ffe14d; }
 .worlds { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .world { display: flex; flex-direction: column; gap: 8px; }
 .world h3 { margin: 0 0 4px; font-size: 11px; line-height: 1.6; color: #ffe14d; }
 .world h3 small { display: block; font-size: 9px; color: #fff; opacity: 0.8; }
-.menu .card { width: 124px; height: 82px; padding: 6px; }
+.menu .card { width: 124px; height: 74px; padding: 5px; }
 .menu .card .num { font-size: 20px; }
 .menu .card .name { font-size: 9px; }
 .menu .card .status { font-size: 9px; line-height: 1.6; }

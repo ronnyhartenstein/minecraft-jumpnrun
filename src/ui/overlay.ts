@@ -29,6 +29,19 @@ export interface WinStats {
 
 export type FadeKind = 'fall' | 'lava' | 'hurt' | 'boom' | 'poison';
 
+/** Pflicht-Hinweis laut den Minecraft-Nutzungsrichtlinien von Mojang. */
+const DISCLAIMER = 'NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.';
+
+const INFO_HTML = `
+  <h1>Über das Spiel</h1>
+  <p><b>Steves Pixel Sprint</b> ist ein kostenloses Fan-Spiel für Minecraft-Fans. Es gibt keine Werbung und nichts zu kaufen. Das Spiel lädt nichts von fremden Servern nach, und Spielstand und Bestzeiten bleiben nur in deinem Browser.</p>
+  <p class="disclaimer-big">${DISCLAIMER}</p>
+  <p>Dies ist kein offizielles Minecraft-Produkt. Es ist nicht von Mojang oder Microsoft genehmigt und steht in keiner Verbindung zu ihnen. Minecraft ist eine Marke von Mojang Synergies AB.</p>
+  <p>Alle Grafiken, Figuren, Sounds und die Musik sind selbst gemacht bzw. werden im Spiel erzeugt – es werden keine Dateien aus Minecraft verwendet.</p>
+  <p>Verantwortlich: Ronny Hartenstein · Kontakt: <a href="https://blog.rh-flow.de/impressum/" target="_blank" rel="noopener">Impressum</a><br>
+  Quellcode: <a href="https://github.com/ronnyhartenstein/minecraft-jumpnrun" target="_blank" rel="noopener">GitHub</a></p>
+  <div class="buttons"><button type="button" class="primary">Zurück</button></div>`;
+
 export const formatTime = (seconds: number) => `${seconds.toFixed(1).replace('.', ',')} s`;
 
 /** Alles, was als HTML über dem 3D-Bild liegt: Menü, Überblendung, Hinweise, Ziel-Anzeige. */
@@ -43,6 +56,7 @@ export class Overlay {
   private readonly warningBox = el('div', 'warnings hidden');
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
+  private readonly infoPanel = el('div', 'panel info hidden', INFO_HTML);
   private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
   private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
 
@@ -52,6 +66,11 @@ export class Overlay {
       this.soundButton.blur();
       actions.toggleSound();
     });
+    this.infoPanel.querySelector('button')!.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLButtonElement).blur();
+      this.infoPanel.classList.add('hidden');
+      this.menuPanel.classList.remove('hidden');
+    });
     this.menuButton.type = 'button';
     this.menuButton.title = 'Levelauswahl (Esc)';
     this.menuButton.addEventListener('click', () => {
@@ -60,7 +79,7 @@ export class Overlay {
     });
     parent.append(
       this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl,
-      this.win, this.menuPanel, this.soundButton, this.menuButton,
+      this.win, this.menuPanel, this.infoPanel, this.soundButton, this.menuButton,
     );
   }
 
@@ -197,13 +216,19 @@ export class Overlay {
     if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
     const columns = [...worlds].map(([title, cards]) => `<div class="world"><h3>${title}</h3>${cards.join('')}</div>`);
     this.menuPanel.innerHTML = `
-      <h1>Minecraft Jump 'n' Run</h1>
+      <h1>Steves Pixel Sprint<small>Ein Fan-Jump-'n'-Run für Minecraft-Fans</small></h1>
+      <p class="disclaimer">${DISCLAIMER} · <button type="button" class="info-button">ℹ Über das Spiel</button></p>
       <div class="difficulty-tabs">${DIFFICULTY_ORDER.map((d) => `
         <button type="button" data-difficulty="${d}" class="${d === difficulty ? 'active' : ''}">${DIFFICULTIES[d].label}</button>`).join('')}
       </div>
       <div class="worlds">${columns.join('')}</div>
       <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
     this.setScreen('menu');
+    this.menuPanel.querySelector<HTMLButtonElement>('.info-button')!.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLButtonElement).blur();
+      this.menuPanel.classList.add('hidden');
+      this.infoPanel.classList.remove('hidden');
+    });
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.difficulty-tabs button').forEach((tab) => {
       tab.addEventListener('click', () => this.actions.setDifficulty(tab.dataset.difficulty as DifficultyId));
     });
@@ -214,6 +239,7 @@ export class Overlay {
       });
     });
     this.win.classList.add('hidden');
+    this.infoPanel.classList.add('hidden');
     this.hint.classList.add('hidden');
     this.hud.classList.add('hidden');
     this.warningBox.classList.add('hidden');
