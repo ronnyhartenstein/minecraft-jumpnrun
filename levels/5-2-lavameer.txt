@@ -11,7 +11,7 @@ Info: Inseln und Säulen mitten im Lavameer, Seelensand vor den Sprüngen.
 .
 ..........*............*.........................*...........*.....*
 ......*.....................*...............*.................................*.................*
-...S.t.......t............Xt....s...........t.......X.t................t...s.t..........NNN....t...t.Z.t
+...S.t.......t............Xt....s...........t.7.....X.t.6..............t...s.t..........NNN....t.5.t.Z.t
 GGGGGGGGGG..GGWWW..NNN...GGGGGGGGGG..NNN..GGGGGG...GGGGGWWWWW..NNN...GGGGGGGGGGGG..NNN..DDD..GGGGGGGGGGGG
 DDDDDDDDOD..DDDDD..DDD...DDDDDDDDDD..DDD..DDDDOD...DDDDDDDDOD..DDD...DDDDDDDDDDOD..DDD..DDD..DDDDDDDDDDDD
 DDDDDDDDDD..DDDDD..DDD...DDDDDDDDDD..DDD..DDDDDD...DDDDDDDDDD..DDD...DDDDDDDDDDDD..DDD..DDD..DDDDDDDDDDDD

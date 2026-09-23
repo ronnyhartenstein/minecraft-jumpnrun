@@ -8,8 +8,8 @@ Info: Leichte Hindernisse, kleine Lücken, am Ende die Ziel-Fahne.
 ...................................*......................................................................*
 .................*............................................*......................*..................................*
 ..........*......................................................................................*
-.*....*...................C........t...............##......................C.............................GGG
-...S...t..#...t........t..C....GGGGGGGGG.......P..####...t...PPP....t..C...C....t.............t.HH..t.GGGDDDGGG..st.......t..Z...t
+.*....*...................C........t..7............##......................C.............................GGG
+...S...t..#...t5.......t..C....GGGGGGGGG.......P..####...t...PPP....t6.C...C....t.8...........t.HH..t.GGGDDDGGG..st.......t..Z...t
 GGGGGGGGGGGGGGGGG..GGGGGGGGGGGGDDDDDDDDDGG...GGGGGGGGGGGGGGG.....GGGGGGGGGGGGGGGGGGG..GGG..GGGGGGGGGGGDDDDDDDDDGGGGGGGG..GGGGGGGGGGG
 DDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD.....DDDDDDDDDDDDDDDDDDD..DDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDD
 DDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD.....DDDDDDDDDDDDDDDDDDD..DDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDD

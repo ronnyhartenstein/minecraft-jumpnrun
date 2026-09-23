@@ -11,9 +11,9 @@ Info: Brücken mit Löchern, Türme und Glowstone-Lampen hoch über dem Lavameer
 .........................................................................................................................*
 ..............................*.........*...........O...........*........*.............*............................t.N...t.N...Z
 ............................*...................NNNNNNNN.........................................................NNNNNNNNNNNNNNNNNN
-..........*............X.N.t......N..t......t.NNNNNNNNNNNN...X.......t........t.s..t.......t.............t..s..NNNNNNNNNNNNNNNNNNNN
+..........*............X.N.t......N..t......t.NNNNNNNNNNNN...X.......t7.......t.s..t.......t..6..........t..s..NNNNNNNNNNNNNNNNNNNN
 ......*.............NNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNWWWWWW..NNNNNNNNNNNNNNNNNNNNNNNNNNNN
-...S.t..t.....t...NNNNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNNNNNNN..NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+...S.t..t.....t.5.NNNNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNNNNNNN..NNNNNNNNNNNNNNNNNNNNNNNNNNNN
 GGGGGGGGGG..GGGGGGNNNNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNNNNNNN..NNNNNNNNNNNNNNNNNNNNNNNNNNNN
 DDDDDDDDDD..DDDDDDNNNNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNNNNNNN..NNNNNNNNNNNNNNNNNNNNNNNNNNNN
 DDDDDDDDDD..DDDDDDNNNNNNNNNNNN..NNNNNNN...NNNNNNNNNNNNNNNNNNNNNN..NNNNNN...NNNNNNNNNNN...NNNNNNNNNNNN..NNNNNNNNNNNNNNNNNNNNNNNNNNNN

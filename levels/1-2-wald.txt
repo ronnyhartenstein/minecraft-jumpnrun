@@ -10,8 +10,8 @@ Info: Viele Bäume, Baumstämme als Hindernisse und die ersten Slimes.
 ...................................*
 .......................................................*
 ..............*..............*....t............*...................................................*
-.......*....................t...GGGGGG...*.............C.........................*........t...............*
-...S..t..Ht......t.....st.GGGGGGDDDDDD.t....t.....X.t..C..t..t.....t.....t.H..t.s...t..GGGGGG..t........t.....Z..t
+.......*....................t...GGGGGG...*.............C.........................*........t8..............*
+...S..t..Ht......t.....st.GGGGGGDDDDDD.t...6t.....X.t..C..t.7t.....t.....t.H..t.s...t..GGGGGG..t........t.5...Z..t
 GGGGGGGGGGGGGG..GGGGGGGGGGDDDDDDDDDDDDGGGGGGGG...GGGGGGGGGGGGGG..GGGG..GGGGGGGGGGGGGGGGDDDDDDGGGGG...GGGGGGGGGGGGGGG
 DDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDD..DDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD
 DDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDD..DDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD
