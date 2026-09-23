@@ -11,7 +11,7 @@ Info: Das Finale über dem Lavameer, am Ende die Nether-Festung.
 .............*............................................................*.................................t........t
 ............................*..............*...............................................................GGGG...GGGGG...........*..........*...........................N...N.s.N...Z....N
 .*..................................*.........................................N.........................GGGDDDD...DDDDDG............................................NNNNNNNNNNNNNNNNNNNNNNNNNN
-...S..t....t.......5t.......N.t................t.8..........X.t..t.....6....t.N...tb........NN....X.tGGGDDDDDDD...DDDDDDG..s.t........t..........X..t7...........t.NNNNNNNNNNNNNNNNNNNNNNNNNNN
+...S..t....t.......5t.......N.t................t.8..........X.t..t.....6....t.N...t.........NN....X.tGGGDDDDDDD...DDDDDDG..s.t........t..........X..t7...........t.NNNNNNNNNNNNNNNNNNNNNNNNNNN
 GGGGGGGGGGGGG..GGGWWWWW..GGGGGGGG..NNN..GGG~~GGGGGG..NNN..GGGGGGGGGWWWWWW...GGGGGGGGG..NNN..GG..GGGGGDDDDDDDDDD...DDDDDDDGGGGGGGG~~~GGGGWWWWW..GGGGGGGG..NNN..GGGGGNNNNNNNNNNNNNNNNNNNNNNNNNNN
 DDDDDDDDDODDD..DDDDDDDD..DDDDDDDD..DDD..DDDDDDODDDD..DDD..DDDDDODDDDDDDDD...DDDDDDDDD..DDD..DD..DDDODDDDDDDDDDD...DDDDDDDDDDDDODD~~~DDDDDDDDD..DDDDODDD..DDD..DDDDDNNNNNNNNNNNNNNNNNNNNNNNNNNN
 DDDDDDDDDDDDD..DDDDDDDD..DDDDDDDD..DDD..DDDDDDDDDDD..DDD..DDDDDDDDDDDDDDD...DDDDDDDDD..DDD..DD..DDDDDDDDDDDDDDD...DDDDDDDDDDDDDDD~~~DDDDDDDDD..DDDDDDDD..DDD..DDDDDNNNNNNNNNNNNNNNNNNNNNNNNNNN

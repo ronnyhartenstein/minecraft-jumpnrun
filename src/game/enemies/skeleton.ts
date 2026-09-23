@@ -58,7 +58,8 @@ export class Skeleton extends Enemy {
 
   protected think(dt: number, ctx: EnemyContext) {
     this.cooldown -= dt;
-    if (!this.sees(ctx.player, RANGE, 4)) {
+    // Nur auf gleicher Höhe schießen, nicht von oben auf jemanden, der gerade hochklettert
+    if (!this.sees(ctx.player, RANGE, 1.5)) {
       this.drawing = 0;
       this.patrol(WALK_SPEED);
       return;

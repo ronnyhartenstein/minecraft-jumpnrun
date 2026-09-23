@@ -11,7 +11,7 @@ Info: Klettern bis ganz nach oben, mit Eis vor den Lücken.
 .......................................................................................................GGGGGGGGGGGGGGGGGGGGGGG
 ..................................................................................*.......*..........t.DDDDDDDDDDDDDDDDDDDDDDD
 ........................................................................*.........................GGGGGDDDDDDDDDDDDDDDDDDDDDDD
-..................................................................tk.......s..t........t6....X.t..DDDDDDDDDDDDDDDDDDDDDDDDDDDD
+..................................................................t........s..tk.......t6....X.t..DDDDDDDDDDDDDDDDDDDDDDDDDDDD
 .............................................................*..GGGGGGGGGGGGGGGGG...EEEEEE..GGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ...................................................*..........t.DDDDDDDDDDDDDDDDD...DDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ............................................*..............GGGGGDDDDDDDDDDDDDDDDD...DDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD

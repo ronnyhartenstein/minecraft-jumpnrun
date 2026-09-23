@@ -51,7 +51,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     skeletonCooldown: 4,
     arrowSpeed: 7,
     witchCooldown: 3.0,
-    blazeCooldown: 3.5,
+    blazeCooldown: 4.5,
     blazeBurst: 1,
     fireballSpeed: 4.5,
   },
