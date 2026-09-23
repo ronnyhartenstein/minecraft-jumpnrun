@@ -5,7 +5,7 @@ import type { World } from '../world';
 import { Enemy, type EnemyContext } from './base';
 import { box, dots, P, skin } from './models';
 
-const JUMP = 8;
+const JUMP = 9;
 const POUNCE_X = 5;
 const POUNCE_Y = 6.5;
 /** So nah muss Steve (vor ihr) sein, damit die Spinne ihn anspringt. */
@@ -79,16 +79,28 @@ export class Spider extends Enemy {
     const col = Math.floor(this.pos.x + this.dir * (this.halfWidth + 0.1));
     const row = Math.round(this.pos.y);
     const lowWall = this.world.isSolid(col, row) && !this.world.isSolid(col, row + 1) && !this.world.isSolid(col, row + 2);
-    if (lowWall && this.onGround) this.vel.set(this.dir * this.difficulty.spiderSpeed, JUMP);
+    // Im Sprung weiter vorwärts drücken, damit sie über die Kante kommt
+    if (!this.onGround) {
+      this.vel.x = this.dir * this.difficulty.spiderSpeed;
+      return;
+    }
+    if (lowWall) this.vel.set(this.dir * this.difficulty.spiderSpeed, JUMP);
     else this.flip();
   }
 
-  /** Vor einer 1er-Stufe nicht umdrehen, sondern hinaufspringen. */
+  /**
+   * Die Spinne ist der einzige Gegner, der treppauf und treppab kann:
+   * Vor einer 1er-Stufe springt sie hinauf, an einer 1er-Kante hüpft sie hinunter.
+   * In Lava oder in eine Lücke geht sie aber nie.
+   */
   protected override blockedAhead(x: number): boolean {
     const col = Math.floor(x);
     const row = Math.round(this.pos.y);
-    const step = this.world.isSolid(col, row) && !this.world.isSolid(col, row + 1) && !this.world.isSolid(col, row + 2);
-    if (step) return false;
+    const { world } = this;
+    const stepUp = world.isSolid(col, row) && !world.isSolid(col, row + 1) && !world.isSolid(col, row + 2);
+    const stepDown = !world.isSolid(col, row) && !world.isSolid(col, row - 1) && world.blockAt(col, row - 1) !== 'lava'
+      && world.isSolid(col, row - 2);
+    if (stepUp || stepDown) return false;
     return super.blockedAhead(x);
   }
 

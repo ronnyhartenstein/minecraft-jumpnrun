@@ -82,7 +82,7 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `c` | Creeper: Kommt man ihm zu nah, blinkt er und explodiert |
 | `s` | Slime (im Nether ein Magmawürfel): hüpft herum |
 | `z` | Zombie (in der Wüste Wüstenzombie): verfolgt Steve, wenn er nah ist |
-| `p` | Spinne (in der Höhle Höhlenspinne): schnell, springt über 1er-Blöcke und springt Steve an |
+| `p` | Spinne (in der Höhle Höhlenspinne): schnell, springt Steve an und kann als einzige 1er-Stufen hinauf- und hinunterlaufen |
 | `k` | Skelett (im Schnee Eiswanderer): schießt Pfeile |
 | `h` | Waldhexe: wirft Gift im Bogen |
 | `b` | Lohe (Blaze): schwebt und schießt Feuerbälle – man kann unter ihr durchlaufen |
