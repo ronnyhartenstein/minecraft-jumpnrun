@@ -12,8 +12,8 @@ Info: Häuser zum Drüberklettern, ein hoher Turm und der erste Creeper.
 ................*
 ................................HH.........................*...............................................C
 ................PP..............PP.......*............................*...................................CC.t.............*
-.........*.....PCCP............HPPH........................PP.......................*........PP....t....GGGGGGGG................*
-...S...t...t7.PCCCCP..t.....st.PPPP..t.......X.t....c..t..PCCP..t..8.......t..PPP..t.....st.PCCPGGGGGGGGDDDDDDDD....t6.............t..5t..Z...t
+.........*.....PCCP............HPPH........................PP.......................*........PP....t..z.GGGGGGGG................*
+...S...t...t7.PCCCCP..t.....st.PPPP..t.h.....X.t....c..t..PCCP..t..8.......tk.PPP..t.....st.PCCPGGGGGGGGDDDDDDDD....t6.............t..5t..Z...t
 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGG
 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDD
 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDD

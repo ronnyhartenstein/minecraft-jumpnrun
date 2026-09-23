@@ -13,8 +13,8 @@ Info: Minenbrücken, enge Stollen, ein tiefer Abstieg und Creeper in den Hallen.
 ............#######1#2.................................######1######2##....................................*.......................*
 .............................*..........*............*..................................*.....................................t.....6f..Z..t
 ........*.......*..............................................................................*.............................GGGGGG2GGGGGGGGG
-...S..f...t5............t.7.....X.t............f..c.t...........*...........X.f..s..t............f..8t.f........f..c..t..GGG2DDDDDDDDDD1DDDDD
+...S..f...t5............t.7.....X.t...p........f..c.t...........*...........X.f..s..t............f..8t.f........f..c..t..GGG2DDDDDDDDDD1DDDDD
 GGGGG2GGGGGG2GGGGGG1GG2GGGGG...G2GGGGPPP..PPPGGGGGGG1GG..................GGGGGGGGGGGGGG...G22GGGGGGG1G1GGG~~~GGGGGGGGG1GGDDDDDDDDDDDDDDDDDDDD
-DDD1DDDDDDDD3D1DDDDDDDDDDDDD...1DDDDD........DD2DDDDDDDGG.....f.....t..GGDDDDDDDD1DDDDD...DDDD1DDD1DDDDDDD~~~D2DDDDDDDDDDD1D3DDDDDDDDDDDDDDDD
+DDD1DDDDDDDD3D1DDDDDDDDDDDDD...1DDDDD........DD2DDDDDDDGG....pf.....t..GGDDDDDDDD1DDDDD...DDDD1DDD1DDDDDDD~~~D2DDDDDDDDDDD1D3DDDDDDDDDDDDDDDD
 2DDD1DDDDDD2D11DDDDDDDDDD1DD...DDD22D........DDDDDDDDDDDDGGGGG2G~~GGGGGDDDDDDDDD2DDDDDD...D12DDDDDDDD2DDDD1DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 DDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDD........DDDDDDDDDDD1DDDDDDDDD2DDD2DDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD

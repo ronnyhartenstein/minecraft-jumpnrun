@@ -15,7 +15,7 @@ Info: Eine Pyramide mit Lavabecken und ein großer Tempel mit Lavagruben.
 ...................................YYYYYY~~YY
 ..............................*..YYYYYYYYYYYYYY...*............................X....6
 ...............................YYYYYYYYYYYYYYYYYY.............................YYYYYYYY~~YYYYY~~~YYYY
-..........*......*...........YYYYYYYYYYYYYYYYYYYYYY.............*.............YYYYYYYYYYYYYYYYYYYYYY
+..........*......*...........YYYYYYYYYYYYYYYYYYYYYY.............*.............YYYYYYYYYYYYYYYYYYYYYY....z
 ......*....................YYYYYYYYYYYYYYYYYYYYYYYYYY.....................YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY...*
 ...S...t.....t.7.....t.c.YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY...t.s.......t.c.t.YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY..t.5t..Z.t
 GGGGGGGGGG~GGGGGG~~GGGGGGYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYGGGGGG~~~GGGGGGGGYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYGGGGGGGGGGGG
