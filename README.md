@@ -35,6 +35,8 @@ Creeper und Slimes (im Nether Magmawürfel) laufen oder hüpfen herum. Von oben 
 
 In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen.
 
+**Schwierigkeitsgrade:** Jedes Level gibt es auf Leicht, Mittel und Schwer (Auswahl oben in der Levelauswahl). Auf Mittel und Schwer kommen zusätzliche Gegner dazu, Creeper zünden schneller, Slimes hüpfen öfter, die Lava ist weniger gnädig, und auf Schwer gibt es keine Checkpoints. Schwer gibt es für ein Level erst, wenn man es auf Mittel geschafft hat. Alle Werte stehen in `src/game/difficulty.ts`.
+
 Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
 Direkt zu einem Level springen: `#level=2-3` an die Adresse anhängen.
 Alle Level automatisch prüfen (Regeln und ein Bot, der jedes Level durchspielt): `?pruefen` an die Adresse anhängen.

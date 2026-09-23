@@ -1,19 +1,16 @@
 import * as THREE from 'three';
 import type { Point } from '../levels/format';
 import { noiseRect, pixelTexture, px } from '../textures/pixel';
+import type { Difficulty } from './difficulty';
 import type { World } from './world';
 
 export type EnemyKind = 'creeper' | 'slime' | 'magma';
 
 const GRAVITY = 30;
 const CREEPER_SPEED = 1.3;
-const HOP_SPEED_X = 2.4;
 const HOP_SPEED_Y = 7.5;
-const HOP_PAUSE = 0.9;
-/** Creeper: So nah muss Steve kommen, damit er zündet … */
+/** Creeper: So nah muss Steve kommen, damit er zündet. Einmal gezündet, gibt es kein Zurück. */
 const FUSE_TRIGGER = 2;
-/** … und so lange dauert es dann bis zur Explosion (wie im Original 1,5 s). Einmal gezündet, gibt es kein Zurück. */
-const FUSE_TIME = 1.5;
 /** Wer näher als das an der Explosion steht, fängt neu an. */
 export const BLAST_RADIUS = 2.8;
 const EPS = 1e-4;
@@ -91,7 +88,13 @@ export class Enemy {
   private blast: THREE.Group | null = null;
   private blastTime = 0;
 
-  constructor(readonly kind: EnemyKind, private readonly start: Point, private readonly world: World) {
+  /** Zündzeit der Creeper und Sprünge der Slimes hängen von der Schwierigkeit ab (siehe difficulty.ts). */
+  constructor(
+    readonly kind: EnemyKind,
+    private readonly start: Point,
+    private readonly world: World,
+    private readonly difficulty: Difficulty,
+  ) {
     ({ halfWidth: this.halfWidth, height: this.height } = SIZE[kind]);
     if (kind === 'creeper') this.buildCreeper();
     else this.buildSlime(kind === 'magma');
@@ -110,7 +113,7 @@ export class Enemy {
     this.setFlash(false);
     this.blast?.removeFromParent();
     this.blast = null;
-    this.timer = Math.random() * HOP_PAUSE;
+    this.timer = Math.random() * this.difficulty.slimePause;
     this.object.visible = true;
     this.model.visible = true;
     this.model.scale.set(1, 1, 1);
@@ -162,9 +165,9 @@ export class Enemy {
     this.fuse += dt;
     // Immer schneller weiß blinken und dabei anschwellen
     this.setFlash(Math.sin(this.fuse * this.fuse * 14) > 0);
-    const swell = 1 + (this.fuse / FUSE_TIME) * 0.25;
+    const swell = 1 + (this.fuse / this.difficulty.creeperFuse) * 0.25;
     this.model.scale.set(swell, 1 + (swell - 1) * 0.5, swell);
-    if (this.fuse >= FUSE_TIME) this.explode();
+    if (this.fuse >= this.difficulty.creeperFuse) this.explode();
   }
 
   private explode() {
@@ -214,11 +217,11 @@ export class Enemy {
   }
 
   private hop() {
-    if (!this.onGround || this.timer < HOP_PAUSE) return;
+    if (!this.onGround || this.timer < this.difficulty.slimePause) return;
     // Nur dorthin hüpfen, wo sicherer Boden ist; geht es in keine Richtung, hüpft er auf der Stelle
     const unsafe = () => this.blockedAhead(this.pos.x + this.dir * 1.2) || this.blockedAhead(this.pos.x + this.dir * (this.halfWidth + 0.05));
     if (unsafe()) this.dir = -this.dir as 1 | -1;
-    this.vel.set(unsafe() ? 0 : this.dir * HOP_SPEED_X, HOP_SPEED_Y);
+    this.vel.set(unsafe() ? 0 : this.dir * this.difficulty.slimeHop, HOP_SPEED_Y);
     this.timer = 0;
   }
 

@@ -3,6 +3,7 @@ import type { Level } from '../levels/format';
 import { Checkpoint } from './checkpoint';
 import { Clouds } from './clouds';
 import { Diamond } from './diamond';
+import { atLeast, type Difficulty } from './difficulty';
 import { Enemy } from './enemy';
 import { GoalFlag } from './goal';
 import { lavaSparks, netherAsh, Particles, snowfall } from './particles';
@@ -20,8 +21,8 @@ export class LevelScene {
   private readonly particles: Particles[] = [];
 
   /** `focus` ist die Stelle, auf die die Kamera schaut. Dort entstehen Schnee, Asche und Funken. */
-  constructor(readonly level: Level, focus: THREE.Vector3) {
-    this.world = new World(level);
+  constructor(readonly level: Level, focus: THREE.Vector3, readonly difficulty: Difficulty) {
+    this.world = new World(level, difficulty);
     this.object.add(this.world.object);
 
     this.clouds = level.biome.clouds ? new Clouds(level.width, level.height) : null;
@@ -30,14 +31,17 @@ export class LevelScene {
     this.goal = level.goal ? new GoalFlag(level.goal) : null;
     if (this.goal) this.object.add(this.goal.object);
 
-    this.checkpoints = level.checkpoints.map((at) => new Checkpoint(at));
+    // Auf Schwer gibt es keine Checkpoints
+    this.checkpoints = difficulty.checkpoints ? level.checkpoints.map((at) => new Checkpoint(at)) : [];
     for (const cp of this.checkpoints) this.object.add(cp.object);
 
     this.diamonds = level.diamonds.map((at) => new Diamond(at));
     for (const d of this.diamonds) this.object.add(d.object);
 
     const slime = level.biome.id === 'nether' ? 'magma' : 'slime';
-    this.enemies = level.enemies.map((e) => new Enemy(e.kind === 'slime' ? slime : 'creeper', e, this.world));
+    this.enemies = level.enemies
+      .filter((e) => atLeast(difficulty.id, e.from))
+      .map((e) => new Enemy(e.kind === 'slime' ? slime : 'creeper', e, this.world, difficulty));
     for (const e of this.enemies) this.object.add(e.object);
 
     if (this.world.lavaSurfaces.size > 0) this.particles.push(lavaSparks(this.world.lavaSurfaces, focus));

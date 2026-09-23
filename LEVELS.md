@@ -81,10 +81,22 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `*` | Diamant zum Einsammeln |
 | `c` | Creeper: Kommt man ihm zu nah, blinkt er und explodiert |
 | `s` | Slime (im Nether ein Magmawürfel): hüpft herum |
+| `5` `6` | Creeper bzw. Slime, die erst ab **Mittel** auftauchen |
+| `7` `8` | Creeper bzw. Slime, die nur auf **Schwer** auftauchen |
 | `t` | Baum oder Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Tropfstein …) |
 | `f` | Fackel (leuchtet, gut für die Höhle) |
 
 Gegner besiegt man, indem man **von oben** draufspringt.
+
+### Schwierigkeitsgrade
+
+Jedes Level gibt es auf **Leicht**, **Mittel** und **Schwer**. Das Raster bleibt gleich, aber:
+
+- Mit `5` `6` `7` `8` kannst du Gegner setzen, die erst auf Mittel oder nur auf Schwer dabei sind.
+- Auf Mittel und Schwer zünden Creeper schneller, Slimes hüpfen öfter und weiter, und die Lava ist weniger gnädig.
+- Auf Schwer gibt es **keine Checkpoints**.
+
+Auf **Leicht** muss dein Level schaffbar sein – das prüft auch der Prüf-Roboter.
 
 ## Tipps für ein gutes Level
 

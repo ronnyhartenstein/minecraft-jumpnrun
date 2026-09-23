@@ -7,6 +7,7 @@ import { Overlay, type FadeKind } from '../ui/overlay';
 import { BASE_DISTANCE, CameraRig } from './cameraRig';
 import { BLAST_RADIUS } from './enemy';
 import { BoxSteve, type Character } from './character';
+import { DIFFICULTIES, type Difficulty, type DifficultyId } from './difficulty';
 import { LevelScene } from './levelScene';
 import { PHYSICS, Player, type PlayerInput } from './player';
 import { Progress } from './progress';
@@ -16,8 +17,6 @@ import type { Stage } from './scene';
 const FALL_LIMIT = -4;
 /** Dauer der Abblende beim Respawn, passend zur CSS-Transition. */
 const FADE_TIME = 0.3;
-/** So lange können Gegner Steve nach einem Neustart nichts anhaben. */
-const INVULNERABLE_TIME = 1.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
@@ -57,6 +56,7 @@ export class Game {
       next: () => this.next(),
       menu: () => this.showMenu(),
       toggleSound: () => this.toggleSound(),
+      setDifficulty: (id) => this.setDifficulty(id),
     });
     this.overlay.setSoundIcon(this.sound.muted);
     input.onAnyInput = () => this.sound.unlock();
@@ -83,10 +83,25 @@ export class Game {
     return this.diamonds;
   }
 
-  /** Weiter geht es nur innerhalb der Welten bzw. innerhalb der eigenen Level. */
-  private get hasNext(): boolean {
+  /** Die gewählte Schwierigkeit. Die automatische Level-Prüfung spielt immer auf Leicht. */
+  get difficulty(): Difficulty {
+    return this.testMode ? DIFFICULTIES.leicht : DIFFICULTIES[this.progress.difficulty];
+  }
+
+  private setDifficulty(id: DifficultyId) {
+    this.progress.selectDifficulty(id);
+    if (this.state === 'menu') this.overlay.showMenu(this.progress);
+  }
+
+  /** Das nächste Level in derselben Gruppe (Welten bzw. eigene Level), falls es eins gibt. */
+  private get nextLevel(): Level | undefined {
     const next = this.levels[this.index + 1];
-    return next !== undefined && next.custom === this.level.custom;
+    return next?.custom === this.level.custom ? next : undefined;
+  }
+
+  /** Weiter geht es nur, wenn das nächste Level auf der gewählten Schwierigkeit spielbar ist. */
+  private get hasNext(): boolean {
+    return this.nextLevel !== undefined && this.progress.isAvailable(this.levels, this.index + 1, this.difficulty.id);
   }
 
   private bindKeys() {
@@ -111,7 +126,8 @@ export class Game {
 
   /** Das erste noch nicht geschaffte Level, sonst das letzte. */
   private firstOpenLevel(): number {
-    const open = this.levels.findIndex((level, i) => this.progress.isUnlocked(this.levels, i) && !this.progress.finished(level.name));
+    const d = this.difficulty.id;
+    const open = this.levels.findIndex((level, i) => this.progress.isAvailable(this.levels, i, d) && !this.progress.finished(level.name, d));
     return open === -1 ? this.levels.length - 1 : open;
   }
 
@@ -135,7 +151,7 @@ export class Game {
     this.playTime = 0;
     this.resetCheckpoints();
     this.respawn();
-    this.overlay.levelStarted(this.index);
+    this.overlay.levelStarted(this.index, this.difficulty.label);
   }
 
   next(): void {
@@ -143,12 +159,12 @@ export class Game {
   }
 
   private load(index: number) {
-    if (this.scene && this.index === index) return;
+    if (this.scene && this.index === index && this.scene.difficulty === this.difficulty) return;
     this.scene?.dispose();
     this.index = index;
     const level = this.level;
     this.stage.applyBiome(level.biome);
-    this.scene = new LevelScene(level, this.cameraRig.focus);
+    this.scene = new LevelScene(level, this.cameraRig.focus, this.difficulty);
     this.stage.scene.add(this.scene.object);
     this.player = new Player(this.scene.world);
     this.cameraRig.setLevel(level.width, level.start.y + 1);
@@ -167,7 +183,7 @@ export class Game {
 
   private updateHud() {
     const total = this.scene!.diamonds.length;
-    this.overlay.setDiamonds(this.state === 'menu' || total === 0 ? null : `${this.diamonds}/${total}`);
+    this.overlay.setDiamonds(this.state === 'menu' ? null : total === 0 ? '' : `${this.diamonds}/${total}`, this.difficulty.label);
   }
 
   private respawn() {
@@ -186,10 +202,24 @@ export class Game {
 
   private win() {
     this.state = 'won';
-    const best = this.progress.best(this.level.name);
-    const record = this.testMode ? false : this.progress.finish(this.level.name, this.playTime, this.diamonds);
+    const { name } = this.level;
+    const d = this.difficulty.id;
+    const best = this.progress.best(name, d);
+    // Das erste Mal auf Mittel geschafft: Schwer ist jetzt offen
+    const hardUnlocked = d === 'mittel' && !this.testMode && !this.progress.finished(name, 'mittel');
+    const record = this.testMode ? false : this.progress.finish(name, d, this.playTime, this.diamonds);
     this.sound.play('win');
-    this.overlay.showWin(this.index, this.playTime, best, record, this.diamonds, this.scene!.diamonds.length, this.hasNext);
+    this.overlay.showWin(this.index, {
+      seconds: this.playTime,
+      best,
+      record,
+      diamonds: this.diamonds,
+      total: this.scene!.diamonds.length,
+      hasNext: this.hasNext,
+      nextNeedsMedium: this.nextLevel !== undefined && !this.hasNext,
+      hardUnlocked,
+      difficulty: this.difficulty.label,
+    });
   }
 
   /**
@@ -270,7 +300,7 @@ export class Game {
         this.stateTimer -= dt;
         if (this.stateTimer <= 0) {
           this.respawn();
-          this.invulnerable = INVULNERABLE_TIME;
+          this.invulnerable = this.difficulty.invulnerable;
           this.overlay.setFade(false);
           this.state = 'playing';
         }

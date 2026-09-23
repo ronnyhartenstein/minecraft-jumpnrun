@@ -1,4 +1,5 @@
 import type { Level } from '../levels/format';
+import { DIFFICULTIES, DIFFICULTY_ORDER, type DifficultyId } from '../game/difficulty';
 import type { Progress } from '../game/progress';
 import { isTouchDevice } from './touch';
 
@@ -8,6 +9,22 @@ export interface OverlayActions {
   next(): void;
   menu(): void;
   toggleSound(): void;
+  setDifficulty(id: DifficultyId): void;
+}
+
+/** Was die Ziel-Anzeige über den Durchlauf wissen muss. */
+export interface WinStats {
+  seconds: number;
+  best: number | undefined;
+  record: boolean;
+  diamonds: number;
+  total: number;
+  hasNext: boolean;
+  /** Es gibt ein nächstes Level, aber auf Schwer muss man es erst auf Mittel schaffen. */
+  nextNeedsMedium: boolean;
+  /** Gerade zum ersten Mal auf Mittel geschafft. */
+  hardUnlocked: boolean;
+  difficulty: string;
 }
 
 export type FadeKind = 'fall' | 'lava' | 'hurt' | 'boom';
@@ -66,7 +83,7 @@ export class Overlay {
     document.body.dataset.screen = screen;
   }
 
-  levelStarted(index: number): void {
+  levelStarted(index: number, difficulty: string): void {
     this.setScreen('play');
     this.win.classList.add('hidden');
     this.menuPanel.classList.add('hidden');
@@ -74,7 +91,7 @@ export class Overlay {
     this.setFade(false);
     const level = this.levels[index];
     const label = level.custom ? 'Eigenes Level' : level.world !== null ? `Welt ${level.code}` : `Level ${level.code}`;
-    this.banner.innerHTML = `<small>${label}</small>${escapeHtml(level.name)}`;
+    this.banner.innerHTML = `<small>${label} · ${difficulty}</small>${escapeHtml(level.name)}`;
     restartAnimation(this.banner, 'show');
     this.showWarnings(level.warnings);
   }
@@ -87,10 +104,12 @@ export class Overlay {
     this.warningBox.innerHTML = `<strong>⚠ Im Level stimmt etwas nicht:</strong><ul>${shown}${more}</ul>`;
   }
 
-  /** Diamanten-Zähler oben links, `null` blendet ihn aus. */
-  setDiamonds(text: string | null): void {
+  /** Anzeige oben links: Diamanten und Schwierigkeit. `null` blendet sie aus. */
+  setDiamonds(text: string | null, difficulty: string): void {
     this.hud.classList.toggle('hidden', text === null);
-    if (text !== null) this.hud.innerHTML = `<span class="gem">💎</span> ${text}`;
+    if (text === null) return;
+    const gems = text ? `<span class="gem">💎</span> ${text} &nbsp;` : '';
+    this.hud.innerHTML = `${gems}<small class="hud-difficulty">${difficulty}</small>`;
   }
 
   /** Kleiner Hüpfer des Zählers beim Einsammeln. */
@@ -104,24 +123,30 @@ export class Overlay {
     restartAnimation(this.toastEl, 'show');
   }
 
-  showWin(index: number, seconds: number, best: number | undefined, record: boolean, diamonds: number, total: number, hasNext: boolean): void {
+  showWin(index: number, stats: WinStats): void {
+    const { seconds, best, record, diamonds, total, hasNext } = stats;
     const level = this.levels[index];
-    const next = hasNext ? this.levels[index + 1] : undefined;
+    // Das nächste Level derselben Gruppe, auch wenn es auf dieser Stufe noch gesperrt ist
+    const following = this.levels[index + 1];
+    const next = following?.custom === level.custom ? following : undefined;
     // Pokal nach der letzten Welt, nicht nach eigenen Leveln
-    const last = !hasNext && !level.custom;
+    const last = next === undefined && !level.custom;
     const worldDone = level.world !== null && !last && next?.world !== level.world;
     const title = last ? 'Alle Welten geschafft!' : worldDone ? `Welt ${level.world} geschafft!` : 'Geschafft!';
-    const nextWorld = worldDone && next ? `<p class="next-world">Weiter geht's in Welt ${next.world}: ${next.biome.name}</p>` : '';
+    const nextWorld = worldDone && next && hasNext ? `<p class="next-world">Weiter geht's in Welt ${next.world}: ${next.biome.name}</p>` : '';
     const gems = total === 0 ? '' : diamonds === total
       ? `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total} &nbsp;Alle gefunden! ⭐</p>`
       : `<p class="gems"><span class="gem">💎</span> ${diamonds}/${total}</p>`;
     this.win.innerHTML = `
       <h1>${title}</h1>
+      <p class="win-difficulty">${stats.difficulty}</p>
+      ${stats.hardUnlocked ? '<p class="unlock">🔥 Schwer freigeschaltet! 🔥</p>' : ''}
       ${last ? '<p class="trophy">🏆</p>' : ''}
       ${nextWorld}
       <p class="time">Zeit: ${formatTime(seconds)}</p>
       ${gems}
       <p class="best">${record ? '⭐ Neue Bestzeit! ⭐' : best !== undefined ? `Bestzeit: ${formatTime(best)}` : ''}</p>
+      ${stats.nextNeedsMedium ? '<p class="next-locked">Das nächste Level gibt es auf Schwer erst, wenn du es auf Mittel geschafft hast.</p>' : ''}
       <div class="buttons">
         ${hasNext ? '<button type="button" data-action="next" class="primary">Weiter <small>(Enter)</small></button>' : ''}
         <button type="button" data-action="restart">Nochmal <small>(R)</small></button>
@@ -135,20 +160,28 @@ export class Overlay {
   }
 
   showMenu(progress: Progress): void {
+    const difficulty = progress.difficulty;
     const card = (level: Level, i: number) => {
-      const locked = !progress.isUnlocked(this.levels, i);
-      const best = progress.best(level.name);
+      const locked = !progress.isAvailable(this.levels, i, difficulty);
+      // Auf Schwer gesperrt, obwohl das Level offen ist: erst auf Mittel schaffen
+      const needsMedium = locked && progress.isUnlocked(this.levels, i);
+      const best = progress.best(level.name, difficulty);
       const total = level.diamonds.length;
-      const found = progress.diamonds(level.name);
+      const found = progress.diamonds(level.name, difficulty);
       const gems = total ? `<span class="gem">💎</span> ${found}/${total}${found === total ? ' ⭐' : ''}` : '';
-      const status = locked
-        ? '<span class="lock">🔒</span>'
-        : best !== undefined ? `⏱ ${formatTime(best)}<br>${gems}` : 'Neu!';
+      // Kleine Marken L M S: auf welchen Stufen ist das Level schon geschafft?
+      const stages = DIFFICULTY_ORDER.map((d) => `<i class="${progress.finished(level.name, d) ? 'done' : ''}">${DIFFICULTIES[d].label[0]}</i>`).join('');
+      const status = needsMedium
+        ? '<span class="lock">🔒</span><br>erst Mittel'
+        : locked
+          ? '<span class="lock">🔒</span>'
+          : best !== undefined ? `⏱ ${formatTime(best)}<br>${gems}` : 'Neu!';
       return `
         <button type="button" class="card" data-level="${i}" ${locked ? 'disabled' : ''} style="--biome: ${level.biome.color}">
           <span class="num">${level.code}</span>
           <span class="name">${escapeHtml(level.name)}</span>
           <span class="status">${status}</span>
+          ${progress.finished(level.name) ? `<span class="stages">${stages}</span>` : ''}
         </button>`;
     };
     // Eine Spalte pro Welt, darin die Level untereinander
@@ -165,9 +198,15 @@ export class Overlay {
     const columns = [...worlds].map(([title, cards]) => `<div class="world"><h3>${title}</h3>${cards.join('')}</div>`);
     this.menuPanel.innerHTML = `
       <h1>Minecraft Jump 'n' Run</h1>
+      <div class="difficulty-tabs">${DIFFICULTY_ORDER.map((d) => `
+        <button type="button" data-difficulty="${d}" class="${d === difficulty ? 'active' : ''}">${DIFFICULTIES[d].label}</button>`).join('')}
+      </div>
       <div class="worlds">${columns.join('')}</div>
       <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
     this.setScreen('menu');
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('.difficulty-tabs button').forEach((tab) => {
+      tab.addEventListener('click', () => this.actions.setDifficulty(tab.dataset.difficulty as DifficultyId));
+    });
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();

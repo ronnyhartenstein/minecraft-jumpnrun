@@ -81,6 +81,18 @@ button { touch-action: manipulation; }
 .menu .card .name { font-size: 9px; }
 .menu .card .status { font-size: 9px; line-height: 1.6; }
 .panel .next-world { color: #7dff7d; }
+.panel .win-difficulty { margin-top: -10px; font-size: 11px; opacity: 0.8; }
+.panel .unlock { color: #ff9a3c; }
+.panel .next-locked { font-size: 10px; opacity: 0.85; }
+
+/* Schwierigkeit im Menü */
+.difficulty-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.panel .difficulty-tabs button { padding: 8px 14px; font-size: 11px; }
+.panel .difficulty-tabs button.active { background: #5c9e35; border-color: #2f5a17; box-shadow: inset -3px -3px #3f7a22, inset 3px 3px #86c95a; }
+.card .stages { display: flex; gap: 3px; font-size: 7px; font-style: normal; }
+.card .stages i { font-style: normal; padding: 1px 3px; background: rgb(0 0 0 / 0.35); opacity: 0.5; }
+.card .stages i.done { background: #ffe14d; color: #3a2a00; text-shadow: none; opacity: 1; }
+.hud-difficulty { font-size: 10px; opacity: 0.85; }
 
 .warnings {
   position: absolute; left: 50%; top: 70px; transform: translateX(-50%);

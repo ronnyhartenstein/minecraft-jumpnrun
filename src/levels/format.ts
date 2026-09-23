@@ -1,3 +1,4 @@
+import type { DifficultyId } from '../game/difficulty';
 import type { BlockId } from '../textures/blocks';
 import { BIOMES, type Biome, type BiomeId } from './biomes';
 
@@ -20,6 +21,8 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   *  Diamant zum Einsammeln
  *   c  Creeper (läuft hin und her)
  *   s  Slime (hüpft, im Nether ein Magmawürfel)
+ *   5  Creeper ab Mittel     6  Slime ab Mittel
+ *   7  Creeper nur Schwer    8  Slime nur Schwer
  *      Gegner besiegt man, indem man von oben draufspringt.
  *   t  Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Stalagmit, …)
  *   f  Fackel (leuchtet, nur Deko)
@@ -55,7 +58,19 @@ export interface Point {
 
 export interface EnemySpawn extends Point {
   kind: 'creeper' | 'slime';
+  /** Ab dieser Schwierigkeit ist der Gegner dabei. */
+  from: DifficultyId;
 }
+
+/** Gegner-Zeichen: welche Art und ab welcher Schwierigkeit. */
+const ENEMY_CHARS: Record<string, Omit<EnemySpawn, 'x' | 'y'>> = {
+  c: { kind: 'creeper', from: 'leicht' },
+  s: { kind: 'slime', from: 'leicht' },
+  '5': { kind: 'creeper', from: 'mittel' },
+  '6': { kind: 'slime', from: 'mittel' },
+  '7': { kind: 'creeper', from: 'schwer' },
+  '8': { kind: 'slime', from: 'schwer' },
+};
 
 export interface Level {
   name: string;
@@ -149,8 +164,7 @@ export function parseLevel(
       else if (ch === 'Z') goal = { x, y };
       else if (ch === 'X') checkpoints.push({ x, y });
       else if (ch === '*') diamonds.push({ x, y });
-      else if (ch === 'c') enemies.push({ kind: 'creeper', x, y });
-      else if (ch === 's') enemies.push({ kind: 'slime', x, y });
+      else if (ch in ENEMY_CHARS) enemies.push({ ...ENEMY_CHARS[ch], x, y });
       else if (ch === 't') deco.push({ x, y });
       else if (ch === 'f') torches.push({ x, y });
       else if (ch !== '.' && ch !== ' ') {

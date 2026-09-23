@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { DecoKind } from '../levels/biomes';
 import type { Level, Point } from '../levels/format';
 import { blockMaterials, type BlockId } from '../textures/blocks';
+import type { Difficulty } from './difficulty';
 
 /** So viele Blockreihen werden hinter der Spielebene als Deko ergänzt. */
 const DECO_DEPTH = 6;
@@ -15,9 +16,6 @@ const ROCK_SIDES = 8;
 const DECO_Z = -3;
 /** Die Lava-Oberfläche liegt etwas tiefer als ein voller Block … */
 const LAVA_TOP = 0.875;
-/** … und gefährlich ist sie erst ein Stück darunter, damit knappe Sprünge gut gehen. */
-const LAVA_DEADLY_TOP = 0.7;
-const LAVA_DEADLY_INSET = 0.1;
 /** Das Lavameer reicht so weit links, rechts und nach hinten über das Level hinaus. */
 const SEA_MARGIN = 30;
 const SEA_DEPTH = 30;
@@ -40,7 +38,8 @@ export class World {
   /** Lava-Oberflächen nahe der Spielebene, nach x-Spalte sortiert. Dort steigen Funken auf. */
   readonly lavaSurfaces = new Map<number, THREE.Vector3[]>();
 
-  constructor(readonly level: Level) {
+  /** Wie gnädig die Lava ist, hängt von der Schwierigkeit ab (siehe difficulty.ts). */
+  constructor(readonly level: Level, private readonly difficulty: Difficulty) {
     const positions = new Map<BlockId, THREE.Vector4[]>();
     const add: AddBlock = (id, x, y, z, h = 1) => {
       if (!positions.has(id)) positions.set(id, []);
@@ -109,12 +108,13 @@ export class World {
     for (let y = Math.floor(minY); y <= Math.floor(maxY); y++) {
       for (let x = Math.floor(minX); x <= Math.floor(maxX); x++) {
         if (this.blockAt(x, y) !== 'lava') continue;
-        const top = this.blockAt(x, y + 1) === 'lava' ? 1 : LAVA_DEADLY_TOP;
-        if (maxX > x + LAVA_DEADLY_INSET && minX < x + 1 - LAVA_DEADLY_INSET && minY < y + top && maxY > y) return true;
+        const { lavaInset, lavaTop } = this.difficulty;
+        const top = this.blockAt(x, y + 1) === 'lava' ? 1 : lavaTop;
+        if (maxX > x + lavaInset && minX < x + 1 - lavaInset && minY < y + top && maxY > y) return true;
       }
     }
     const sea = this.level.biome.lavaSea;
-    return sea !== null && minY < sea + LAVA_DEADLY_TOP;
+    return sea !== null && minY < sea + this.difficulty.lavaTop;
   }
 
   /** Draußen: Boden nach hinten und nach unten fortsetzen, Hindernisse bleiben vorne. */
