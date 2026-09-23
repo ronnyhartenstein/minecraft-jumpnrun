@@ -13,6 +13,7 @@ button { touch-action: manipulation; }
   pointer-events: none; transition: opacity 0.3s;
 }
 .fade.lava { background: radial-gradient(circle, #ffb030, #d42a00 70%); }
+.fade.poison { background: radial-gradient(circle, #b6ff7a, #2f7a1a 70%); }
 .fade.boom { background: radial-gradient(circle, #ffffff, #cfcfcf 70%); }
 .fade.dark { opacity: 1; }
 

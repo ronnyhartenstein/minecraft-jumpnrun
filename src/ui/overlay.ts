@@ -27,7 +27,7 @@ export interface WinStats {
   difficulty: string;
 }
 
-export type FadeKind = 'fall' | 'lava' | 'hurt' | 'boom';
+export type FadeKind = 'fall' | 'lava' | 'hurt' | 'boom' | 'poison';
 
 export const formatTime = (seconds: number) => `${seconds.toFixed(1).replace('.', ',')} s`;
 

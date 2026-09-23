@@ -21,6 +21,7 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   *  Diamant zum Einsammeln
  *   c  Creeper (läuft hin und her)
  *   s  Slime (hüpft, im Nether ein Magmawürfel)
+ *   z  Zombie   p  Spinne   k  Skelett   h  Waldhexe   b  Lohe (Blaze)
  *   5  Creeper ab Mittel     6  Slime ab Mittel
  *   7  Creeper nur Schwer    8  Slime nur Schwer
  *      Gegner besiegt man, indem man von oben draufspringt.
@@ -57,7 +58,7 @@ export interface Point {
 }
 
 export interface EnemySpawn extends Point {
-  kind: 'creeper' | 'slime';
+  kind: 'creeper' | 'slime' | 'zombie' | 'spider' | 'skeleton' | 'witch' | 'blaze';
   /** Ab dieser Schwierigkeit ist der Gegner dabei. */
   from: DifficultyId;
 }
@@ -66,6 +67,11 @@ export interface EnemySpawn extends Point {
 const ENEMY_CHARS: Record<string, Omit<EnemySpawn, 'x' | 'y'>> = {
   c: { kind: 'creeper', from: 'leicht' },
   s: { kind: 'slime', from: 'leicht' },
+  z: { kind: 'zombie', from: 'leicht' },
+  p: { kind: 'spider', from: 'leicht' },
+  k: { kind: 'skeleton', from: 'leicht' },
+  h: { kind: 'witch', from: 'leicht' },
+  b: { kind: 'blaze', from: 'leicht' },
   '5': { kind: 'creeper', from: 'mittel' },
   '6': { kind: 'slime', from: 'mittel' },
   '7': { kind: 'creeper', from: 'schwer' },

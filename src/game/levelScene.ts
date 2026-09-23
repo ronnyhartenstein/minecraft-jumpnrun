@@ -4,7 +4,7 @@ import { Checkpoint } from './checkpoint';
 import { Clouds } from './clouds';
 import { Diamond } from './diamond';
 import { atLeast, type Difficulty } from './difficulty';
-import { Enemy } from './enemy';
+import { createEnemy, type Enemy, type EnemyContext, type Projectile } from './enemies';
 import { GoalFlag } from './goal';
 import { lavaSparks, netherAsh, Particles, snowfall } from './particles';
 import { World } from './world';
@@ -17,6 +17,8 @@ export class LevelScene {
   readonly checkpoints: Checkpoint[];
   readonly diamonds: Diamond[];
   readonly enemies: Enemy[];
+  /** Pfeile, Gift und Feuerbälle, die gerade unterwegs sind. */
+  readonly projectiles: Projectile[] = [];
   private readonly clouds: Clouds | null;
   private readonly particles: Particles[] = [];
 
@@ -38,10 +40,9 @@ export class LevelScene {
     this.diamonds = level.diamonds.map((at) => new Diamond(at));
     for (const d of this.diamonds) this.object.add(d.object);
 
-    const slime = level.biome.id === 'nether' ? 'magma' : 'slime';
     this.enemies = level.enemies
       .filter((e) => atLeast(difficulty.id, e.from))
-      .map((e) => new Enemy(e.kind === 'slime' ? slime : 'creeper', e, this.world, difficulty));
+      .map((e) => createEnemy(e, this.world, difficulty));
     for (const e of this.enemies) this.object.add(e.object);
 
     if (this.world.lavaSurfaces.size > 0) this.particles.push(lavaSparks(this.world.lavaSurfaces, focus));
@@ -50,14 +51,27 @@ export class LevelScene {
     for (const p of this.particles) this.object.add(p.object);
   }
 
-  /** `player` ist Steves Position (für die Creeper). */
-  update(dt: number, player: THREE.Vector2): void {
+  /** `ctx.player` ist Steves Position, damit Gegner ihn sehen und auf ihn zielen können. */
+  update(dt: number, ctx: Omit<EnemyContext, 'shoot'>): void {
     this.clouds?.update(dt);
     this.goal?.update(dt);
     for (const cp of this.checkpoints) cp.update(dt);
     for (const d of this.diamonds) d.update(dt);
-    for (const e of this.enemies) e.update(dt, player);
+    const shoot = (p: Projectile) => {
+      this.projectiles.push(p);
+      this.object.add(p.object);
+    };
+    for (const e of this.enemies) e.update(dt, { ...ctx, shoot });
+    for (const p of this.projectiles) p.update(dt, this.world);
+    for (const p of this.projectiles.filter((q) => !q.alive)) p.dispose();
+    this.projectiles.splice(0, this.projectiles.length, ...this.projectiles.filter((q) => q.alive));
     for (const p of this.particles) p.update(dt);
+  }
+
+  /** Alle Geschosse entfernen, z. B. beim Neustart. */
+  clearProjectiles(): void {
+    for (const p of this.projectiles) p.dispose();
+    this.projectiles.length = 0;
   }
 
   dispose(): void {

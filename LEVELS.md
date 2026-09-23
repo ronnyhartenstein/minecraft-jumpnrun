@@ -81,12 +81,17 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `*` | Diamant zum Einsammeln |
 | `c` | Creeper: Kommt man ihm zu nah, blinkt er und explodiert |
 | `s` | Slime (im Nether ein Magmawürfel): hüpft herum |
+| `z` | Zombie (in der Wüste Wüstenzombie): verfolgt Steve, wenn er nah ist |
+| `p` | Spinne (in der Höhle Höhlenspinne): schnell, springt über 1er-Blöcke und springt Steve an |
+| `k` | Skelett (im Schnee Eiswanderer): schießt Pfeile |
+| `h` | Waldhexe: wirft Gift im Bogen |
+| `b` | Lohe (Blaze): schwebt und schießt Feuerbälle – man kann unter ihr durchlaufen |
 | `5` `6` | Creeper bzw. Slime, die erst ab **Mittel** auftauchen |
 | `7` `8` | Creeper bzw. Slime, die nur auf **Schwer** auftauchen |
 | `t` | Baum oder Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Tropfstein …) |
 | `f` | Fackel (leuchtet, gut für die Höhle) |
 
-Gegner besiegt man, indem man **von oben** draufspringt.
+Gegner besiegt man, indem man **von oben** draufspringt. Pfeilen, Gift und Feuerbällen weicht man aus: tief fliegende überspringen, bei hohen kurz warten.
 
 ### Schwierigkeitsgrade
 

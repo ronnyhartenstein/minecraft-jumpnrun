@@ -16,6 +16,21 @@ export interface Difficulty {
   lavaTop: number;
   /** So lange ist Steve nach einem Treffer unverwundbar (Sekunden). */
   invulnerable: number;
+  /** Tempo eines Zombies, der Steve verfolgt (Blöcke pro Sekunde). */
+  zombieSpeed: number;
+  /** Tempo einer Spinne und Pause zwischen zwei Sprüngen auf Steve (Sekunden). */
+  spiderSpeed: number;
+  spiderPounce: number;
+  /** Pause zwischen zwei Pfeilen eines Skeletts und Tempo der Pfeile. */
+  skeletonCooldown: number;
+  arrowSpeed: number;
+  /** Pause zwischen zwei Giftwürfen einer Hexe. */
+  witchCooldown: number;
+  /** Pause zwischen zwei Feuer-Salven einer Lohe und Anzahl der Feuerbälle pro Salve. */
+  blazeCooldown: number;
+  blazeBurst: number;
+  /** Tempo der Feuerbälle einer Lohe. */
+  fireballSpeed: number;
 }
 
 /** Alle Werte je Schwierigkeit an einem Ort. Leicht entspricht dem ursprünglichen Spiel. */
@@ -30,6 +45,15 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     lavaInset: 0.1,
     lavaTop: 0.7,
     invulnerable: 1.5,
+    zombieSpeed: 1.5,
+    spiderSpeed: 2.2,
+    spiderPounce: 3,
+    skeletonCooldown: 4,
+    arrowSpeed: 7,
+    witchCooldown: 3.0,
+    blazeCooldown: 3.5,
+    blazeBurst: 1,
+    fireballSpeed: 4.5,
   },
   mittel: {
     id: 'mittel',
@@ -41,6 +65,15 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     lavaInset: 0.05,
     lavaTop: 0.8,
     invulnerable: 1,
+    zombieSpeed: 1.8,
+    spiderSpeed: 2.6,
+    spiderPounce: 1.6,
+    skeletonCooldown: 2.4,
+    arrowSpeed: 10,
+    witchCooldown: 2.3,
+    blazeCooldown: 2.8,
+    blazeBurst: 2,
+    fireballSpeed: 6,
   },
   schwer: {
     id: 'schwer',
@@ -52,6 +85,15 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     lavaInset: 0,
     lavaTop: 0.875,
     invulnerable: 0.5,
+    zombieSpeed: 2.2,
+    spiderSpeed: 3.0,
+    spiderPounce: 1.1,
+    skeletonCooldown: 1.7,
+    arrowSpeed: 12,
+    witchCooldown: 1.7,
+    blazeCooldown: 2.1,
+    blazeBurst: 3,
+    fireballSpeed: 7.5,
   },
 };
 

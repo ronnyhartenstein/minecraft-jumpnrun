@@ -5,7 +5,7 @@ import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
 import { BASE_DISTANCE, CameraRig } from './cameraRig';
-import { BLAST_RADIUS } from './enemy';
+import { BLAST_RADIUS } from './enemies';
 import { BoxSteve, type Character } from './character';
 import { DIFFICULTIES, type Difficulty, type DifficultyId } from './difficulty';
 import { LevelScene } from './levelScene';
@@ -177,6 +177,7 @@ export class Game {
     for (const cp of this.scene!.checkpoints) cp.reset();
     for (const d of this.scene!.diamonds) d.reset();
     for (const e of this.scene!.enemies) e.reset();
+    this.scene!.clearProjectiles();
     this.diamonds = 0;
     this.updateHud();
   }
@@ -188,6 +189,7 @@ export class Game {
 
   private respawn() {
     this.invulnerable = 0;
+    this.scene?.clearProjectiles();
     this.player.spawn(this.spawnPoint);
     this.cameraRig.snap(this.player.pos);
     this.input.consumeJump();
@@ -197,7 +199,7 @@ export class Game {
     this.state = 'respawning';
     this.stateTimer = FADE_TIME;
     this.overlay.setFade(true, kind);
-    if (kind !== 'boom') this.sound.play(kind);
+    if (kind !== 'boom') this.sound.play(kind === 'poison' ? 'hurt' : kind);
   }
 
   private win() {
@@ -222,8 +224,20 @@ export class Game {
     });
   }
 
+  /** Pfeile, Gift und Feuerbälle: Treffer heißt Neustart. */
+  private checkProjectiles() {
+    const { pos } = this.player;
+    for (const p of this.scene!.projectiles) {
+      if (!p.hits(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) continue;
+      p.burst();
+      if (this.invulnerable > 0) continue;
+      this.die(p.kind === 'poison' ? 'poison' : p.kind === 'fireball' ? 'lava' : 'hurt');
+      return;
+    }
+  }
+
   /**
-   * Von oben draufspringen besiegt einen Gegner. Slimes seitlich berühren heißt Neustart.
+   * Von oben draufspringen besiegt einen Gegner. Seitlich berühren heißt Neustart.
    * Creeper sind fest wie eine Wand und gefährlich erst, wenn sie explodieren.
    */
   private checkEnemies() {
@@ -247,12 +261,12 @@ export class Game {
         e.stomp();
         p.bounce();
         this.sound.play('stomp');
-      } else if (e.kind === 'creeper') {
+      } else if (e.solid) {
         // Nicht durchlaufen: Steve an die Seite schieben, von der er kam
         const left = p.prevPos.x < e.pos.x;
         p.pos.x = left ? e.pos.x - e.halfWidth - 0.3 - 0.001 : e.pos.x + e.halfWidth + 0.3 + 0.001;
         p.vel.x = 0;
-      } else if (this.invulnerable <= 0) {
+      } else if (!e.harmlessTouch && this.invulnerable <= 0) {
         this.die('hurt');
         return;
       }
@@ -267,7 +281,7 @@ export class Game {
       : NO_INPUT;
     this.player.update(dt, input);
     if (this.player.jumped) this.sound.play('jump');
-    this.scene.update(dt, this.player.pos);
+    this.scene.update(dt, { player: this.player.pos, sound: (name) => this.sound.play(name) });
 
     const { pos } = this.player;
     switch (this.state) {
@@ -291,6 +305,7 @@ export class Game {
         }
         this.invulnerable -= dt;
         this.checkEnemies();
+        if (this.state === 'playing') this.checkProjectiles();
         if (this.state !== 'playing') break;
         if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');

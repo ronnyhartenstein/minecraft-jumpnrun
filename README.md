@@ -31,7 +31,7 @@ Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils d
 | 4 Schneeberge | Rutschiges Eis, viel Klettern | 4-1 Die Schneeberge · 4-2 Der Eissee · 4-3 Der Gipfel |
 | 5 Nether | Seelensand, Lavameer, Magmawürfel | 5-1 Der Nether · 5-2 Das Lavameer · 5-3 Die Netherfestung |
 
-Creeper und Slimes (im Nether Magmawürfel) laufen oder hüpfen herum. Von oben draufspringen besiegt sie. Slimes seitlich berühren heißt zurück zum Checkpoint. Durch Creeper kommt man nicht hindurch. Kommt man ihnen zu nah, blinken sie weiß und explodieren nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
+Gegner: Creeper, Slimes (im Nether Magmawürfel), Zombies (in der Wüste Wüstenzombies), Spinnen (in der Höhle Höhlenspinnen), Skelette (im Schnee Eiswanderer) mit Pfeilen, Waldhexen mit Gift und im Nether Lohen mit Feuerbällen. Von oben draufspringen besiegt sie; seitlich berühren oder von einem Geschoss getroffen werden heißt zurück zum Checkpoint. Durch Creeper kommt man nicht hindurch. Kommt man ihnen zu nah, blinken sie weiß und explodieren nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
 
 In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen.
 

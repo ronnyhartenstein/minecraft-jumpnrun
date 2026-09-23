@@ -114,24 +114,35 @@ export function runBot(game: Game, input: Input, index: number): BotResult {
   let hold = 0;
   let steps = 0;
   let wasPlaying = true;
+  let wait = false;
 
   while (steps < BOT_TIMEOUT / STEP && game.status !== 'won') {
     const p = game.player;
     const scene = game.levelScene!;
+    wait = false;
     if (hold === 0 && p.onGround && game.status === 'playing') {
       const gy = Math.round(p.pos.y);
       const front = Math.floor(p.pos.x + 0.55);
       const blocked = solid(front, gy) || solid(front, gy + 1);
       const sea = level.biome.lavaSea !== null && !solid(front, gy - 1);
       const danger = sea || lava(front, gy - 1) || lava(front, gy - 2) || (!solid(front, gy - 1) && !solid(front, gy - 2));
-      const enemy = scene.enemies.some((e) => e.alive && e.pos.x > p.pos.x && e.pos.x - p.pos.x < 2.2 && Math.abs(e.pos.y - p.pos.y) < 1.5);
-      if (blocked || danger || enemy) {
+      const enemy = scene.enemies.some((e) => e.alive && !e.harmlessTouch && e.pos.x > p.pos.x && e.pos.x - p.pos.x < 2.2 && Math.abs(e.pos.y - p.pos.y) < 1.5);
+      // Geschosse, die auf Steve zufliegen: tief kommende überspringen, bei hohen lieber kurz warten
+      const threat = scene.projectiles.find((q) => {
+        if (!q.flying) return false;
+        const dx = q.pos.x - p.pos.x;
+        return Math.abs(dx) < 4.5 && Math.sign(q.vel.x) === -Math.sign(dx) && q.pos.y > p.pos.y - 0.5;
+      });
+      wait = threat !== undefined && threat.pos.y > p.pos.y + 1.2;
+      const incoming = threat !== undefined && !wait && Math.abs(threat.pos.x - p.pos.x) < 3;
+      if (!wait && (blocked || danger || enemy || incoming)) {
         input.release('Space');
         input.press('Space');
         hold = 21; // Sprungtaste gut 1/3 Sekunde halten = voller Sprung
       }
     }
-    input.press('ArrowRight');
+    if (wait) input.release('ArrowRight');
+    else input.press('ArrowRight');
     if (hold > 0) hold--;
     else input.release('Space');
     game.update(STEP);
