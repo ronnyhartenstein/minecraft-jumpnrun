@@ -9,7 +9,7 @@ Info: Dünen, Kakteen, eine Tempelruine und die erste Lava.
 ..................................................................Y...Y.......................................................*...........*
 ..............*.........t...........*.........*...................YYYYY............................t.............*
 .*...................k.GGGG......................................YYYYYYY..........................GGG.........................K
-...S...t...5t.K...GGGGGDDDDGGG...t......ct.........K...t7.....t.YYYYYYYYY...h..........ct....GGGGGDDDGGG...t8...........ts....K.....tz...........t6...Z...t
+...S...t...5t.K...GGGGGDDDDGGG...t......ct.........K...t7....Xt.YYYYYYYYY..............ct....GGGGGDDDGGG..Xt8...........ts....K.....tz...........t6...Z...t
 GGGGGGGGGGGGGGGGGGDDDDDDDDDDDDGGGGGG~GGGGGGGG~~GGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGG~~~GGGGGGGGGGDDDDDDDDDDDGGGGGGG~~GG~~GGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG
 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDD~~~DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDD
 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDD
