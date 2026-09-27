@@ -81,7 +81,7 @@ abstract class Animal implements Character {
 /** Schaf: dicke Wolle, federt weich von Gegnern ab. */
 export class Sheep extends Animal {
   constructor() {
-    super(1.35);
+    super(1);
     const wool = skin(['#ececec', '#dedede', '#f6f6f6']);
     const skinColors = ['#cdb39c', '#c0a58e', '#d8bfa8'];
     const face = skin(skinColors, (ctx) => dots(ctx, [[1, 3, DARK], [6, 3, DARK], [3, 6, '#d98f8f'], [4, 6, '#d98f8f']]));
@@ -102,7 +102,7 @@ export class Chicken extends Animal {
   private flap = 0;
 
   constructor() {
-    super(1.8);
+    super(1.05);
     const white = skin(['#f4f4f4', '#e6e6e6', '#fbfbfb']);
     const orange = skin(['#f0a020', '#e39410', '#f7b030']);
     const feathers = skin(['#d6d6d6', '#c8c8c8', '#e0e0e0']);
@@ -131,7 +131,7 @@ export class Chicken extends Animal {
 /** Fuchs: flink, mit buschigem Schwanz. */
 export class Fox extends Animal {
   constructor() {
-    super(1.45);
+    super(0.9);
     const orangeColors = ['#e2772b', '#d66b22', '#ea8638'];
     const orange = skin(orangeColors);
     const white = skin(['#f2ede6', '#e8e2da', '#f8f4ee']);
@@ -155,17 +155,25 @@ export class Fox extends Animal {
   }
 }
 
-/** Wolf: springt höher, mit dicker Mähne. */
+/** Wolf: springt höher, gezähmt mit rotem Halsband und weißen Pixeln in den Augen. */
 export class Wolf extends Animal {
   constructor() {
-    super(1.4);
+    super(0.95);
     const greyColors = ['#d4d0ca', '#c6c1ba', '#dedad4'];
     const grey = skin(greyColors);
     const mane = skin(['#c2bdb5', '#b5afa7', '#cdc8c1']);
-    const face = skin(greyColors, (ctx) => dots(ctx, [[1, 3, DARK], [6, 3, DARK]]));
+    // Augen wie beim gezähmten Wolf: außen ein weißer Pixel, innen schwarz, dunkles Fell drumherum
+    const brow = '#8a847c';
+    const face = skin(greyColors, (ctx) => dots(ctx, [
+      [0, 2, brow], [1, 2, brow], [2, 2, brow], [3, 2, brow], [4, 2, brow], [5, 2, brow], [6, 2, brow], [7, 2, brow],
+      [0, 3, brow], [1, 3, '#ffffff'], [2, 3, DARK], [5, 3, DARK], [6, 3, '#ffffff'], [7, 3, brow],
+    ]));
+    const collar = skin(['#c8201c', '#b81a17', '#d42a24']);
     const snoutFace = skin(['#b5afa7'], (ctx) => dots(ctx, [[3, 0, DARK], [4, 0, DARK], [3, 1, DARK], [4, 1, DARK]]));
     this.model.add(at(box(6, 6, 10, grey), 0, 11, -2));
     this.model.add(at(box(8, 7, 6, mane), 0, 11.5, 3.5));
+    // Halsband um den Hals, zwischen Mähne und Kopf
+    this.model.add(at(box(8.6, 2.5, 3, collar), 0, 10.5, 5.2));
     this.model.add(at(box(6, 6, 4, withFace(grey, face)), 0, 13, 8));
     this.model.add(at(box(3, 3, 4, withFace(grey, snoutFace)), 0, 11.5, 12));
     this.model.add(at(box(2, 2, 1, grey), -2, 17, 7.5), at(box(2, 2, 1, grey), 2, 17, 7.5));
@@ -182,7 +190,7 @@ export class Strider extends Animal {
   private readonly bristles: THREE.Mesh[] = [];
 
   constructor() {
-    super(0.95);
+    super(0.8);
     const redColors = ['#c9483c', '#b83f35', '#d65446'];
     const red = skin(redColors);
     const face = skin(redColors, (ctx) => {
