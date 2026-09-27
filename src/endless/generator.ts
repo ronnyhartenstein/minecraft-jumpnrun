@@ -21,6 +21,8 @@ const MAX_GROUND = 9;
 const LEAD_IN = 6;
 const LEAD_OUT = 4;
 const CHECKPOINT_X = 2;
+/** Gegner halten Abstand zum Checkpoint, damit man nach einem Treffer nicht sofort wieder getroffen wird. */
+const MONSTER_FROM = 12;
 
 export const ENDLESS_BIOMES: BiomeId[] = ['meadow', 'desert', 'cave', 'snow', 'nether', 'end'];
 
@@ -200,7 +202,7 @@ export function generateChunk(seed: number, index: number, entryHeight: number, 
     diamonds,
     deco,
     torches,
-    safe: safe.filter((x) => x > CHECKPOINT_X + 3 && x < CHUNK - 2 && !obstacles.has(x) && !obstacles.has(x - 1) && !obstacles.has(x + 1)),
+    safe: safe.filter((x) => x >= MONSTER_FROM && x < CHUNK - 2 && !obstacles.has(x) && !obstacles.has(x - 1) && !obstacles.has(x + 1)),
   };
 }
 
@@ -214,7 +216,7 @@ export function flatChunk(seed: number, index: number, entryHeight: number): Chu
   chunk.diamonds = chunk.diamonds.map((d) => ({ x: d.x, y: entryHeight + 1 }));
   chunk.deco = chunk.deco.map((d) => ({ ...d, y: entryHeight }));
   chunk.torches = chunk.torches.map((t) => ({ ...t, y: entryHeight }));
-  chunk.safe = Array.from({ length: CHUNK - 8 }, (_, i) => i + 6);
+  chunk.safe = Array.from({ length: CHUNK - 2 - MONSTER_FROM }, (_, i) => i + MONSTER_FROM);
   return chunk;
 }
 

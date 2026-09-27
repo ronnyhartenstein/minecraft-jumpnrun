@@ -38,6 +38,9 @@ export interface Difficulty {
   /** Pause zwischen zwei Kugeln eines Shulkers und Tempo der Kugeln. */
   shulkerCooldown: number;
   shulkerBulletSpeed: number;
+  /** Endlos-Lauf: Startzeit in Sekunden (`null` = kein Zeitlimit) und Zeit dazu alle 300 Blöcke. */
+  endlessTime: number | null;
+  endlessBonus: number;
 }
 
 /** Alle Werte je Schwierigkeit an einem Ort. Leicht entspricht dem ursprünglichen Spiel. */
@@ -65,6 +68,8 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     endermanSpeed: 1.6,
     shulkerCooldown: 3.6,
     shulkerBulletSpeed: 3.5,
+    endlessTime: null,
+    endlessBonus: 0,
   },
   mittel: {
     id: 'mittel',
@@ -89,6 +94,8 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     endermanSpeed: 2.0,
     shulkerCooldown: 2.7,
     shulkerBulletSpeed: 4.5,
+    endlessTime: 90,
+    endlessBonus: 75,
   },
   schwer: {
     id: 'schwer',
@@ -113,6 +120,8 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     endermanSpeed: 2.4,
     shulkerCooldown: 2.0,
     shulkerBulletSpeed: 5.5,
+    endlessTime: 60,
+    endlessBonus: 55,
   },
 };
 

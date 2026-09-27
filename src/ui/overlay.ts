@@ -13,7 +13,33 @@ export interface OverlayActions {
   toggleMusic(): void;
   setDifficulty(id: DifficultyId): void;
   setFigure(id: FigureId): void;
+  /** Endlos-Lauf mit diesem Seed starten, `null` = neuer zufälliger Seed. */
+  startEndless(seed: number | null): void;
 }
+
+/** Was die Anzeige im Endlos-Lauf zeigt. */
+export interface EndlessHud {
+  hearts: number;
+  meters: number;
+  diamonds: number;
+  /** Restzeit in Sekunden, `null` = kein Zeitlimit (Leicht). */
+  time: number | null;
+  seed: number;
+  difficulty: string;
+}
+
+/** Ergebnis eines Endlos-Laufs für das Ende-Fenster. */
+export interface EndlessResult {
+  reason: 'hearts' | 'time';
+  meters: number;
+  best: number | undefined;
+  record: boolean;
+  seed: number;
+  difficulty: string;
+}
+
+/** So viele Herzen hat man zu Beginn; leere werden bis hierhin angezeigt, Extra-Herzen darüber hinaus. */
+const START_HEARTS = 5;
 
 /** Was die Ziel-Anzeige über den Durchlauf wissen muss. */
 export interface WinStats {
@@ -147,6 +173,52 @@ export class Overlay {
     this.hud.innerHTML = `${gems}<small class="hud-difficulty">${difficulty}</small>`;
   }
 
+  /** Endlos-Lauf gestartet: Banner mit Seed. */
+  endlessStarted(seed: number, difficulty: string): void {
+    this.setScreen('play');
+    this.win.classList.add('hidden');
+    this.menuPanel.classList.add('hidden');
+    this.hint.classList.add('hidden');
+    this.warningBox.classList.add('hidden');
+    this.setFade(false);
+    this.banner.innerHTML = `<small>Seed ${seed} · ${difficulty}</small>∞ Endlos-Lauf`;
+    restartAnimation(this.banner, 'show');
+  }
+
+  /** Anzeige oben links im Endlos-Lauf: Herzen, Meter, Diamanten, Restzeit. */
+  setEndlessHud({ hearts, meters, diamonds, time, seed, difficulty }: EndlessHud): void {
+    this.hud.classList.remove('hidden');
+    const heartIcons = '❤'.repeat(hearts) + '<span class="lost">❤</span>'.repeat(Math.max(0, START_HEARTS - hearts));
+    const clock = time === null ? '' : `<span class="clock${time < 10 ? ' low' : ''}">⏱ ${Math.ceil(time)} s</span>`;
+    this.hud.innerHTML = `<span class="hearts">${heartIcons}</span> <span class="meters">📏 ${meters} m</span>
+      <span class="gem">💎</span> ${diamonds} ${clock}<small class="hud-difficulty">Seed ${seed} · ${difficulty}</small>`;
+  }
+
+  /** Ende des Endlos-Laufs: Weite, Bestweite für den Seed, Wiederholen oder neu starten. */
+  showEndlessOver({ reason, meters, best, record, seed, difficulty }: EndlessResult): void {
+    this.win.innerHTML = `
+      <h1>${reason === 'time' ? 'Zeit abgelaufen!' : 'Lauf vorbei!'}</h1>
+      <p class="win-difficulty">${difficulty} · Seed <b class="seed">${seed}</b></p>
+      <p class="endless-meters">📏 ${meters} m</p>
+      <p class="best">${record ? '⭐ Neue Bestweite für diesen Seed! ⭐' : best !== undefined ? `Bestweite für diesen Seed: ${best} m` : ''}</p>
+      <p class="next-locked">Sag deinen Freunden den Seed – dann laufen alle dieselbe Strecke.</p>
+      <div class="buttons">
+        <button type="button" data-endless="repeat" class="primary">Wiederholen <small>(Enter)</small></button>
+        <button type="button" data-endless="new">Neu starten <small>(R)</small></button>
+        <button type="button" data-action="menu">Menü <small>(Esc)</small></button>
+      </div>`;
+    this.bindButtons(this.win);
+    this.win.querySelectorAll<HTMLButtonElement>('button[data-endless]').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.blur();
+        this.actions.startEndless(button.dataset.endless === 'repeat' ? seed : null);
+      });
+    });
+    this.setScreen('win');
+    this.hint.classList.add('hidden');
+    this.win.classList.remove('hidden');
+  }
+
   /** Kleiner Hüpfer des Zählers beim Einsammeln. */
   bumpDiamonds(): void {
     restartAnimation(this.hud, 'bump');
@@ -231,6 +303,18 @@ export class Overlay {
     });
     // Eigene Level stehen als eigene Spalte neben den Welten
     if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
+    // Endlos-Lauf: eigene Spalte mit Start-Knopf und Seed-Eingabe
+    const endlessBest = progress.endlessBest(difficulty);
+    worlds.set('<small>Immer neu</small>∞ Endlos', [`
+      <button type="button" class="card endless-card">
+        <span class="num">∞</span>
+        <span class="name">Endlos-Lauf</span>
+        <span class="status">${endlessBest !== undefined ? `🏆 ${endlessBest} m` : 'Neu!'}</span>
+      </button>
+      <form class="seed-form">
+        <input type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Seed" aria-label="Seed (6 Ziffern)">
+        <button type="submit">Los</button>
+      </form>`]);
     // Spielfiguren: Steve und die Tiere, die man für geschaffte Welten bekommt
     const current = progress.currentFigure(this.levels);
     const figures = FIGURE_ORDER.map((id) => {
@@ -263,7 +347,26 @@ export class Overlay {
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.figure-tabs button').forEach((tab) => {
       tab.addEventListener('click', () => this.actions.setFigure(tab.dataset.figure as FigureId));
     });
-    this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
+    this.menuPanel.querySelector<HTMLButtonElement>('.endless-card')!.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLButtonElement).blur();
+      this.actions.startEndless(null);
+    });
+    const seedForm = this.menuPanel.querySelector<HTMLFormElement>('.seed-form')!;
+    const seedInput = seedForm.querySelector('input')!;
+    // Tasten im Eingabefeld gehören nicht dem Spiel (sonst startet z. B. Enter ein Level)
+    seedInput.addEventListener('keydown', (e) => e.stopPropagation());
+    seedInput.addEventListener('input', () => (seedInput.value = seedInput.value.replace(/\D/g, '').slice(0, 6)));
+    seedForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!/^\d{6}$/.test(seedInput.value)) {
+        seedInput.classList.add('invalid');
+        seedInput.focus();
+        return;
+      }
+      seedInput.blur();
+      this.actions.startEndless(Number(seedInput.value));
+    });
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('.card:not(.endless-card)').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();
         this.actions.start(Number(card.dataset.level));

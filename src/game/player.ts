@@ -78,7 +78,14 @@ export class Player {
   private jumpCutDone = true;
   private jumpStartY = 0;
 
-  constructor(private readonly world: World) {}
+  constructor(private world: World) {}
+
+  /** Endlos-Lauf: Beim Nachladen wird die Welt neu gebaut und um `dx` verschoben. */
+  moveToWorld(world: World, dx: number): void {
+    this.world = world;
+    this.pos.x += dx;
+    this.prevPos.x += dx;
+  }
 
   setFigure({ physics, glide, lavaWalker }: { physics: Partial<Physics>; glide: number | null; lavaWalker: boolean }): void {
     this.physics = { ...PHYSICS, ...physics };

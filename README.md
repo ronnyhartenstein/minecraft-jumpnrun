@@ -56,6 +56,17 @@ Alle Level automatisch prüfen (Regeln und ein Bot, der jedes Level durchspielt)
 
 **Eigene Level bauen:** Die Level sind einfache Textdateien im Ordner `levels/`. Eigene Level kommen nach `levels/eigene/` und erscheinen automatisch im Menü in der Spalte „Eigene“. Die Anleitung mit allen Zeichen steht in [LEVELS.md](LEVELS.md).
 
+## Endlos-Lauf ∞
+
+Neben den Welten gibt es den **Endlos-Lauf**: eine Strecke, die nie aufhört. Sie wird unterwegs Stück für Stück erzeugt, und jedes Stück wird vorher automatisch getestet, ob man es auf Leicht schaffen kann. Nach etwa 300 Blöcken wechselt das Biom – zufällig, auch mal direkt vom Nether auf die Wiese.
+
+- **5 Herzen:** Jeder Treffer, jeder Sturz und jede Lava kostet ein Herz, dann geht es am letzten Checkpoint weiter. Für je 10 Diamanten gibt es ein Herz dazu, bis zu 10 Herzen.
+- **Meter:** Gezählt wird, wie weit man kommt. Die Bestweite merkt sich der Browser.
+- **Zeitlimit auf Mittel und Schwer:** Auf Mittel startet man mit 90 Sekunden und bekommt alle 300 Blöcke 75 dazu, auf Schwer 60 und 55. Leicht hat keine Uhr.
+- **Seed:** Jeder Lauf hat eine 6-stellige Zahl. Gleicher Seed heißt gleiche Strecke – und auf gleicher Schwierigkeit auch dieselben Monster an denselben Stellen. Am Ende kann man den Lauf **wiederholen** oder **neu starten**. Im Menü kann man einen Seed eingeben: So laufen Freunde dieselbe Strecke und vergleichen ihre Meter. Direkt-Link: `#endlos=123456`.
+
+Der Generator steht in `src/endless/`.
+
 ## Spielfiguren
 
 Am Anfang spielt man Steve. Wer eine ganze Welt auf **Mittel** schafft, bekommt ein Tier dazu. Die Figur wählt man in der Levelauswahl.
@@ -101,6 +112,7 @@ src/
   game/      Szene, Welt, Steve und Tiere, Spieler-Physik, Kamera, Partikel
   ui/        Menü, Hinweise, Ziel-Anzeige
   levels/    Level-Format, Biome, Laden der Level-Dateien
+  endless/   Endlos-Lauf: Strecken-Generator, Sprungtest, Nachladen
   textures/  Pixel-Texturen, im Code erzeugt
 levels/      Die Level als Textdateien, eigene Level in levels/eigene/
 ```

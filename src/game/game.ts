@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { Sound } from '../audio/sound';
 import type { Input } from '../engine/input';
+import { CHUNK, randomSeed } from '../endless/generator';
+import { EndlessRun } from '../endless/run';
+import { BIOMES, type BiomeId } from '../levels/biomes';
 import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
@@ -24,7 +27,27 @@ const SONIC_COOLDOWN = 0.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
-export type State = 'menu' | 'playing' | 'respawning' | 'won';
+/** Endlos-Lauf: Herzen zu Beginn und höchstens, Diamanten pro Extra-Herz, alle so viele Blöcke gibt es Zeit dazu. */
+const HEARTS = 5;
+const MAX_HEARTS = 10;
+const DIAMONDS_PER_HEART = 10;
+const TIME_BONUS_EVERY = 300;
+
+/** Zustand eines laufenden Endlos-Laufs. */
+interface Endless {
+  run: EndlessRun;
+  level: Level;
+  hearts: number;
+  diamonds: number;
+  meters: number;
+  /** Restzeit in Sekunden, `null` = kein Zeitlimit. */
+  time: number | null;
+  nextBonus: number;
+  /** Das Biom, dessen Himmel und Musik gerade laufen. */
+  biome: BiomeId;
+}
+
+export type State = 'menu' | 'playing' | 'respawning' | 'won' | 'over';
 
 export class Game {
   player!: Player;
@@ -49,6 +72,8 @@ export class Game {
   /** Laufende Schallwellen des Wardens (nur der Effekt) und die Pause bis zur nächsten. */
   private waves: { mesh: THREE.Mesh; age: number; radius: number }[] = [];
   private sonicCooldown = 0;
+  /** Läuft gerade ein Endlos-Lauf? Sonst wird ein festes Level gespielt. */
+  private endless: Endless | null = null;
   /** Beim automatischen Prüfen der Level wird kein Fortschritt gespeichert. */
   testMode = false;
 
@@ -67,6 +92,7 @@ export class Game {
       toggleMusic: () => this.toggleMusic(),
       setDifficulty: (id) => this.setDifficulty(id),
       setFigure: (id) => this.setFigure(id),
+      startEndless: (seed) => this.startEndless(seed),
     });
     this.overlay.setSoundIcon(this.sound.muted);
     this.overlay.setMusicIcon(this.sound.musicOff);
@@ -78,7 +104,7 @@ export class Game {
   }
 
   get level(): Level {
-    return this.levels[this.index];
+    return this.endless?.level ?? this.levels[this.index];
   }
 
   /** Für die Level-Prüfung: Zustand, geladenes Level und gesammelte Diamanten. */
@@ -141,12 +167,16 @@ export class Game {
 
   private bindKeys() {
     const { input } = this;
-    input.onKey('KeyR', () => this.state !== 'menu' && this.restart());
+    input.onKey('KeyR', () => {
+      if (this.state === 'over') this.startEndless(null);
+      else if (this.state !== 'menu') this.restart();
+    });
     input.onKey('KeyM', () => this.toggleSound());
     input.onKey('KeyN', () => this.toggleMusic());
     input.onKey('Escape', () => this.state !== 'menu' && this.showMenu());
     input.onKey('Enter', () => {
-      if (this.state === 'won') this.hasNext ? this.next() : this.restart();
+      if (this.state === 'over') this.startEndless(this.endless!.run.seed);
+      else if (this.state === 'won') this.hasNext ? this.next() : this.restart();
       else if (this.state === 'menu') this.start(this.firstOpenLevel());
     });
   }
@@ -172,6 +202,7 @@ export class Game {
   }
 
   showMenu(): void {
+    this.leaveEndless();
     this.load(this.scene ? this.index : 0);
     this.applyFigure();
     this.state = 'menu';
@@ -182,12 +213,14 @@ export class Game {
   }
 
   start(index: number): void {
+    this.leaveEndless();
     this.load(index);
     this.restart();
     history.replaceState(null, '', `#level=${this.level.code}`);
   }
 
   restart(): void {
+    if (this.endless) return this.startEndless(this.endless.run.seed);
     this.applyFigure();
     this.state = 'playing';
     this.playTime = 0;
@@ -225,6 +258,12 @@ export class Game {
   }
 
   private updateHud() {
+    const e = this.endless;
+    if (e) {
+      return this.overlay.setEndlessHud({
+        hearts: e.hearts, meters: e.meters, diamonds: e.diamonds, time: e.time, seed: e.run.seed, difficulty: this.difficulty.label,
+      });
+    }
     const total = this.scene!.diamonds.length;
     this.overlay.setDiamonds(this.state === 'menu' ? null : total === 0 ? '' : `${this.diamonds}/${total}`, this.difficulty.label);
   }
@@ -238,6 +277,11 @@ export class Game {
   }
 
   private die(kind: FadeKind) {
+    // Endlos-Lauf: Jeder Treffer kostet ein Herz
+    if (this.endless) {
+      this.endless.hearts--;
+      this.updateHud();
+    }
     this.state = 'respawning';
     this.stateTimer = FADE_TIME;
     this.overlay.setFade(true, kind);
@@ -269,6 +313,128 @@ export class Game {
       figureUnlocked,
       difficulty: this.difficulty.label,
     });
+  }
+
+  /** Startet einen Endlos-Lauf. `null` = neuer zufälliger Seed. */
+  startEndless(seed: number | null): void {
+    const run = new EndlessRun(seed ?? randomSeed(), this.difficulty.id);
+    const biome = run.chunks[0].biome;
+    this.endless = {
+      run,
+      level: run.level(biome),
+      hearts: HEARTS,
+      diamonds: 0,
+      meters: 0,
+      time: this.difficulty.endlessTime,
+      nextBonus: TIME_BONUS_EVERY,
+      biome,
+    };
+    this.buildEndlessScene();
+    this.player = new Player(this.scene!.world);
+    this.applyEndlessBiome(biome);
+    this.applyFigure();
+    this.state = 'playing';
+    this.playTime = 0;
+    this.resetCheckpoints();
+    this.respawn();
+    this.overlay.endlessStarted(run.seed, this.difficulty.label);
+    this.updateHud();
+    history.replaceState(null, '', `#endlos=${run.seed}`);
+  }
+
+  /** Baut die Szene aus dem aktuellen Fenster des Endlos-Laufs (neu). */
+  private buildEndlessScene() {
+    const e = this.endless!;
+    e.level = e.run.level(e.biome);
+    this.scene?.dispose();
+    this.scene = new LevelScene(e.level, this.cameraRig.focus, this.difficulty);
+    this.stage.scene.add(this.scene.object);
+    this.cameraRig.setLevel(e.level.width, 2);
+  }
+
+  /** Himmel, Musik und Laterne passend zum Biom, in dem Steve gerade ist. */
+  private applyEndlessBiome(biome: BiomeId) {
+    this.endless!.biome = biome;
+    const b = BIOMES[biome];
+    this.stage.applyBiome({ ...b, lavaSea: null, enclosed: false });
+    this.lantern.visible = b.playerLight;
+    this.sound.playMusic(biome);
+  }
+
+  /** Endlos-Lauf: Meter, Zeit, Biomwechsel und Nachladen. */
+  private updateEndless(dt: number) {
+    const e = this.endless!;
+    const { pos } = this.player;
+    // Gezählt ab dem Start (Mitte des ersten Checkpoints)
+    const meters = Math.max(e.meters, Math.floor(e.run.distance(pos.x) - e.level.start.x - 0.5));
+    if (meters !== e.meters) {
+      e.meters = meters;
+      this.updateHud();
+    }
+    // Alle 300 Blöcke gibt es Zeit dazu
+    while (e.meters >= e.nextBonus) {
+      e.nextBonus += TIME_BONUS_EVERY;
+      if (e.time !== null) {
+        e.time += this.difficulty.endlessBonus;
+        this.overlay.toast(`⏱ +${this.difficulty.endlessBonus} s`);
+        this.sound.play('checkpoint');
+      }
+    }
+    if (e.time !== null) {
+      const before = Math.ceil(e.time);
+      e.time -= dt;
+      if (Math.ceil(e.time) !== before) this.updateHud();
+      if (e.time <= 0) return this.endEndless('time');
+    }
+    const biome = e.run.chunkAt(pos.x).biome;
+    if (biome !== e.biome) this.applyEndlessBiome(biome);
+    // Im dritten Stück angekommen: vorn fällt eins weg, hinten kommt eins dazu
+    if (pos.x >= 2 * CHUNK) this.shiftEndless();
+  }
+
+  /** Nachladen: Welt neu bauen, alles um ein Stück nach links rücken. Soll man nicht merken. */
+  private shiftEndless() {
+    const e = this.endless!;
+    const scene = this.scene!;
+    for (const enemy of scene.enemies) if (!enemy.alive && enemy.id) e.run.defeated.add(enemy.id);
+    for (const d of scene.diamonds) if (d.collected) e.run.collected.add(e.run.key(d.at.x, d.at.y));
+    e.run.advance();
+    this.buildEndlessScene();
+    this.player.moveToWorld(this.scene!.world, -CHUNK);
+    this.cameraRig.shift(-CHUNK, e.level.width);
+    this.spawnPoint = { x: Math.max(e.level.start.x, this.spawnPoint.x - CHUNK), y: this.spawnPoint.y };
+    // Schon erreichte Checkpoints bleiben erreicht
+    for (const cp of this.scene!.checkpoints) if (cp.at.x <= this.spawnPoint.x) cp.activate();
+  }
+
+  /** Ein Diamant im Endlos-Lauf: Je 10 gibt es ein Herz zurück. */
+  private endlessDiamond() {
+    const e = this.endless!;
+    e.diamonds++;
+    if (e.diamonds % DIAMONDS_PER_HEART === 0 && e.hearts < MAX_HEARTS) {
+      e.hearts++;
+      this.overlay.toast('❤ +1');
+    }
+  }
+
+  /** Lauf vorbei: keine Herzen mehr oder Zeit abgelaufen. */
+  private endEndless(reason: 'hearts' | 'time') {
+    const e = this.endless!;
+    this.state = 'over';
+    this.overlay.setFade(false);
+    const d = this.difficulty.id;
+    const best = this.progress.endlessBest(d, e.run.seed);
+    const record = this.testMode ? false : this.progress.saveEndless(e.run.seed, d, e.meters);
+    this.sound.play(record ? 'win' : 'fall');
+    this.overlay.showEndlessOver({ reason, meters: e.meters, best, record, seed: e.run.seed, difficulty: this.difficulty.label });
+  }
+
+  /** Zurück zu den festen Leveln: die Szene des Endlos-Laufs wegwerfen. */
+  private leaveEndless() {
+    if (!this.endless) return;
+    this.endless = null;
+    this.scene?.dispose();
+    this.scene = null;
   }
 
   /** Warden: Landet er nach einem Sprung, sind Gegner und Geschosse in der Nähe besiegt. */
@@ -384,6 +550,7 @@ export class Game {
           if (!d.touches(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) continue;
           d.collect();
           this.diamonds++;
+          if (this.endless) this.endlessDiamond();
           this.updateHud();
           this.overlay.bumpDiamonds();
           this.sound.play('diamond');
@@ -398,10 +565,13 @@ export class Game {
         if (lava) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');
         else if (this.scene.goal?.reached(pos.x)) this.win();
+        else if (this.endless) this.updateEndless(dt);
         break;
       case 'respawning':
         this.stateTimer -= dt;
-        if (this.stateTimer <= 0) {
+        if (this.stateTimer <= 0 && this.endless && this.endless.hearts <= 0) {
+          this.endEndless('hearts');
+        } else if (this.stateTimer <= 0) {
           this.respawn();
           this.invulnerable = this.difficulty.invulnerable;
           this.overlay.setFade(false);

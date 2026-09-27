@@ -29,6 +29,13 @@ export class CameraRig {
     this.minY = minY;
   }
 
+  /** Endlos-Lauf: Beim Nachladen rückt alles um `dx`, die Kamera mit. */
+  shift(dx: number, levelWidth: number): void {
+    this.levelWidth = levelWidth;
+    this.x += dx;
+    this.apply();
+  }
+
   snap(target: THREE.Vector2): void {
     this.ahead = 0;
     this.x = this.clampX(target.x);

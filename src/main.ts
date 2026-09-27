@@ -27,10 +27,12 @@ const gamepad = new GamepadInput(input, {
 // Safari: Zoomen per Zwei-Finger-Geste im Spiel verhindern
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-// Direkt-Link zu einem Level, z. B. #level=2-3 oder #level=E1
+// Direkt-Link zu einem Level, z. B. #level=2-3 oder #level=E1, oder zu einem Endlos-Lauf: #endlos=123456
 const code = /level=([\w-]+)/.exec(location.hash)?.[1];
+const endlessSeed = /endlos=(\d{6})/.exec(location.hash)?.[1];
 const linked = LEVELS.findIndex((level) => level.code === code);
-if (linked >= 0) game.start(linked);
+if (endlessSeed) game.startEndless(Number(endlessSeed));
+else if (linked >= 0) game.start(linked);
 else game.showMenu();
 
 // Mit ?pruefen an der Adresse spielt ein Bot alle Level durch und prüft die Level-Regeln

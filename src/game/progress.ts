@@ -5,6 +5,7 @@ import { FIGURE_ORDER, FIGURES, type FigureId } from './figures';
 const KEY = 'minecraft-jumpnrun';
 const DIFFICULTY_KEY = 'minecraft-jumpnrun-difficulty';
 const FIGURE_KEY = 'minecraft-jumpnrun-figure';
+const ENDLESS_KEY = 'minecraft-jumpnrun-endless';
 
 interface Saved {
   /** Bestzeiten in Sekunden. Wer eine Bestzeit hat, hat das Level auf dieser Stufe geschafft. */
@@ -23,6 +24,8 @@ export class Progress {
   difficulty: DifficultyId = 'leicht';
   /** Die zuletzt gewählte Spielfigur, gilt nur, wenn sie freigeschaltet ist (siehe `currentFigure`). */
   private figure: FigureId = 'steve';
+  /** Endlos-Lauf: beste Weite in Blöcken je „Seed|Schwierigkeit“. */
+  private endless: Record<string, number> = {};
 
   constructor() {
     try {
@@ -32,6 +35,7 @@ export class Progress {
       if (difficulty && DIFFICULTY_ORDER.includes(difficulty)) this.difficulty = difficulty;
       const figure = localStorage.getItem(FIGURE_KEY) as FigureId | null;
       if (figure && FIGURE_ORDER.includes(figure)) this.figure = figure;
+      this.endless = JSON.parse(localStorage.getItem(ENDLESS_KEY) ?? '{}') as Record<string, number>;
     } catch {
       // Ohne Speicher geht es trotzdem
     }
@@ -44,6 +48,27 @@ export class Progress {
     } catch {
       // Ohne Speicher gilt die Auswahl nur bis zum Neuladen
     }
+  }
+
+  /** Beste Weite für diesen Seed, ohne Seed die beste überhaupt auf dieser Stufe. */
+  endlessBest(difficulty: DifficultyId, seed?: number): number | undefined {
+    if (seed !== undefined) return this.endless[`${seed}|${difficulty}`];
+    const all = Object.entries(this.endless).filter(([k]) => k.endsWith(`|${difficulty}`)).map(([, m]) => m);
+    return all.length ? Math.max(...all) : undefined;
+  }
+
+  /** Merkt sich die Weite eines Laufs. Liefert true bei neuem Rekord für diesen Seed. */
+  saveEndless(seed: number, difficulty: DifficultyId, meters: number): boolean {
+    const key = `${seed}|${difficulty}`;
+    const previous = this.endless[key];
+    if (previous !== undefined && meters <= previous) return false;
+    this.endless[key] = meters;
+    try {
+      localStorage.setItem(ENDLESS_KEY, JSON.stringify(this.endless));
+    } catch {
+      // Ohne Speicher gilt die Bestweite nur bis zum Neuladen
+    }
+    return true;
   }
 
   selectFigure(figure: FigureId): void {

@@ -108,6 +108,24 @@ button { touch-action: manipulation; }
 .difficulty-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
 .panel .difficulty-tabs button { padding: 8px 14px; font-size: 11px; }
 .panel .difficulty-tabs button.active { background: #5c9e35; border-color: #2f5a17; box-shadow: inset -3px -3px #3f7a22, inset 3px 3px #86c95a; }
+/* Endlos-Lauf */
+.menu .endless-card { --biome: #3a3a55; }
+.seed-form { display: flex; gap: 4px; width: 124px; }
+.seed-form input {
+  width: 0; flex: 1; padding: 6px; font: inherit; font-size: 10px; text-align: center; letter-spacing: 1px;
+  color: #fff; background: rgb(0 0 0 / 0.45); border: 2px solid #999; border-radius: 3px;
+}
+.seed-form input.invalid { border-color: #ff5a5a; }
+.seed-form button { padding: 6px 8px; font-size: 10px; }
+.hud .hearts { font-family: system-ui, sans-serif; font-size: 18px; color: #ff4a4a; letter-spacing: 1px; vertical-align: -2px; }
+.hud .hearts .lost { color: rgb(255 255 255 / 0.25); }
+.hud .meters { margin: 0 8px; }
+.hud .clock { margin-left: 8px; }
+.hud .clock.low { color: #ff5a5a; animation: blink 0.5s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+.panel .endless-meters { font-size: 28px; color: #ffe14d; }
+.panel .seed { color: #ffe14d; letter-spacing: 2px; }
+
 /* Spielfigur im Menü */
 .figure-tabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 6px; }
 .panel .figure-tabs button { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 76px; padding: 6px 8px; font-size: 9px; }

@@ -40,6 +40,8 @@ export abstract class Enemy {
   protected readonly model = new THREE.Group();
   /** Zufall des Gegners. Im Endlos-Lauf aus dem Seed, damit gleiche Seeds gleich ablaufen. */
   protected readonly rng: Rng;
+  /** Endlos-Lauf: Kennung, damit besiegte Gegner beim Nachladen nicht wiederkommen. */
+  readonly id: string | undefined;
 
   constructor(
     readonly kind: string,
@@ -50,8 +52,9 @@ export abstract class Enemy {
     protected readonly difficulty: Difficulty,
   ) {
     this.object.add(this.model);
-    const seed = (start as Partial<EnemySpawn>).seed;
+    const { seed, id } = start as Partial<EnemySpawn>;
     this.rng = seed === undefined ? Math.random : mulberry32(seed);
+    this.id = id;
   }
 
   reset(): void {
