@@ -31,8 +31,10 @@ export interface Difficulty {
   blazeBurst: number;
   /** Tempo der Feuerbälle einer Lohe. */
   fireballSpeed: number;
-  /** So oft kann sich ein Enderman in Steves Nähe teleportieren (Sekunden). */
+  /** So oft kann sich ein Enderman in Steves Nähe teleportieren (Sekunden) … */
   endermanTeleport: number;
+  /** … und so schnell greift er an (Blöcke pro Sekunde). */
+  endermanSpeed: number;
   /** Pause zwischen zwei Kugeln eines Shulkers und Tempo der Kugeln. */
   shulkerCooldown: number;
   shulkerBulletSpeed: number;
@@ -60,6 +62,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeBurst: 1,
     fireballSpeed: 4.5,
     endermanTeleport: 3.5,
+    endermanSpeed: 1.6,
     shulkerCooldown: 3.6,
     shulkerBulletSpeed: 3.5,
   },
@@ -83,6 +86,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeBurst: 2,
     fireballSpeed: 6,
     endermanTeleport: 2.5,
+    endermanSpeed: 2.0,
     shulkerCooldown: 2.7,
     shulkerBulletSpeed: 4.5,
   },
@@ -106,6 +110,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeBurst: 3,
     fireballSpeed: 7.5,
     endermanTeleport: 1.8,
+    endermanSpeed: 2.4,
     shulkerCooldown: 2.0,
     shulkerBulletSpeed: 5.5,
   },

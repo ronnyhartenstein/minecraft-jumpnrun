@@ -5,7 +5,7 @@ import type { World } from '../world';
 import { Enemy, type EnemyContext } from './base';
 import { box, dots, humanoid, P, skin, walkLegs, type Humanoid } from './models';
 
-const WALK_SPEED = 0.8;
+const WALK_SPEED = 1;
 /** So nah muss Steve kommen, damit der Enderman sich teleportiert. */
 const RANGE = 6;
 /** Wohin er springt: so weit von seinem Platz weg … */
@@ -21,8 +21,8 @@ const HEIGHT = 2.6;
 const HITBOX = 2;
 
 /**
- * Enderman: groß, schwarz, lila Augen. Er verfolgt Steve nicht, bleibt aber stehen und starrt ihn an.
- * Kommt Steve nah, teleportiert er sich ein Stück weiter – nie direkt neben Steve.
+ * Enderman: groß, schwarz, lila Augen. Läuft herum, und sieht er Steve, greift er an.
+ * Ab und zu teleportiert er sich ein Stück weiter – nie direkt neben Steve – und starrt dann kurz.
  */
 export class Enderman extends Enemy {
   private readonly body: Humanoid;
@@ -100,7 +100,9 @@ export class Enderman extends Enemy {
       ctx.sound('teleport');
       return;
     }
-    this.vel.x = 0;
+    // Angriff: auf Steve zu, aber nicht über Kanten oder in Lava
+    if (this.onGround && this.blockedAhead(this.pos.x + this.dir * (this.halfWidth + 0.05))) this.vel.x = 0;
+    else this.vel.x = this.dir * this.difficulty.endermanSpeed;
   }
 
   /** Sucht eine freie Stelle mit Boden in der Nähe seines Platzes, nicht zu nah an Steve. */
@@ -148,8 +150,13 @@ export class Enderman extends Enemy {
       ((this.puff.children[0] as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = Math.max(0, 1 - age / 0.6);
       if (age > 0.6) this.puff.visible = false;
     }
-    walkLegs(this.body.legs, this.timer * 4, Math.abs(this.vel.x) > 0.1 ? 0.35 : 0);
-    // Arme hängen lang herunter und pendeln leicht
-    this.body.arms.forEach((arm, i) => (arm.rotation.x = Math.sin(this.timer * 4 + i * Math.PI) * (Math.abs(this.vel.x) > 0.1 ? 0.2 : 0.03)));
+    const walking = Math.abs(this.vel.x) > 0.1;
+    const attacking = Math.abs(this.vel.x) > WALK_SPEED + 0.1;
+    walkLegs(this.body.legs, this.timer * (attacking ? 7 : 4), walking ? 0.35 : 0);
+    // Beim Angriff greifen die Arme nach vorn, sonst hängen sie lang herunter und pendeln leicht
+    this.body.arms.forEach((arm, i) => {
+      const target = attacking ? -1.3 + Math.sin(this.timer * 10 + i * Math.PI) * 0.25 : Math.sin(this.timer * 4 + i * Math.PI) * (walking ? 0.2 : 0.03);
+      arm.rotation.x += (target - arm.rotation.x) * Math.min(1, dt * 10);
+    });
   }
 }

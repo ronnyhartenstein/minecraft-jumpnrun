@@ -88,7 +88,7 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `k` | Skelett (im Schnee Eiswanderer): schießt Pfeile |
 | `h` | Waldhexe: wirft Gift im Bogen |
 | `b` | Lohe (Blaze): schwebt und schießt Feuerbälle – man kann unter ihr durchlaufen |
-| `e` | Enderman: steht und starrt, teleportiert sich weg, wenn man nah kommt – man kann über ihn springen |
+| `e` | Enderman: läuft herum, greift an, wenn er Steve sieht, und teleportiert sich ab und zu – man kann über ihn springen |
 | `q` | Shulker: Kasten, der aufklappt und Kugeln schießt – man kommt nicht hindurch, Berührung ist harmlos |
 | `m` | Endermite: klein und schnell |
 | `5` `6` | Creeper bzw. Slime, die erst ab **Mittel** auftauchen |
