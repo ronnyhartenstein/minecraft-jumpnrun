@@ -7,6 +7,7 @@ export type BlockId =
   | 'snowGrass' | 'snow' | 'ice' | 'spruceLog' | 'spruceLeaves'
   | 'coalOre' | 'ironOre' | 'goldOre' | 'diamondOre'
   | 'netherrack' | 'netherBricks' | 'glowstone' | 'soulSand'
+  | 'endStone' | 'obsidian' | 'purpur' | 'chorus' | 'endCrystal'
   | 'lava';
 
 type Draw = (ctx: CanvasRenderingContext2D, rng: Rng) => void;
@@ -185,6 +186,44 @@ const soulSand: Draw = (ctx, rng) => {
   }
 };
 
+const endStone: Draw = (ctx, rng) => {
+  noiseRect(ctx, rng, 0, 0, S, S, ['#dedfa3', '#d6d79a', '#e4e5ad', '#cfd092']);
+  // Kleine dunkle Mulden wie im Endstein
+  for (let i = 0; i < 6; i++) {
+    const x = Math.floor(rng() * 15);
+    const y = Math.floor(rng() * 15);
+    px(ctx, x, y, '#b9ba7e');
+    px(ctx, x + 1, y, '#c4c589');
+  }
+};
+
+const obsidian: Draw = (ctx, rng) => {
+  noiseRect(ctx, rng, 0, 0, S, S, ['#14101c', '#1b1526', '#0f0c16']);
+  speckle(ctx, rng, 10, '#3b2a5a');
+  speckle(ctx, rng, 4, '#5a4088');
+};
+
+const purpur: Draw = (ctx, rng) => {
+  noiseRect(ctx, rng, 0, 0, S, S, ['#a97aa9', '#b184b1', '#a070a0']);
+  // Vier Kacheln mit dunkler Fuge
+  for (let k = 0; k < S; k++) {
+    for (const line of [0, 8]) {
+      px(ctx, k, line, '#8a5a8a');
+      px(ctx, line, k, '#8a5a8a');
+    }
+  }
+};
+
+const chorus: Draw = (ctx, rng) => {
+  noiseRect(ctx, rng, 0, 0, S, S, ['#6b4a7a', '#7a5689', '#5e4070']);
+  speckle(ctx, rng, 12, '#a07ab4');
+};
+
+const endCrystal: Draw = (ctx, rng) => {
+  noiseRect(ctx, rng, 0, 0, S, S, ['#f2b6f5', '#e79ae9', '#f8d0fa']);
+  for (let k = 2; k < 14; k++) px(ctx, k, k, '#ffffff');
+};
+
 type Faces = { side: Draw; top?: Draw; bottom?: Draw };
 
 const DESIGNS: Record<Exclude<BlockId, 'lava'>, Faces> = {
@@ -211,6 +250,11 @@ const DESIGNS: Record<Exclude<BlockId, 'lava'>, Faces> = {
   netherBricks: { side: netherBricks },
   glowstone: { side: glowstone },
   soulSand: { side: soulSand },
+  endStone: { side: endStone },
+  obsidian: { side: obsidian },
+  purpur: { side: purpur },
+  chorus: { side: chorus },
+  endCrystal: { side: endCrystal },
 };
 
 /** Besondere Material-Einstellungen pro Block. */
@@ -221,7 +265,7 @@ const OPTIONS: Partial<Record<BlockId, THREE.MeshLambertMaterialParameters>> = {
 };
 
 /** Leuchtende Blöcke brauchen kein Licht, sie sind selbst hell. */
-const GLOWING = new Set<BlockId>(['glowstone']);
+const GLOWING = new Set<BlockId>(['glowstone', 'endCrystal']);
 
 /** Lava: ein hoher Streifen, der langsam durch den Block fließt. */
 function lavaTexture(): THREE.CanvasTexture {

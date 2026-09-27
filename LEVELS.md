@@ -39,11 +39,11 @@ Ganz oben stehen ein paar Zeilen, dann kommt eine Leerzeile und danach das Level
 | Zeile | Bedeutung |
 | --- | --- |
 | `Name: Die Drachenburg` | So heißt dein Level im Spiel. |
-| `Biom: Wiese` | Die Welt, in der dein Level spielt: `Wiese`, `Wüste`, `Höhle`, `Schnee` oder `Nether`. |
+| `Biom: Wiese` | Die Welt, in der dein Level spielt: `Wiese`, `Wüste`, `Höhle`, `Schnee`, `Nether` oder `End`. |
 | `Info: …` | Eine Notiz für dich. Das Spiel liest sie nicht. |
 
 Das Biom bestimmt, wie der Himmel aussieht, ob es schneit, welche Musik läuft und was `G`, `D` und `t` sind.
-In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Netherrack.
+In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Netherrack, im End zu Endstein.
 
 ## Alle Zeichen
 
@@ -52,8 +52,8 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | Zeichen | Block |
 | --- | --- |
 | `.` | Luft |
-| `G` | Boden oben (je nach Biom: Gras, Sand, Schnee, Stein, Netherrack) |
-| `D` | Boden darunter (je nach Biom: Erde, Sandstein, Stein, Netherrack) |
+| `G` | Boden oben (je nach Biom: Gras, Sand, Schnee, Stein, Netherrack, Endstein) |
+| `D` | Boden darunter (je nach Biom: Erde, Sandstein, Stein, Netherrack, Endstein) |
 | `#` | Stein |
 | `C` | Bruchstein |
 | `P` | Holzbretter, gut für schwebende Plattformen |
@@ -69,6 +69,8 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `N` | Nether-Ziegel |
 | `O` | Glowstone (leuchtet) |
 | `W` | Seelensand – Steve wird **langsam** |
+| `U` | Purpurblock (für die Endstadt) |
+| `V` | Obsidian |
 | `~` | Lava – **heiß!** Wer sie berührt, fängt neu an |
 
 ### Besondere Dinge
@@ -86,9 +88,12 @@ In der Wüste wird `G` zu Sand, im Schnee zu verschneitem Gras, im Nether zu Net
 | `k` | Skelett (im Schnee Eiswanderer): schießt Pfeile |
 | `h` | Waldhexe: wirft Gift im Bogen |
 | `b` | Lohe (Blaze): schwebt und schießt Feuerbälle – man kann unter ihr durchlaufen |
+| `e` | Enderman: steht und starrt, teleportiert sich weg, wenn man nah kommt – man kann über ihn springen |
+| `q` | Shulker: Kasten, der aufklappt und Kugeln schießt – man kommt nicht hindurch, Berührung ist harmlos |
+| `m` | Endermite: klein und schnell |
 | `5` `6` | Creeper bzw. Slime, die erst ab **Mittel** auftauchen |
 | `7` `8` | Creeper bzw. Slime, die nur auf **Schwer** auftauchen |
-| `t` | Baum oder Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Tropfstein …) |
+| `t` | Baum oder Deko im Hintergrund (je nach Biom: Baum, Kaktus, Fichte, Tropfstein, Chorus-Pflanze …) |
 | `f` | Fackel (leuchtet, gut für die Höhle) |
 
 Gegner besiegt man, indem man **von oben** draufspringt. Pfeilen, Gift und Feuerbällen weicht man aus: tief fliegende überspringen, bei hohen kurz warten.
@@ -138,10 +143,10 @@ Dort steht, in welcher Zeile und Spalte der Fehler ist.
 
 ## Die großen Level
 
-Die Welten des Spiels liegen im Ordner `levels/`, drei Level pro Welt: von `1-1-wiese.txt` bis `5-3-netherfestung.txt`.
+Die Welten des Spiels liegen im Ordner `levels/`, drei Level pro Welt: von `1-1-wiese.txt` bis `6-3-endstadt.txt`.
 Die Zahlen am Anfang des Dateinamens sind **Welt und Level**: `2-3-wuestentempel.txt` ist das dritte Level in Welt 2.
 Du kannst sie dir anschauen und lernen, wie sie gebaut sind.
-Eine neue Datei `6-1-irgendwas.txt` würde automatisch als Welt 6 im Menü erscheinen.
+Eine neue Datei `7-1-irgendwas.txt` würde automatisch als Welt 7 im Menü erscheinen.
 
 ## Dein Level für alle
 

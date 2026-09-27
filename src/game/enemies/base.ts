@@ -11,10 +11,10 @@ const EPS = 1e-4;
 export interface EnemyContext {
   /** Steves Position (Mitte der Füße). */
   player: THREE.Vector2;
-  /** Ein Geschoss abfeuern (Pfeil, Gift, Feuerball). */
+  /** Ein Geschoss abfeuern (Pfeil, Gift, Feuerball, Shulker-Kugel). */
   shoot(projectile: Projectile): void;
   /** Einen Sound abspielen. */
-  sound(name: 'bow' | 'throw' | 'fireball'): void;
+  sound(name: 'bow' | 'throw' | 'fireball' | 'teleport' | 'shulker'): void;
 }
 
 /**

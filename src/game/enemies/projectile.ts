@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { World } from '../world';
 
-export type ProjectileKind = 'arrow' | 'poison' | 'fireball';
+export type ProjectileKind = 'arrow' | 'poison' | 'fireball' | 'shulker';
 
 const LIFETIME = 5;
 
@@ -23,12 +23,13 @@ const MODELS: Record<ProjectileKind, () => THREE.Object3D> = {
     return group;
   },
   fireball: () => new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.34, 0.34), new THREE.MeshBasicMaterial({ color: '#ff8a1a' })),
+  shulker: () => new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, 0.26), new THREE.MeshBasicMaterial({ color: '#f4f0c8' })),
 };
 
 /** Wie das Geschoss beim Aufprall aussieht: kleine Würfel, die auseinanderfliegen. */
-const SPLASH: Record<ProjectileKind, string> = { arrow: '#b0b0b0', poison: '#5bd13a', fireball: '#ffb030' };
+const SPLASH: Record<ProjectileKind, string> = { arrow: '#b0b0b0', poison: '#5bd13a', fireball: '#ffb030', shulker: '#fff6a8' };
 
-/** Ein Geschoss: Pfeil (leichter Bogen), Giftflasche (hoher Bogen) oder Feuerball (geradeaus). */
+/** Ein Geschoss: Pfeil (leichter Bogen), Giftflasche (hoher Bogen), Feuerball oder Shulker-Kugel (geradeaus). */
 export class Projectile {
   readonly object: THREE.Object3D;
   alive = true;
@@ -70,7 +71,7 @@ export class Projectile {
     this.pos.addScaledVector(this.vel, dt);
     this.object.position.set(this.pos.x, this.pos.y, 0);
     this.object.rotation.z = Math.atan2(this.vel.y, this.vel.x);
-    if (this.kind === 'fireball') this.object.rotation.x += dt * 8;
+    if (this.kind === 'fireball' || this.kind === 'shulker') this.object.rotation.x += dt * 8;
     if (world.isSolid(Math.floor(this.pos.x), Math.floor(this.pos.y))) this.burst();
     if (this.age > LIFETIME) this.alive = false;
   }

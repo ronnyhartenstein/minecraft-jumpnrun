@@ -33,7 +33,7 @@ Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](
 
 ## Level
 
-Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils das schwerste Level.
+Sechs Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils das schwerste Level.
 
 | Welt | Neu in dieser Welt | Level |
 | --- | --- | --- |
@@ -42,8 +42,9 @@ Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils d
 | 3 Höhle | Decken, Lavaseen mit Trittsteinen, Fackeln | 3-1 Die Höhle · 3-2 Die Mine · 3-3 Die Diamantenhöhle |
 | 4 Schneeberge | Rutschiges Eis, viel Klettern | 4-1 Die Schneeberge · 4-2 Der Eissee · 4-3 Der Gipfel |
 | 5 Nether | Seelensand, Lavameer, Magmawürfel | 5-1 Der Nether · 5-2 Das Lavameer · 5-3 Die Netherfestung |
+| 6 End | Leere unter den Inseln, Obsidiansäulen, Purpur-Endstadt | 6-1 Das End · 6-2 Die Obsidiansäulen · 6-3 Die Endstadt |
 
-Gegner: Creeper, Slimes (im Nether Magmawürfel), Zombies (in der Wüste Wüstenzombies), Spinnen (in der Höhle Höhlenspinnen), Skelette (im Schnee Eiswanderer) mit Pfeilen, Waldhexen mit Gift und im Nether Lohen mit Feuerbällen. Von oben draufspringen besiegt sie; seitlich berühren oder von einem Geschoss getroffen werden heißt zurück zum Checkpoint. Creeper, Skelette und Lohen sind dagegen bei Berührung harmlos, man kommt aber nicht durch sie hindurch. Kommt man einem Creeper zu nah, blinkt er weiß und explodiert nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
+Gegner: Creeper, Slimes (im Nether Magmawürfel), Zombies (in der Wüste Wüstenzombies), Spinnen (in der Höhle Höhlenspinnen), Skelette (im Schnee Eiswanderer) mit Pfeilen, Waldhexen mit Gift, im Nether Lohen mit Feuerbällen und im End Endermen, Shulker und Endermiten. Von oben draufspringen besiegt sie; seitlich berühren oder von einem Geschoss getroffen werden heißt zurück zum Checkpoint. Creeper, Skelette, Lohen und Shulker sind dagegen bei Berührung harmlos, man kommt aber nicht durch sie hindurch. Endermen teleportieren sich weg, wenn man ihnen nah kommt. Kommt man einem Creeper zu nah, blinkt er weiß und explodiert nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
 
 In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen.
 

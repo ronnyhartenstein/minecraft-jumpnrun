@@ -6,7 +6,7 @@ import { Diamond } from './diamond';
 import { atLeast, type Difficulty } from './difficulty';
 import { createEnemy, type Enemy, type EnemyContext, type Projectile } from './enemies';
 import { GoalFlag } from './goal';
-import { lavaSparks, netherAsh, Particles, snowfall } from './particles';
+import { endMotes, lavaSparks, netherAsh, Particles, snowfall } from './particles';
 import { World } from './world';
 
 /** Alles, was zu einem geladenen Level gehört. Wird beim Levelwechsel komplett freigegeben. */
@@ -48,6 +48,7 @@ export class LevelScene {
     if (this.world.lavaSurfaces.size > 0) this.particles.push(lavaSparks(this.world.lavaSurfaces, focus));
     if (level.biome.particles === 'snow') this.particles.push(snowfall(focus));
     if (level.biome.particles === 'ash') this.particles.push(netherAsh(focus));
+    if (level.biome.particles === 'end') this.particles.push(endMotes(focus));
     for (const p of this.particles) this.object.add(p.object);
   }
 

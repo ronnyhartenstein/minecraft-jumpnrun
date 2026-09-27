@@ -31,6 +31,11 @@ export interface Difficulty {
   blazeBurst: number;
   /** Tempo der Feuerbälle einer Lohe. */
   fireballSpeed: number;
+  /** So oft kann sich ein Enderman in Steves Nähe teleportieren (Sekunden). */
+  endermanTeleport: number;
+  /** Pause zwischen zwei Kugeln eines Shulkers und Tempo der Kugeln. */
+  shulkerCooldown: number;
+  shulkerBulletSpeed: number;
 }
 
 /** Alle Werte je Schwierigkeit an einem Ort. Leicht entspricht dem ursprünglichen Spiel. */
@@ -54,6 +59,9 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeCooldown: 4.5,
     blazeBurst: 1,
     fireballSpeed: 4.5,
+    endermanTeleport: 3.5,
+    shulkerCooldown: 3.6,
+    shulkerBulletSpeed: 3.5,
   },
   mittel: {
     id: 'mittel',
@@ -74,6 +82,9 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeCooldown: 2.8,
     blazeBurst: 2,
     fireballSpeed: 6,
+    endermanTeleport: 2.5,
+    shulkerCooldown: 2.7,
+    shulkerBulletSpeed: 4.5,
   },
   schwer: {
     id: 'schwer',
@@ -94,6 +105,9 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     blazeCooldown: 2.1,
     blazeBurst: 3,
     fireballSpeed: 7.5,
+    endermanTeleport: 1.8,
+    shulkerCooldown: 2.0,
+    shulkerBulletSpeed: 5.5,
   },
 };
 

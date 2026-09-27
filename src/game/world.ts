@@ -220,6 +220,8 @@ export class World {
         return this.addStalagmite(add, x, y);
       case 'nether':
         return this.addNetherDeco(add, x, y);
+      case 'chorus':
+        return this.addEndDeco(add, x, y);
     }
   }
 
@@ -265,6 +267,28 @@ export class World {
     let ceiling = floor;
     while (ceiling < this.level.height && !this.level.blocks[ceiling][x]) ceiling++;
     if (ceiling < this.level.height) for (let dy = 1; dy <= 1 + (x % 2); dy++) add('stone', x, ceiling - dy, z);
+  }
+
+  /**
+   * End: meist eine verzweigte Chorus-Pflanze, jede dritte Stelle eine hohe Obsidiansäule
+   * weiter hinten mit einem leuchtenden Endkristall obendrauf.
+   */
+  private addEndDeco(add: AddBlock, x: number, ground: number) {
+    if (x % 3 === 0) {
+      const h = 6 + (x % 4);
+      for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < 2; dx++) add('obsidian', x + dx, ground + dy, DECO_Z - 2);
+      add('endCrystal', x, ground + h + 1, DECO_Z - 2);
+      return;
+    }
+    const z = DECO_Z + 1;
+    const stem = 2 + (x % 2);
+    for (let dy = 0; dy < stem; dy++) add('chorus', x, ground + dy, z);
+    // Zwei Seitenäste, die nach oben weiterwachsen
+    for (const [dx, up] of [[-1, 1 + (x % 2)], [1, 2 - (x % 2)]]) {
+      add('chorus', x + dx, ground + stem - 1, z);
+      for (let dy = 0; dy < up; dy++) add('chorus', x + dx, ground + stem + dy, z);
+    }
+    add('chorus', x, ground + stem, z);
   }
 
   /** Nether: abwechselnd eine Säule mit Glowstone oder ein Lavafall aus dem Nichts. */

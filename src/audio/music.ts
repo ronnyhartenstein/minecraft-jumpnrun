@@ -48,6 +48,11 @@ export const THEMES: Record<BiomeId, Theme> = {
     lead: [0, _, 0, 2, 3, _, 2, 0, 5, _, 4, 3, 2, _, _, _, 0, _, 0, 2, 3, _, 5, 7, 6, _, 5, 4, 5, _, _, _],
     bass: [0, 0, _, 0, _, 0, _, 0, 5, 5, _, 5, _, 5, _, 5, 3, 3, _, 3, _, 3, _, 3, 4, 4, _, 4, 6, _, 4, _],
   },
+  end: {
+    bpm: 66, root: 57, scale: MINOR, leadWave: 'sine', bassWave: 'sine',
+    lead: [7, _, _, 9, 11, _, _, _, 9, _, 7, _, 4, _, _, _, 5, _, _, 7, 8, _, _, _, 7, _, 5, _, 2, _, _, _],
+    bass: [0, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 5, _, _, _, _, _, _, _, 3, _, _, _, 4, _, _, _],
+  },
 };
 
 /** Frequenz einer Tonleiter-Stufe, `octave` verschiebt in ganzen Oktaven. */

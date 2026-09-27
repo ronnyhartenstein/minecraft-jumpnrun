@@ -1,9 +1,9 @@
 import type { BlockId } from '../textures/blocks';
 
-export type BiomeId = 'meadow' | 'desert' | 'cave' | 'snow' | 'nether';
+export type BiomeId = 'meadow' | 'desert' | 'cave' | 'snow' | 'nether' | 'end';
 
 /** Was das Zeichen `t` im Level-Raster im Hintergrund entstehen lässt. */
-export type DecoKind = 'oak' | 'cactus' | 'spruce' | 'stalagmite' | 'nether';
+export type DecoKind = 'oak' | 'cactus' | 'spruce' | 'stalagmite' | 'nether' | 'chorus';
 
 export interface Biome {
   id: BiomeId;
@@ -31,7 +31,7 @@ export interface Biome {
   /** Ein Lavameer unter dem ganzen Level, in dieser Blockreihe. Wer hineinfällt, fängt neu an. */
   lavaSea: number | null;
   /** Partikel in der Luft. */
-  particles: 'snow' | 'ash' | null;
+  particles: 'snow' | 'ash' | 'end' | null;
 }
 
 export const BIOMES: Record<BiomeId, Biome> = {
@@ -124,5 +124,23 @@ export const BIOMES: Record<BiomeId, Biome> = {
     playerLight: false,
     lavaSea: 2,
     particles: 'ash',
+  },
+  end: {
+    id: 'end',
+    name: 'End',
+    color: '#5b3f7a',
+    surface: 'endStone',
+    subsoil: 'endStone',
+    underground: ['endStone', 'endStone'],
+    sky: ['#050308', '#140c1f', '#231733'],
+    fog: { color: '#140c1f', near: 24, far: 70 },
+    ambient: { sky: '#d9c8ff', ground: '#4a3a5a', intensity: 1.6 },
+    sun: null,
+    clouds: false,
+    deco: 'chorus',
+    enclosed: false,
+    playerLight: false,
+    lavaSea: null,
+    particles: 'end',
   },
 };

@@ -1,0 +1,20 @@
+Name: Das End
+Biom: End
+Info: Endstein-Inseln über der Leere. Vorsicht vor Endermen – sie teleportieren sich!
+
+.
+.
+.
+.
+.
+.
+........................................*
+................................*..........*..............*......................................*
+................*................................................................................................*
+.........*.................................VV............................*
+..........................*...........X.t..VV...t..e....................................................tm....Z....t
+...S..t....t........t...m..t......GGGGGGGGGGGGGGGGGGGGGGG......t....m...t..........Xt.....e..t.....GGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGG..GGGGGGGGGGGGGG...DDDDDDDDDDDDDDDDDDDDDDD...GGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG...DDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDD

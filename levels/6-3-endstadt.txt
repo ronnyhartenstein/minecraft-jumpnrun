@@ -1,0 +1,20 @@
+Name: Die Endstadt
+Biom: End
+Info: Purpur-Türme, Shulker und Endermen. Am Ende wartet das Ziel.
+
+.
+.
+.
+.
+.
+.
+.........................*.............................................................................*
+.......................................................*..........*............*............*
+................*.........................*.............................................................q.....................*
+.........*..............UUUUU...........................q............................................UUUUUU
+.......................UUUUUUU......................UUUUUUU............t..m....U.....e.t........tX...UUUUUU.....t...e...t..Z
+...S..t....t.......t..UUUUUUUUU...q.t.e........tX...UUUUUUU...t.....GGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGG...DDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDD...DDDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD

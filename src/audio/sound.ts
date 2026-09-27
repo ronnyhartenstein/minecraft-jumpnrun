@@ -3,7 +3,7 @@ import { noteFrequency, THEMES, type Theme } from './music';
 
 export type Sfx =
   | 'jump' | 'diamond' | 'checkpoint' | 'lava' | 'fall' | 'win' | 'stomp' | 'hurt' | 'fuse' | 'boom'
-  | 'bow' | 'throw' | 'fireball';
+  | 'bow' | 'throw' | 'fireball' | 'teleport' | 'shulker' | 'sonic';
 
 const STORAGE_KEY = 'minecraft-jumpnrun-sound';
 const MUSIC_KEY = 'minecraft-jumpnrun-music';
@@ -135,6 +135,20 @@ export class Sound {
       case 'boom':
         this.noise(t, 1.2, 0.6, 1800, 60);
         this.tone(t, 0.8, 'sine', 0.5, 110, 30);
+        break;
+      case 'teleport':
+        // Schwirren nach oben, dann nach unten
+        this.tone(t, 0.18, 'sine', 0.2, 300, 1400);
+        this.tone(t + 0.15, 0.2, 'sine', 0.15, 1400, 250);
+        break;
+      case 'shulker':
+        this.tone(t, 0.15, 'square', 0.1, 520, 780);
+        break;
+      case 'sonic':
+        // Tiefer Wumms mit hellem Nachhall
+        this.tone(t, 0.6, 'sine', 0.5, 90, 40);
+        this.tone(t, 0.35, 'sawtooth', 0.12, 900, 200);
+        this.noise(t, 0.4, 0.3, 3000, 300);
         break;
     }
   }

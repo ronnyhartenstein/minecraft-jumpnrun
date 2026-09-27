@@ -7,13 +7,14 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  * Die Level liegen als Textdateien im Ordner `levels/`, die Anleitung dazu steht in LEVELS.md.
  *
  *   .  Luft
- *   G  Boden oben   (je nach Biom: Gras, Sand, Schneegras, Stein, Netherrack)
- *   D  Boden unten  (je nach Biom: Erde, Sandstein, Stein, Netherrack)
+ *   G  Boden oben   (je nach Biom: Gras, Sand, Schneegras, Stein, Netherrack, Endstein)
+ *   D  Boden unten  (je nach Biom: Erde, Sandstein, Stein, Netherrack, Endstein)
  *   #  Stein        C  Bruchstein   H  Holzstamm    L  Laub        P  Holzbretter
  *   A  Sand         Y  Sandstein    K  Kaktus
  *   M  Schnee       E  Eis (rutschig!)
  *   1  Kohle-Erz    2  Eisen-Erz    3  Gold-Erz     4  Diamant-Erz
  *   R  Netherrack   N  Nether-Ziegel  O  Glowstone  W  Seelensand (langsam!)
+ *   U  Purpur       V  Obsidian
  *   ~  Lava (heiß! Wer sie berührt, fängt neu an)
  *   S  Start von Steve
  *   Z  Ziel-Fahne
@@ -22,6 +23,7 @@ import { BIOMES, type Biome, type BiomeId } from './biomes';
  *   c  Creeper (läuft hin und her)
  *   s  Slime (hüpft, im Nether ein Magmawürfel)
  *   z  Zombie   p  Spinne   k  Skelett   h  Waldhexe   b  Lohe (Blaze)
+ *   e  Enderman q  Shulker  m  Endermite
  *   5  Creeper ab Mittel     6  Slime ab Mittel
  *   7  Creeper nur Schwer    8  Slime nur Schwer
  *      Gegner besiegt man, indem man von oben draufspringt.
@@ -49,6 +51,8 @@ export const BLOCK_CHARS: Record<string, BlockId> = {
   N: 'netherBricks',
   O: 'glowstone',
   W: 'soulSand',
+  U: 'purpur',
+  V: 'obsidian',
   '~': 'lava',
 };
 
@@ -58,7 +62,7 @@ export interface Point {
 }
 
 export interface EnemySpawn extends Point {
-  kind: 'creeper' | 'slime' | 'zombie' | 'spider' | 'skeleton' | 'witch' | 'blaze';
+  kind: 'creeper' | 'slime' | 'zombie' | 'spider' | 'skeleton' | 'witch' | 'blaze' | 'enderman' | 'shulker' | 'endermite';
   /** Ab dieser Schwierigkeit ist der Gegner dabei. */
   from: DifficultyId;
 }
@@ -72,6 +76,9 @@ const ENEMY_CHARS: Record<string, Omit<EnemySpawn, 'x' | 'y'>> = {
   k: { kind: 'skeleton', from: 'leicht' },
   h: { kind: 'witch', from: 'leicht' },
   b: { kind: 'blaze', from: 'leicht' },
+  e: { kind: 'enderman', from: 'leicht' },
+  q: { kind: 'shulker', from: 'leicht' },
+  m: { kind: 'endermite', from: 'leicht' },
   '5': { kind: 'creeper', from: 'mittel' },
   '6': { kind: 'slime', from: 'mittel' },
   '7': { kind: 'creeper', from: 'schwer' },
@@ -112,6 +119,7 @@ const BIOME_NAMES: Record<string, BiomeId> = {
   schnee: 'snow',
   schneeberge: 'snow',
   nether: 'nether',
+  end: 'end',
 };
 
 /**
@@ -131,7 +139,7 @@ export function parseLevelFile(fileText: string, fileName: string, custom: boole
   const name = header.name || fileName.replace(/\.txt$/, '');
   const biomeName = (header.biom ?? 'wiese').toLowerCase();
   const biome = BIOME_NAMES[biomeName];
-  if (!biome) warnings.push(`Unbekanntes Biom „${header.biom}“. Erlaubt sind: Wiese, Wüste, Höhle, Schnee, Nether.`);
+  if (!biome) warnings.push(`Unbekanntes Biom „${header.biom}“. Erlaubt sind: Wiese, Wüste, Höhle, Schnee, Nether, End.`);
   const level = parseLevel(name, biome ?? 'meadow', lines.slice(i).join('\n'), { custom, firstLine: i + 1 });
   level.warnings.unshift(...warnings);
   return level;

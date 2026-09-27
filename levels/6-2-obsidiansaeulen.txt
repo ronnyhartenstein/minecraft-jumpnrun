@@ -1,0 +1,20 @@
+Name: Die Obsidiansäulen
+Biom: End
+Info: Von Säule zu Säule über die Leere. Oben lauern Shulker.
+
+.
+.
+.
+.
+.
+...................................................*
+..............................................*...............*...................................*
+..................................*
+......................*
+..............*...........................VVVVVVVV.......e..........q......*........................................*
+........*......................q.......X..VVVVVVVV..VVVVVVVVV...VVVVVVV......................VVVV
+.....................VVVV..VVVVVV...VVVVVVVVVVVVVV..VVVVVVVVV...VVVVVVV.......m........X.....VVVV.......t..e.t..Z..t
+...S..t...t..........VVVV..VVVVVV...VVVVVVVVVVVVVV..VVVVVVVVV...VVVVVVVVVVVVVVVVV..VVVVVVVVVVVVVV...GGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGG..VVVVVVVVVV..VVVVVV...VVVVVVVVVVVVVV..VVVVVVVVV...VVVVVVVVVVVVVVVVV..VVVVVVVVVVVVVV...DDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDD..VVVVVVVVVV..VVVVVV...VVVVVVVVVVVVVV..VVVVVVVVV...VVVVVVVVVVVVVVVVV..VVVVVVVVVVVVVV...DDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDD..VVVVVVVVVV..VVVVVV...VVVVVVVVVVVVVV..VVVVVVVVV...VVVVVVVVVVVVVVVVV..VVVVVVVVVVVVVV...DDDDDDDDDDDDDDDDDD

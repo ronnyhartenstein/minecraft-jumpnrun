@@ -99,3 +99,12 @@ export function netherAsh(focus: THREE.Vector3): Particles {
     return true;
   });
 }
+
+/** Lila Portal-Partikel, die im End langsam durch die Luft schweben. */
+export function endMotes(focus: THREE.Vector3): Particles {
+  return new Particles({ count: 220, color: '#c77dff', size: 0.1, life: [3, 6], gravity: -0.1, glow: true }, (pos, vel) => {
+    pos.set(focus.x + rand(-24, 24), focus.y + rand(-8, 8), rand(-12, 3));
+    vel.set(rand(-0.3, 0.3), rand(-0.2, 0.3), rand(-0.2, 0.2));
+    return true;
+  });
+}

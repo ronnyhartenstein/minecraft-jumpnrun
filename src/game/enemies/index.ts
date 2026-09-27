@@ -4,6 +4,9 @@ import type { World } from '../world';
 import type { Enemy } from './base';
 import { Blaze } from './blaze';
 import { Creeper } from './creeper';
+import { Enderman } from './enderman';
+import { Endermite } from './endermite';
+import { Shulker } from './shulker';
 import { Skeleton } from './skeleton';
 import { Slime } from './slime';
 import { Spider } from './spider';
@@ -25,5 +28,8 @@ export function createEnemy(spawn: EnemySpawn, world: World, difficulty: Difficu
     case 'skeleton': return new Skeleton(spawn, world, difficulty, biome === 'snow');
     case 'witch': return new Witch(spawn, world, difficulty);
     case 'blaze': return new Blaze(spawn, world, difficulty);
+    case 'enderman': return new Enderman(spawn, world, difficulty);
+    case 'shulker': return new Shulker(spawn, world, difficulty);
+    case 'endermite': return new Endermite(spawn, world, difficulty);
   }
 }
