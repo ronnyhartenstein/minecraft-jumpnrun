@@ -46,6 +46,8 @@ const HEIGHT = 1.8;
 const EPS = 1e-4;
 /** Maximale Strecke pro Kollisions-Teilschritt, damit Steve nie durch einen Block rutscht. */
 const MAX_SUBSTEP = 0.4;
+/** So lange muss die Figur in der Luft gewesen sein, damit eine Landung zählt. */
+const LANDING_AIR_TIME = 0.25;
 /** So hohe Kanten läuft der Schreiter hinauf, z. B. vom Lavasee ans Ufer. */
 const MAX_STEP_UP = 0.2;
 
@@ -66,6 +68,9 @@ export class Player {
   private glide: number | null = null;
   /** Gleitet die Figur gerade? (für die Flügel) */
   gliding = false;
+  /** Ist die Figur in diesem Schritt nach einem Sprung oder Sturz gelandet? (für die Schallwelle des Wardens) */
+  landed = false;
+  private airTime = 0;
   /** Trägt die Lava die Figur wie Boden (Schreiter)? */
   private lavaWalker = false;
   private coyote = 0;
@@ -88,6 +93,7 @@ export class Player {
     this.facing = 1;
     this.onGround = false;
     this.buffer = 0;
+    this.airTime = 0;
   }
 
   update(dt: number, input: PlayerInput): void {
@@ -109,6 +115,9 @@ export class Player {
       this.moveX(dx / steps);
       this.moveY(dy / steps);
     }
+    // Nur echte Landungen zählen, nicht jede kleine Stufe
+    this.landed = this.onGround && this.airTime > LANDING_AIR_TIME;
+    this.airTime = this.onGround ? 0 : this.airTime + dt;
   }
 
   /** Abfedern nach dem Draufspringen auf einen Gegner. */

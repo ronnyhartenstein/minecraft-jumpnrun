@@ -216,3 +216,52 @@ export class Strider extends Animal {
     this.bristles.forEach((hair, i) => (hair.rotation.x = Math.sin(this.time * (speed > 0.1 ? 10 : 3) + i) * 0.2));
   }
 }
+
+/** Warden: riesig, blind, mit Fühlern am Kopf und einer leuchtenden Brust voller Seelen. */
+export class Warden extends Animal {
+  private readonly arms: THREE.Object3D[];
+  private readonly glow: THREE.MeshLambertMaterial[] = [];
+
+  constructor() {
+    super(0.6);
+    const teal = ['#0f3a44', '#12464f', '#0c2f37'];
+    const dark = skin(teal);
+    const glowing = (colors: string[], draw?: (ctx: CanvasRenderingContext2D) => void) => {
+      // Die Textur selbst leuchtet: helle Pixel stark, dunkle kaum
+      const material = skin(colors, draw);
+      material.emissive.set('#ffffff');
+      material.emissiveMap = material.map;
+      this.glow.push(material);
+      return material;
+    };
+    // Brust mit leuchtenden Seelen-Flecken
+    const chest = glowing(teal, (ctx) => dots(ctx, [
+      [2, 2, '#9ffcf8'], [3, 2, '#4fe0dc'], [5, 3, '#9ffcf8'], [3, 5, '#6ff5f0'], [4, 5, '#4fe0dc'], [6, 6, '#9ffcf8'], [1, 6, '#6ff5f0'],
+    ]));
+    this.model.add(at(box(18, 21, 11, [dark, dark, dark, dark, chest, dark]), 0, 23.5, 0));
+    // Kopf ohne Augen, nur ein dunkles Maul
+    const face = skin(teal, (ctx) => {
+      ctx.fillStyle = '#06181c';
+      ctx.fillRect(1, 5, 6, 2);
+    });
+    this.model.add(at(box(16, 16, 10, withFace(dark, face)), 0, 42, 0));
+    // Fühler links und rechts am Kopf
+    const tendril = glowing(['#2fb8bf', '#27a3aa', '#3cc9cf']);
+    for (const side of [-1, 1]) {
+      const t = at(box(4, 12, 2, tendril), side * 10, 48, 0);
+      t.rotation.z = side * -0.5;
+      this.model.add(t);
+    }
+    this.arms = [-1, 1].map((side) => limb(box(8, 28, 8, dark), [side * 13, 33, 0], -14));
+    this.front = [limb(box(6, 13, 6, dark), [-5.5, 13, 0], -6.5), limb(box(6, 13, 6, dark), [5.5, 13, 0], -6.5)];
+    this.model.add(...this.arms, ...this.front);
+  }
+
+  protected override animate(_dt: number, { onGround }: CharacterState) {
+    // Arme schwingen gegengleich zu den Beinen, in der Luft gehen sie hoch
+    this.arms.forEach((arm, i) => (arm.rotation.x = onGround ? Math.sin(this.walkPhase) * 0.5 * (i % 2 ? -1 : 1) : -1.2));
+    // Die Seelen in der Brust pulsieren
+    const pulse = 0.7 + Math.sin(this.time * 3) * 0.3;
+    for (const material of this.glow) material.emissiveIntensity = pulse;
+  }
+}

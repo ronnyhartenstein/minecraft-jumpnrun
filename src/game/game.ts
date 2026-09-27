@@ -18,6 +18,9 @@ import type { Stage } from './scene';
 const FALL_LIMIT = -4;
 /** Dauer der Abblende beim Respawn, passend zur CSS-Transition. */
 const FADE_TIME = 0.3;
+/** Schallwelle des Wardens: so lange breitet sich der Ring aus, und so lange ist danach Pause. */
+const SONIC_TIME = 0.4;
+const SONIC_COOLDOWN = 0.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
@@ -43,6 +46,9 @@ export class Game {
   /** Gesammelte Diamanten bleiben nach einem Sturz erhalten, erst ein Neustart setzt sie zurück. */
   private diamonds = 0;
   private invulnerable = 0;
+  /** Laufende Schallwellen des Wardens (nur der Effekt) und die Pause bis zur nächsten. */
+  private waves: { mesh: THREE.Mesh; age: number; radius: number }[] = [];
+  private sonicCooldown = 0;
   /** Beim automatischen Prüfen der Level wird kein Fortschritt gespeichert. */
   testMode = false;
 
@@ -265,6 +271,42 @@ export class Game {
     });
   }
 
+  /** Warden: Landet er nach einem Sprung, sind Gegner und Geschosse in der Nähe besiegt. */
+  private sonicBoom() {
+    const radius = FIGURES[this.figureId].sonicBoom;
+    if (radius === null || this.sonicCooldown > 0) return;
+    this.sonicCooldown = SONIC_COOLDOWN;
+    const center = new THREE.Vector2(this.player.pos.x, this.player.pos.y + 0.9);
+    for (const e of this.scene!.enemies) {
+      if (e.alive && Math.abs(e.pos.x - center.x) < radius + e.halfWidth && Math.abs(e.pos.y + e.height / 2 - center.y) < radius) e.stomp();
+    }
+    for (const p of this.scene!.projectiles) if (p.flying && p.pos.distanceTo(center) < radius) p.burst();
+    const mesh = new THREE.Mesh(
+      new THREE.RingGeometry(0.85, 1, 48),
+      new THREE.MeshBasicMaterial({ color: '#4ff0ea', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }),
+    );
+    mesh.position.set(center.x, center.y, 0.2);
+    this.stage.scene.add(mesh);
+    this.waves.push({ mesh, age: 0, radius });
+    this.sound.play('sonic');
+  }
+
+  /** Der Ring der Schallwelle wird größer und blasser, dann verschwindet er. */
+  private updateWaves(dt: number) {
+    for (const wave of this.waves) {
+      wave.age += dt;
+      const t = Math.min(wave.age / SONIC_TIME, 1);
+      wave.mesh.scale.setScalar(0.3 + t * (wave.radius - 0.3));
+      (wave.mesh.material as THREE.MeshBasicMaterial).opacity = 1 - t;
+    }
+    for (const wave of this.waves.filter((w) => w.age >= SONIC_TIME)) {
+      wave.mesh.removeFromParent();
+      wave.mesh.geometry.dispose();
+      (wave.mesh.material as THREE.Material).dispose();
+    }
+    this.waves = this.waves.filter((w) => w.age < SONIC_TIME);
+  }
+
   /** Pfeile, Gift und Feuerbälle: Treffer heißt Neustart. */
   private checkProjectiles() {
     const { pos } = this.player;
@@ -323,6 +365,7 @@ export class Game {
       : NO_INPUT;
     this.player.update(dt, input);
     if (this.player.jumped) this.sound.play('jump');
+    this.updateWaves(dt);
     this.scene.update(dt, { player: this.player.pos, sound: (name) => this.sound.play(name) });
 
     const { pos } = this.player;
@@ -346,6 +389,8 @@ export class Game {
           this.sound.play('diamond');
         }
         this.invulnerable -= dt;
+        this.sonicCooldown -= dt;
+        if (this.player.landed) this.sonicBoom();
         this.checkEnemies();
         if (this.state === 'playing') this.checkProjectiles();
         if (this.state !== 'playing') break;

@@ -69,6 +69,9 @@ Jedes Tier kann etwas besser als Steve, aber nichts schlechter. So bleibt jedes 
 | ![Fuchs](docs/figuren/fuchs.png) | ![Wolf](docs/figuren/wolf.png) | ![Schreiter](docs/figuren/schreiter.png) |
 | **🦊 Fuchs** · Welt 3 auf Mittel | **🐺 Wolf** · Welt 4 auf Mittel | **🔥 Schreiter** · Welt 5 auf Mittel |
 | Flink: läuft schneller als alle anderen. Ideal für die Jagd nach Bestzeiten. | Springt höher: kommt an Diamanten, die für Steve knapp zu hoch hängen. | Hitzefest: läuft über Lava, ohne Schaden zu nehmen. Nur Feuerbälle, Gegner und Abgründe sind noch gefährlich. |
+| ![Warden](docs/figuren/warden.png) | | |
+| **💥 Warden** · Welt 6 auf Mittel | | |
+| Schallwelle: Landet er nach einem Sprung, sind alle Gegner und Geschosse im Umkreis von 3 Blöcken besiegt. Einfach neben Gegnern hochspringen! | | |
 
 Alle Werte stehen in `src/game/figures.ts`, die Modelle in `src/game/animals.ts`.
 
