@@ -149,7 +149,7 @@ button { touch-action: manipulation; }
 .card .stages { display: flex; gap: 3px; font-size: 7px; font-style: normal; }
 .card .stages i { font-style: normal; padding: 1px 3px; background: rgb(0 0 0 / 0.35); opacity: 0.5; }
 .card .stages i.done { background: #ffe14d; color: #3a2a00; text-shadow: none; opacity: 1; }
-.hud-difficulty { font-size: 10px; opacity: 0.85; }
+.hud-difficulty { margin-left: 6px; font-size: 10px; opacity: 0.85; }
 
 .warnings {
   position: absolute; left: 50%; top: 70px; transform: translateX(-50%);

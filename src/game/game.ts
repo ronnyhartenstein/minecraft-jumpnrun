@@ -14,6 +14,7 @@ import { DIFFICULTIES, type Difficulty, type DifficultyId } from './difficulty';
 import { FIGURE_ORDER, FIGURES, type FigureId } from './figures';
 import { LevelScene } from './levelScene';
 import { Player, type PlayerInput } from './player';
+import { Popup } from './popup';
 import { Progress } from './progress';
 import type { Stage } from './scene';
 
@@ -70,6 +71,8 @@ export class Game {
   /** Laufende Schallwellen des Wardens (nur der Effekt) und die Pause bis zur nächsten. */
   private waves: { mesh: THREE.Mesh; age: number; radius: number }[] = [];
   private sonicCooldown = 0;
+  /** Kurze Anzeigen in der Spielwelt, z. B. „+20 s“ über einem Checkpoint. */
+  private popups: Popup[] = [];
   /** Läuft gerade ein Endlos-Lauf? Sonst wird ein festes Level gespielt. */
   private endless: Endless | null = null;
   /** Beim automatischen Prüfen der Level wird kein Fortschritt gespeichert. */
@@ -398,6 +401,7 @@ export class Game {
     this.buildEndlessScene({ enemies, projectiles });
     this.player.moveToWorld(this.scene!.world, -CHUNK);
     this.cameraRig.shift(-CHUNK, e.level.width);
+    for (const popup of this.popups) popup.object.position.x -= CHUNK;
     this.spawnPoint = { x: Math.max(e.level.start.x, this.spawnPoint.x - CHUNK), y: this.spawnPoint.y };
     // Schon erreichte Checkpoints bleiben erreicht
     for (const cp of this.scene!.checkpoints) if (cp.at.x <= this.spawnPoint.x) cp.activate();
@@ -414,7 +418,21 @@ export class Game {
     e.time += bonus;
     this.overlay.clockGain(bonus);
     this.updateHud();
-    return `Checkpoint ✔ ⏱ +${bonus} s`;
+    // Über der Flagge zoomt ein gelbes „+20 s“ auf
+    this.showPopup(`+${bonus}s`, new THREE.Vector3(checkpointX + 0.5, this.scene!.checkpoints.find((cp) => cp.at.x === checkpointX)!.at.y + 3.2, 0));
+    return `Checkpoint ✔ ⏱ +${bonus}s`;
+  }
+
+  private showPopup(text: string, at: THREE.Vector3) {
+    const popup = new Popup(text, at);
+    this.stage.scene.add(popup.object);
+    this.popups.push(popup);
+  }
+
+  private updatePopups(dt: number) {
+    for (const popup of this.popups) popup.update(dt);
+    for (const popup of this.popups.filter((p) => p.done)) popup.dispose();
+    this.popups = this.popups.filter((p) => !p.done);
   }
 
   /** Ein Diamant im Endlos-Lauf: Je 10 gibt es ein Herz zurück. */
@@ -542,6 +560,7 @@ export class Game {
     this.player.update(dt, input);
     if (this.player.jumped) this.sound.play('jump');
     this.updateWaves(dt);
+    this.updatePopups(dt);
     this.scene.update(dt, { player: this.player.pos, sound: (name) => this.sound.play(name) });
 
     const { pos } = this.player;
