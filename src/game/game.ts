@@ -238,7 +238,8 @@ export class Game {
 
   /**
    * Von oben draufspringen besiegt einen Gegner. Seitlich berühren heißt Neustart.
-   * Creeper sind fest wie eine Wand und gefährlich erst, wenn sie explodieren.
+   * Creeper, Skelett und Lohe sind fest wie eine Wand und bei Berührung harmlos:
+   * Gefährlich sind nur die Explosion bzw. die Geschosse.
    */
   private checkEnemies() {
     const p = this.player;
@@ -266,7 +267,7 @@ export class Game {
         const left = p.prevPos.x < e.pos.x;
         p.pos.x = left ? e.pos.x - e.halfWidth - 0.3 - 0.001 : e.pos.x + e.halfWidth + 0.3 + 0.001;
         p.vel.x = 0;
-      } else if (!e.harmlessTouch && this.invulnerable <= 0) {
+      } else if (this.invulnerable <= 0) {
         this.die('hurt');
         return;
       }

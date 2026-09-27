@@ -30,10 +30,8 @@ export abstract class Enemy {
   fuse: number | null = null;
   /** Wird für genau einen Schritt true, wenn ein Creeper explodiert. */
   exploded = false;
-  /** Durch feste Gegner (Creeper) kann Steve nicht hindurchlaufen, sie tun bei Berührung aber nichts. */
+  /** Durch feste Gegner (Creeper, Skelett, Lohe) kann Steve nicht hindurchlaufen, sie tun bei Berührung aber nichts. */
   readonly solid: boolean = false;
-  /** Harmlos bei Berührung, gefährlich sind nur die Geschosse (Lohe). */
-  readonly harmlessTouch: boolean = false;
   protected dir: 1 | -1 = -1;
   protected onGround = false;
   protected timer = 0;

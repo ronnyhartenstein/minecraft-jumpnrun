@@ -37,6 +37,7 @@ function makeBow(): THREE.Group {
 
 /** Skelett (im Schnee Eiswanderer): hält Abstand und schießt Pfeile in flachem Bogen. */
 export class Skeleton extends Enemy {
+  override readonly solid = true;
   private readonly body: Humanoid;
   private cooldown = 1;
   private drawing = 0;

@@ -124,7 +124,7 @@ export function runBot(game: Game, input: Input, index: number): BotResult {
       const blocked = solid(front, gy) || solid(front, gy + 1);
       const sea = level.biome.lavaSea !== null && !solid(front, gy - 1);
       const danger = sea || lava(front, gy - 1) || lava(front, gy - 2) || (!solid(front, gy - 1) && !solid(front, gy - 2));
-      const enemy = scene.enemies.some((e) => e.alive && !e.harmlessTouch && e.pos.x > p.pos.x && e.pos.x - p.pos.x < 2.2 && Math.abs(e.pos.y - p.pos.y) < 1.5);
+      const enemy = scene.enemies.some((e) => e.alive && e.pos.x > p.pos.x && e.pos.x - p.pos.x < 2.2 && Math.abs(e.pos.y - p.pos.y) < 1.5);
       // Geschosse: abschätzen, wann und in welcher Höhe sie ankommen, und kurz vorher drüberspringen
       const incoming = scene.projectiles.some((q) => {
         if (!q.flying || Math.abs(q.vel.x) < 0.1) return false;

@@ -19,7 +19,7 @@ const BURST_GAP = 0.35;
  * Man kann unter ihr durchlaufen und von einer höheren Stelle aus auf sie springen.
  */
 export class Blaze extends Enemy {
-  override readonly harmlessTouch = true;
+  override readonly solid = true;
   private readonly rods = new THREE.Group();
   private cooldown = 1.5;
   private shotsLeft = 0;
