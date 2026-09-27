@@ -27,11 +27,10 @@ const SONIC_COOLDOWN = 0.5;
 
 const NO_INPUT: PlayerInput = { left: false, right: false, jumpHeld: false, jumpPressed: false };
 
-/** Endlos-Lauf: Herzen zu Beginn und höchstens, Diamanten pro Extra-Herz, alle so viele Blöcke gibt es Zeit dazu. */
+/** Endlos-Lauf: Herzen zu Beginn und höchstens, Diamanten pro Extra-Herz. */
 const HEARTS = 5;
 const MAX_HEARTS = 10;
 const DIAMONDS_PER_HEART = 10;
-const TIME_BONUS_EVERY = 300;
 
 /** Zustand eines laufenden Endlos-Laufs. */
 interface Endless {
@@ -42,7 +41,6 @@ interface Endless {
   meters: number;
   /** Restzeit in Sekunden, `null` = kein Zeitlimit. */
   time: number | null;
-  nextBonus: number;
   /** Das Biom, dessen Himmel und Musik gerade laufen. */
   biome: BiomeId;
 }
@@ -326,7 +324,6 @@ export class Game {
       diamonds: 0,
       meters: 0,
       time: this.difficulty.endlessTime,
-      nextBonus: TIME_BONUS_EVERY,
       biome,
     };
     this.buildEndlessScene();
@@ -371,15 +368,6 @@ export class Game {
       e.meters = meters;
       this.updateHud();
     }
-    // Alle 300 Blöcke gibt es Zeit dazu
-    while (e.meters >= e.nextBonus) {
-      e.nextBonus += TIME_BONUS_EVERY;
-      if (e.time !== null) {
-        e.time += this.difficulty.endlessBonus;
-        this.overlay.toast(`⏱ +${this.difficulty.endlessBonus} s`);
-        this.sound.play('checkpoint');
-      }
-    }
     if (e.time !== null) {
       const before = Math.ceil(e.time);
       e.time -= dt;
@@ -413,6 +401,20 @@ export class Game {
     this.spawnPoint = { x: Math.max(e.level.start.x, this.spawnPoint.x - CHUNK), y: this.spawnPoint.y };
     // Schon erreichte Checkpoints bleiben erreicht
     for (const cp of this.scene!.checkpoints) if (cp.at.x <= this.spawnPoint.x) cp.activate();
+  }
+
+  /**
+   * Endlos-Lauf mit Zeitlimit: An jedem Checkpoint gibt es Zeit dazu (nicht am Start).
+   * Liefert die Meldung dazu, sonst `null`.
+   */
+  private endlessTimeBonus(checkpointX: number): string | null {
+    const e = this.endless;
+    if (!e || e.time === null || e.run.distance(checkpointX) <= e.level.start.x) return null;
+    const bonus = this.difficulty.endlessBonus;
+    e.time += bonus;
+    this.overlay.clockGain(bonus);
+    this.updateHud();
+    return `Checkpoint ✔ ⏱ +${bonus} s`;
   }
 
   /** Ein Diamant im Endlos-Lauf: Je 10 gibt es ein Herz zurück. */
@@ -551,7 +553,7 @@ export class Game {
           if (cp.active || !cp.reached(pos.x) || !this.player.onGround) continue;
           cp.activate();
           this.spawnPoint = cp.at;
-          this.overlay.toast('Checkpoint ✔');
+          this.overlay.toast(this.endlessTimeBonus(cp.at.x) ?? 'Checkpoint ✔');
           this.sound.play('checkpoint');
         }
         for (const d of this.scene.diamonds) {

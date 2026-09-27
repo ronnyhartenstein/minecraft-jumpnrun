@@ -40,6 +40,8 @@ export interface EndlessResult {
 
 /** So viele Herzen hat man zu Beginn; leere werden bis hierhin angezeigt, Extra-Herzen darüber hinaus. */
 const START_HEARTS = 5;
+/** So lange zeigt die Uhr einen Zeitbonus an (Millisekunden). */
+const GAIN_SHOW_MS = 2000;
 /** So viele eigene Seeds stehen direkt im Menü. */
 const TOP_SEEDS = 5;
 
@@ -91,6 +93,9 @@ export class Overlay {
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly infoPanel = el('div', 'panel info hidden', INFO_HTML);
   private readonly seedsPanel = el('div', 'panel info seeds hidden');
+  /** Zeitbonus im Endlos-Lauf: so lange leuchtet die Uhr grün mit „+13“. */
+  private gainUntil = 0;
+  private gain = 0;
   private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
   private readonly musicButton = el('button', 'corner-button music-toggle', '🎵') as HTMLButtonElement;
   private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
@@ -192,9 +197,17 @@ export class Overlay {
   setEndlessHud({ hearts, meters, diamonds, time, seed, difficulty }: EndlessHud): void {
     this.hud.classList.remove('hidden');
     const heartIcons = '❤'.repeat(hearts) + '<span class="lost">❤</span>'.repeat(Math.max(0, START_HEARTS - hearts));
-    const clock = time === null ? '' : `<span class="clock${time < 10 ? ' low' : ''}">⏱ ${Math.ceil(time)} s</span>`;
+    const gaining = performance.now() < this.gainUntil;
+    const clockClass = gaining ? ' gain' : time !== null && time < 10 ? ' low' : '';
+    const clock = time === null ? '' : `<span class="clock${clockClass}">⏱ ${Math.ceil(time)} s${gaining ? ` <b>+${this.gain}</b>` : ''}</span>`;
     this.hud.innerHTML = `<span class="hearts">${heartIcons}</span> <span class="meters">📏 ${meters} m</span>
       <span class="gem">💎</span> ${diamonds} ${clock}<small class="hud-difficulty">Seed ${seed} · ${difficulty}</small>`;
+  }
+
+  /** Zeitbonus: Die Uhr leuchtet kurz grün und zeigt, wie viel dazukam. */
+  clockGain(seconds: number): void {
+    this.gain = seconds;
+    this.gainUntil = performance.now() + GAIN_SHOW_MS;
   }
 
   /** Ende des Endlos-Laufs: Weite, Bestweite für den Seed, Wiederholen oder neu starten. */
