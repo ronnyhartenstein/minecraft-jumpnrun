@@ -46,6 +46,8 @@ const HEIGHT = 1.8;
 const EPS = 1e-4;
 /** Maximale Strecke pro Kollisions-Teilschritt, damit Steve nie durch einen Block rutscht. */
 const MAX_SUBSTEP = 0.4;
+/** So hohe Kanten läuft der Schreiter hinauf, z. B. vom Lavasee ans Ufer. */
+const MAX_STEP_UP = 0.2;
 
 /** Steves Position ist die Mitte seiner Füße. */
 export class Player {
@@ -166,11 +168,24 @@ export class Player {
     const col = Math.floor(edge);
     for (let y = y0; y <= y1; y++) {
       if (this.world.isSolid(col, y)) {
+        if (y === y0 && this.stepUp(col, y + 1)) return;
         this.pos.x = dx > 0 ? col - HALF_WIDTH - EPS : col + 1 + HALF_WIDTH + EPS;
         this.vel.x = 0;
         return;
       }
     }
+  }
+
+  /**
+   * Der Schreiter steht auf Lava etwas tiefer als auf Boden. Die kleine Kante am Ufer
+   * läuft er einfach hinauf, statt daran hängen zu bleiben.
+   */
+  private stepUp(col: number, top: number): boolean {
+    const step = top - this.pos.y;
+    if (!this.lavaWalker || step <= 0 || step > MAX_STEP_UP) return false;
+    for (let y = top; y < top + HEIGHT; y++) if (this.world.isSolid(col, Math.floor(y))) return false;
+    this.pos.y = top;
+    return true;
   }
 
   private moveY(dy: number) {
