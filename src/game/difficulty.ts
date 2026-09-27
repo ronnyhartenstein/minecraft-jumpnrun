@@ -125,8 +125,8 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     endermanSpeed: 2.4,
     shulkerCooldown: 2.0,
     shulkerBulletSpeed: 5.5,
-    endlessTime: 100,
-    endlessBonus: 18,
+    endlessTime: 90,
+    endlessBonus: 12,
   },
 };
 
