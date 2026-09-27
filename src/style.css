@@ -160,7 +160,14 @@ button { touch-action: manipulation; }
 }
 .corner-button:hover { background: rgb(0 0 0 / 0.55); }
 .sound-toggle { right: max(12px, env(safe-area-inset-right)); }
-.menu-button { right: calc(max(12px, env(safe-area-inset-right)) + 54px); font-family: system-ui, sans-serif; }
+.music-toggle { right: calc(max(12px, env(safe-area-inset-right)) + 54px); }
+/* Musik aus: Note grau und durchgestrichen */
+.music-toggle.off { filter: grayscale(1); opacity: 0.6; }
+.music-toggle.off::after {
+  content: ''; position: absolute; left: 6px; right: 6px; top: 50%; height: 3px;
+  background: #fff; transform: rotate(-45deg); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+.menu-button { right: calc(max(12px, env(safe-area-inset-right)) + 108px); font-family: system-ui, sans-serif; }
 body[data-screen='menu'] .menu-button { display: none; }
 
 /* Touch-Steuerung, nur auf Handy und Tablet */

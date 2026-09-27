@@ -58,10 +58,12 @@ export class Game {
       next: () => this.next(),
       menu: () => this.showMenu(),
       toggleSound: () => this.toggleSound(),
+      toggleMusic: () => this.toggleMusic(),
       setDifficulty: (id) => this.setDifficulty(id),
       setFigure: (id) => this.setFigure(id),
     });
     this.overlay.setSoundIcon(this.sound.muted);
+    this.overlay.setMusicIcon(this.sound.musicOff);
     input.onAnyInput = () => this.sound.unlock();
     this.lantern.position.set(0, 1.6, 1);
     this.character.object.add(this.lantern);
@@ -135,6 +137,7 @@ export class Game {
     const { input } = this;
     input.onKey('KeyR', () => this.state !== 'menu' && this.restart());
     input.onKey('KeyM', () => this.toggleSound());
+    input.onKey('KeyN', () => this.toggleMusic());
     input.onKey('Escape', () => this.state !== 'menu' && this.showMenu());
     input.onKey('Enter', () => {
       if (this.state === 'won') this.hasNext ? this.next() : this.restart();
@@ -149,6 +152,10 @@ export class Game {
 
   private toggleSound() {
     this.overlay.setSoundIcon(this.sound.toggleMute());
+  }
+
+  private toggleMusic() {
+    this.overlay.setMusicIcon(this.sound.toggleMusic());
   }
 
   /** Das erste noch nicht geschaffte Level, sonst das letzte. */

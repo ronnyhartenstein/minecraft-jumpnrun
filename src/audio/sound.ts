@@ -6,6 +6,7 @@ export type Sfx =
   | 'bow' | 'throw' | 'fireball';
 
 const STORAGE_KEY = 'minecraft-jumpnrun-sound';
+const MUSIC_KEY = 'minecraft-jumpnrun-music';
 const SFX_VOLUME = 0.8;
 const MUSIC_VOLUME = 0.12;
 /** So weit im Voraus werden Musiknoten eingeplant (Sekunden). */
@@ -17,6 +18,8 @@ const LOOKAHEAD = 0.15;
  */
 export class Sound {
   muted = false;
+  /** Nur die Musik aus, Geräusche bleiben an. */
+  musicOff = false;
   private ctx: AudioContext | null = null;
   private master!: GainNode;
   private sfx!: GainNode;
@@ -28,6 +31,7 @@ export class Sound {
   constructor() {
     try {
       this.muted = localStorage.getItem(STORAGE_KEY) === 'off';
+      this.musicOff = localStorage.getItem(MUSIC_KEY) === 'off';
     } catch {
       // Ohne Speicher ist der Ton eben an
     }
@@ -42,7 +46,7 @@ export class Sound {
       this.sfx = this.ctx.createGain();
       this.sfx.gain.value = SFX_VOLUME;
       this.music = this.ctx.createGain();
-      this.music.gain.value = MUSIC_VOLUME;
+      this.music.gain.value = this.musicOff ? 0 : MUSIC_VOLUME;
       this.sfx.connect(this.master);
       this.music.connect(this.master);
       setInterval(() => this.scheduleMusic(), 25);
@@ -59,6 +63,17 @@ export class Sound {
       // Ohne Speicher gilt die Einstellung nur bis zum Neuladen
     }
     return this.muted;
+  }
+
+  toggleMusic(): boolean {
+    this.musicOff = !this.musicOff;
+    this.music?.gain.setTargetAtTime(this.musicOff ? 0 : MUSIC_VOLUME, this.ctx!.currentTime, 0.05);
+    try {
+      localStorage.setItem(MUSIC_KEY, this.musicOff ? 'off' : 'on');
+    } catch {
+      // Ohne Speicher gilt die Einstellung nur bis zum Neuladen
+    }
+    return this.musicOff;
   }
 
   /** Wechselt die Hintergrundmusik zum Biom, `null` stoppt sie. */
@@ -163,7 +178,7 @@ export class Sound {
   private scheduleMusic() {
     const ctx = this.ctx!;
     const theme = this.theme;
-    if (!theme) return;
+    if (!theme || this.musicOff) return;
     if (this.nextStepTime < ctx.currentTime) this.nextStepTime = ctx.currentTime + 0.05;
     const stepLength = 60 / theme.bpm / 2;
     while (this.nextStepTime < ctx.currentTime + LOOKAHEAD) {

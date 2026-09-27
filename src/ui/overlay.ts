@@ -10,6 +10,7 @@ export interface OverlayActions {
   next(): void;
   menu(): void;
   toggleSound(): void;
+  toggleMusic(): void;
   setDifficulty(id: DifficultyId): void;
   setFigure(id: FigureId): void;
 }
@@ -62,6 +63,7 @@ export class Overlay {
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly infoPanel = el('div', 'panel info hidden', INFO_HTML);
   private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
+  private readonly musicButton = el('button', 'corner-button music-toggle', '🎵') as HTMLButtonElement;
   private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
 
   constructor(parent: HTMLElement, private readonly levels: Level[], private readonly actions: OverlayActions) {
@@ -69,6 +71,11 @@ export class Overlay {
     this.soundButton.addEventListener('click', () => {
       this.soundButton.blur();
       actions.toggleSound();
+    });
+    this.musicButton.type = 'button';
+    this.musicButton.addEventListener('click', () => {
+      this.musicButton.blur();
+      actions.toggleMusic();
     });
     this.infoPanel.querySelector('button')!.addEventListener('click', (e) => {
       (e.currentTarget as HTMLButtonElement).blur();
@@ -83,13 +90,18 @@ export class Overlay {
     });
     parent.append(
       this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl,
-      this.win, this.menuPanel, this.infoPanel, this.soundButton, this.menuButton,
+      this.win, this.menuPanel, this.infoPanel, this.soundButton, this.musicButton, this.menuButton,
     );
   }
 
   setSoundIcon(muted: boolean): void {
     this.soundButton.textContent = muted ? '🔇' : '🔊';
     this.soundButton.title = muted ? 'Ton an (M)' : 'Ton aus (M)';
+  }
+
+  setMusicIcon(off: boolean): void {
+    this.musicButton.classList.toggle('off', off);
+    this.musicButton.title = off ? 'Musik an (N)' : 'Musik aus (N)';
   }
 
   setFade(dark: boolean, kind: FadeKind = 'fall'): void {
