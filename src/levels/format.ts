@@ -120,6 +120,10 @@ export interface Level {
   groundBlocks?: BlockId[];
   /** Endlos-Lauf: Checkpoints auch auf Schwer. */
   alwaysCheckpoints?: boolean;
+  /** Eigene Level: der Text der Datei, damit der Editor eine Kopie anlegen kann. */
+  source?: string;
+  /** Eigene Level aus dem Editor: Kennung im Browser-Speicher. */
+  browserId?: string;
 }
 
 /** Biom-Namen, wie man sie in eine Level-Datei schreiben kann. */

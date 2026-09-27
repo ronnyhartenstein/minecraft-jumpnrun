@@ -54,7 +54,7 @@ Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Best
 Direkt zu einem Level springen: `#level=2-3` an die Adresse anhängen.
 Alle Level automatisch prüfen (Regeln und ein Bot, der jedes Level durchspielt): `?pruefen` an die Adresse anhängen.
 
-**Eigene Level bauen:** Die Level sind einfache Textdateien im Ordner `levels/`. Eigene Level kommen nach `levels/eigene/` und erscheinen automatisch im Menü in der Spalte „Eigene“. Die Anleitung mit allen Zeichen steht in [LEVELS.md](LEVELS.md).
+**Eigene Level bauen:** Am einfachsten mit dem **Level-Editor** im Spiel (Menü → Eigene → „+ Neues Level“ oder `#editor`): Klötzchen malen, speichern, probespielen, prüfen und den Text exportieren. Die Level im Editor liegen im Browser. Fest ins Spiel kommen sie als Textdatei in `levels/eigene/` – dort erscheinen sie automatisch im Menü in der Spalte „Eigene“. Die Anleitung mit allen Zeichen steht in [LEVELS.md](LEVELS.md).
 
 ## Endlos-Lauf ∞
 
@@ -114,6 +114,7 @@ src/
   ui/        Menü, Hinweise, Ziel-Anzeige
   levels/    Level-Format, Biome, Laden der Level-Dateien
   endless/   Endlos-Lauf: Strecken-Generator, Sprungtest, Nachladen
+  editor/    Level-Editor: Malen, Speichern im Browser, Export
   textures/  Pixel-Texturen, im Code erzeugt
 levels/      Die Level als Textdateien, eigene Level in levels/eigene/
 ```

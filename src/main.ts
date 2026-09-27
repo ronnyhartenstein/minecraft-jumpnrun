@@ -31,9 +31,12 @@ document.addEventListener('gesturestart', (e) => e.preventDefault());
 const code = /level=([\w-]+)/.exec(location.hash)?.[1];
 const endlessSeed = /endlos=(\d{6})/.exec(location.hash)?.[1];
 const linked = LEVELS.findIndex((level) => level.code === code);
+const wantsEditor = location.hash === '#editor';
 if (endlessSeed) game.startEndless(Number(endlessSeed));
 else if (linked >= 0) game.start(linked);
 else game.showMenu();
+// Direkt in den Level-Editor: #editor
+if (wantsEditor) game.openEditor(null);
 
 // Mit ?pruefen an der Adresse spielt ein Bot alle Level durch und prüft die Level-Regeln
 if (new URLSearchParams(location.search).has('pruefen')) {

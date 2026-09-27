@@ -1,10 +1,14 @@
 import * as THREE from 'three';
 import { Sound } from '../audio/sound';
 import type { Input } from '../engine/input';
+import { LevelEditor } from '../editor/editor';
+import { deleteStoredLevel, newDoc, parseDoc, saveStoredLevel } from '../editor/store';
 import { CHUNK, randomSeed } from '../endless/generator';
 import { EndlessRun } from '../endless/run';
 import { BIOMES, type BiomeId } from '../levels/biomes';
 import type { Level, Point } from '../levels/format';
+import { refreshCustomLevels } from '../levels';
+import { runBot, checkRules } from '../tools/checker';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
 import { BASE_DISTANCE, CameraRig } from './cameraRig';
@@ -73,6 +77,9 @@ export class Game {
   private sonicCooldown = 0;
   /** Kurze Anzeigen in der Spielwelt, z. B. „+20 s“ über einem Checkpoint. */
   private popups: Popup[] = [];
+  private readonly editor: LevelEditor;
+  /** Nach dem Probespielen zurück in den Editor, zu diesem Level (Kennung im Browser-Speicher). */
+  private returnToEditor: string | null = null;
   /** Läuft gerade ein Endlos-Lauf? Sonst wird ein festes Level gespielt. */
   private endless: Endless | null = null;
   /** Beim automatischen Prüfen der Level wird kein Fortschritt gespeichert. */
@@ -94,6 +101,26 @@ export class Game {
       setDifficulty: (id) => this.setDifficulty(id),
       setFigure: (id) => this.setFigure(id),
       startEndless: (seed) => this.startEndless(seed),
+      editLevel: (index) => this.openEditor(index),
+      deleteLevel: (index) => this.deleteCustom(this.levels[index].browserId!),
+    });
+    this.editor = new LevelEditor(stage.renderer.domElement.parentElement!, {
+      save: (text, id) => {
+        const saved = saveStoredLevel(text, id ?? undefined);
+        refreshCustomLevels();
+        return saved;
+      },
+      play: (id) => {
+        this.editor.hide();
+        this.returnToEditor = id;
+        this.start(this.customIndex(id));
+      },
+      check: (id) => this.checkCustom(id),
+      delete: (id) => this.deleteCustom(id),
+      close: () => {
+        this.editor.hide();
+        this.showMenu();
+      },
     });
     this.overlay.setSoundIcon(this.sound.muted);
     this.overlay.setMusicIcon(this.sound.musicOff);
@@ -203,14 +230,57 @@ export class Game {
   }
 
   showMenu(): void {
+    // Nach dem Probespielen geht es zurück in den Editor
+    const editing = this.returnToEditor;
+    this.returnToEditor = null;
     this.leaveEndless();
-    this.load(this.scene ? this.index : 0);
+    this.load(this.scene && this.index < this.levels.length ? this.index : 0);
     this.applyFigure();
     this.state = 'menu';
     this.resetCheckpoints();
     this.respawn();
     this.overlay.showMenu(this.progress);
     history.replaceState(null, '', location.pathname + location.search);
+    if (editing) {
+      const level = this.levels[this.customIndex(editing)];
+      if (level) this.editor.open(parseDoc(level.source!), editing);
+    }
+  }
+
+  /** Level-Editor öffnen: eigenes Level bearbeiten (Datei-Level als Kopie) oder `null` = neues Level. */
+  openEditor(index: number | null): void {
+    const level = index === null ? undefined : this.levels[index];
+    if (!level?.source) return this.editor.open(newDoc(), null);
+    const doc = parseDoc(level.source);
+    if (!level.browserId) doc.name = `${doc.name} (Kopie)`;
+    this.editor.open(doc, level.browserId ?? null);
+  }
+
+  /** Position eines Browser-Levels in der Level-Liste. */
+  private customIndex(id: string): number {
+    return this.levels.findIndex((l) => l.browserId === id);
+  }
+
+  /** Prüfen im Editor: Fehler im Text, Level-Regeln und ein Bot-Durchlauf auf Leicht. */
+  private checkCustom(id: string): string[] {
+    const index = this.customIndex(id);
+    const level = this.levels[index];
+    const hints = [...level.warnings, ...checkRules(level)];
+    this.testMode = true;
+    const bot = runBot(this, this.input, index);
+    this.testMode = false;
+    if (!bot.won) hints.push(`Der Prüf-Roboter schafft das Level nicht${bot.deaths.length ? ` (gestorben bei ${bot.deaths.slice(0, 5).join(', ')})` : ''}.`);
+    this.showMenu();
+    return hints;
+  }
+
+  private deleteCustom(id: string) {
+    deleteStoredLevel(id);
+    refreshCustomLevels();
+    this.editor.hide();
+    this.scene?.dispose();
+    this.scene = null;
+    this.showMenu();
   }
 
   start(index: number): void {
@@ -235,7 +305,8 @@ export class Game {
   }
 
   private load(index: number) {
-    if (this.scene && this.index === index && this.scene.difficulty === this.difficulty) return;
+    // Neu laden, wenn sich das Level geändert hat (z. B. im Editor neu gespeichert)
+    if (this.scene && this.index === index && this.scene.level === this.levels[index] && this.scene.difficulty === this.difficulty) return;
     this.scene?.dispose();
     this.index = index;
     const level = this.level;

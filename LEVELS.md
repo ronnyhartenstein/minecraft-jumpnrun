@@ -1,5 +1,20 @@
 # Baue dein eigenes Level! 🧱
 
+## Der Level-Editor – der einfachste Weg
+
+Im Spiel gibt es einen **Level-Editor**: Klick im Menü in der Spalte „Eigene“ auf **+ Neues Level** (oder hänge `#editor` an die Adresse).
+
+- **Malen:** Links wählst du einen Block, einen Gegner, einen Diamanten oder Start 🧍 und Ziel 🏁. Mit der linken Maustaste (oder dem Finger) malst du ins Raster, mit der rechten radierst du. Start und Ziel gibt es nur einmal.
+- **Oben** stellst du Name, Biom und Größe ein. **↶ Rückgängig** (oder Strg+Z) nimmt den letzten Strich zurück.
+- **💾 Speichern** legt das Level in deinem Browser ab, es erscheint im Menü unter „Eigene“. Mit ✎ bearbeitest du es später weiter, mit 🗑 löschst du es.
+- **▶ Probespielen** startet dein Level sofort, mit Esc kommst du zurück in den Editor.
+- **✔ Prüfen** schaut, ob Lücken und Stufen passen, und lässt den Prüf-Roboter durchlaufen.
+- **⇩ Exportieren** zeigt den Text deines Levels zum Kopieren oder Herunterladen. Leg ihn als Datei in `levels/eigene/` – dann ist dein Level fest im Spiel, auch für alle anderen.
+
+Die Level aus `levels/eigene/` kannst du mit **✎ Kopie** als Vorlage im Editor öffnen.
+
+## Level als Textdatei
+
 Jedes Level in diesem Spiel ist eine ganz normale **Textdatei**. Jedes Zeichen darin ist ein Block.
 Du brauchst keine Programmierkenntnisse, nur einen Texteditor (zum Beispiel VS Code).
 

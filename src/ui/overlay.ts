@@ -15,6 +15,10 @@ export interface OverlayActions {
   setFigure(id: FigureId): void;
   /** Endlos-Lauf mit diesem Seed starten, `null` = neuer zufälliger Seed. */
   startEndless(seed: number | null): void;
+  /** Level-Editor: eigenes Level bearbeiten (Datei-Level als Kopie), `null` = neues Level. */
+  editLevel(index: number | null): void;
+  /** Eigenes Level aus dem Browser löschen. */
+  deleteLevel(index: number): void;
 }
 
 /** Was die Anzeige im Endlos-Lauf zeigt. */
@@ -312,13 +316,25 @@ export class Overlay {
     const worlds = new Map<string, string[]>();
     const own: string[] = [];
     this.levels.forEach((level, i) => {
-      if (level.custom) return own.push(card(level, i));
+      if (level.custom) {
+        // Unter jedem eigenen Level: bearbeiten (Datei-Level als Kopie) und löschen (nur Browser-Level)
+        const tools = level.browserId
+          ? `<button type="button" data-edit="${i}" title="Bearbeiten">✎</button><button type="button" data-delete="${i}" title="Löschen">🗑</button>`
+          : `<button type="button" data-edit="${i}" title="Als Kopie bearbeiten">✎ Kopie</button>`;
+        return own.push(`${card(level, i)}<div class="level-tools">${tools}</div>`);
+      }
       const key = level.world !== null ? `<small>Welt ${level.world}</small>${level.biome.name}` : '<small>Weitere</small>Level';
       if (!worlds.has(key)) worlds.set(key, []);
       worlds.get(key)!.push(card(level, i));
     });
-    // Eigene Level stehen als eigene Spalte neben den Welten
-    if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
+    // Eigene Level stehen als eigene Spalte neben den Welten, ganz oben ein neues anlegen
+    own.unshift(`
+      <button type="button" class="card new-level">
+        <span class="num">+</span>
+        <span class="name">Neues Level</span>
+        <span class="status">im Editor bauen</span>
+      </button>`);
+    worlds.set('<small>Selbst gebaut</small>Eigene', own);
     // Endlos-Lauf: eigene Spalte mit Start-Knopf, Seed-Eingabe und den besten eigenen Seeds
     const endlessBest = progress.endlessBest(difficulty);
     const seeds = progress.endlessSeeds();
@@ -401,7 +417,22 @@ export class Overlay {
       seedInput.blur();
       this.actions.startEndless(Number(seedInput.value));
     });
-    this.menuPanel.querySelectorAll<HTMLButtonElement>('.card:not(.endless-card)').forEach((card) => {
+    this.menuPanel.querySelector<HTMLButtonElement>('.new-level')!.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLButtonElement).blur();
+      this.actions.editLevel(null);
+    });
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('[data-edit]').forEach((button) => {
+      button.addEventListener('click', () => this.actions.editLevel(Number(button.dataset.edit)));
+    });
+    // Löschen mit Rückfrage: erster Klick fragt nach, zweiter löscht
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.classList.contains('confirm')) return this.actions.deleteLevel(Number(button.dataset.delete));
+        button.classList.add('confirm');
+        button.textContent = 'Wirklich löschen?';
+      });
+    });
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('.card:not(.endless-card):not(.new-level)').forEach((card) => {
       card.addEventListener('click', () => {
         card.blur();
         this.actions.start(Number(card.dataset.level));
