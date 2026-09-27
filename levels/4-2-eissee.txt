@@ -11,7 +11,7 @@ Info: Lange Eisflächen, Eis-Inseln zwischen Lücken und ein großer gefrorener 
 .
 ............................................................................................*.......*.................*......Z..t
 .........................................*.....*......................t........*...............................*........6tGGGGGGGG
-.........................*................................*.....t..GGGGGG.........s.....t........t8....X.t..M....kt.GGGGGGDDDDDDDD
+.........................*................................*.....t..GGGGGG.........s.....h........t8....X.t..M....kt.GGGGGGDDDDDDDD
 .......*............................X.t.............t..c...t.GGGGGGDDDDDDEEEEEEEEEEEEEEEEEE...EEEEEE..GGGGGGGGGGGGGGDDDDDDDDDDDDDD
 ...S.t...t.5.........p.......t.7.M.GGGGG...EEEE..GGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDD
 GGGGGGGGGGGEEEEEEEEEEEEEE..EEEEEGGGDDDDD...DDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...DDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDD

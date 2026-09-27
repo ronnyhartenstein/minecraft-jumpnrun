@@ -13,7 +13,7 @@ Info: Viel Klettern, rutschiges Eis, oben auf dem Gipfel das Ziel.
 .....................................................................................................tM..GGGGGGDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ......................................................................................t........7...GGGGGGDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 .................................................................*...............GGGGGGGG..EEEEEE..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-............................................*.......t.........................t5.DDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+............................................*.....h.t.........................t5.DDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ...............................................GGGGGGGGGX...t6........t.....GGGGGDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 ...............................*............M..DDDDDDDDDGEEEEEEEEEEEEEEEEEEGDDDDDDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 .......................................GGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD..DDDDDD..DDDDDDDDDDDDDDDDDDDDDD..DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
