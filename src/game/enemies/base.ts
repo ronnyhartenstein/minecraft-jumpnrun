@@ -47,8 +47,8 @@ export abstract class Enemy {
     readonly kind: string,
     readonly halfWidth: number,
     readonly height: number,
-    protected readonly start: Point,
-    protected readonly world: World,
+    protected start: Point,
+    protected world: World,
     protected readonly difficulty: Difficulty,
   ) {
     this.object.add(this.model);
@@ -67,6 +67,20 @@ export abstract class Enemy {
     this.object.visible = true;
     this.model.visible = true;
     this.model.scale.set(1, 1, 1);
+  }
+
+  /**
+   * Endlos-Lauf: Beim Nachladen rückt alles um `dx`, und die Welt wird neu gebaut.
+   * Der Gegner kommt mit seinem ganzen Zustand mit, statt neu zu entstehen (und zurückzuspringen).
+   */
+  shift(dx: number): void {
+    this.start = { ...this.start, x: this.start.x + dx };
+    this.pos.x += dx;
+    this.object.position.x += dx;
+  }
+
+  useWorld(world: World): void {
+    this.world = world;
   }
 
   /** Von oben draufgesprungen: plattdrücken und verschwinden. */

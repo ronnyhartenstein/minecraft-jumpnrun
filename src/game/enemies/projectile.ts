@@ -92,6 +92,12 @@ export class Projectile {
     this.object.add(this.splash);
   }
 
+  /** Endlos-Lauf: beim Nachladen mit verschieben. */
+  shift(dx: number): void {
+    this.pos.x += dx;
+    this.object.position.x += dx;
+  }
+
   dispose(): void {
     this.object.removeFromParent();
     this.object.traverse((node) => {

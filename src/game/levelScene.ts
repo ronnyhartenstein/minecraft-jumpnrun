@@ -23,7 +23,16 @@ export class LevelScene {
   private readonly particles: Particles[] = [];
 
   /** `focus` ist die Stelle, auf die die Kamera schaut. Dort entstehen Schnee, Asche und Funken. */
-  constructor(readonly level: Level, focus: THREE.Vector3, readonly difficulty: Difficulty) {
+  /**
+   * `carried`: Endlos-Lauf – Gegner und Geschosse aus der vorigen Szene, die übernommen werden,
+   * statt neu zu entstehen (schon in die neue Welt verschoben).
+   */
+  constructor(
+    readonly level: Level,
+    focus: THREE.Vector3,
+    readonly difficulty: Difficulty,
+    carried: { enemies: Enemy[]; projectiles: Projectile[] } = { enemies: [], projectiles: [] },
+  ) {
     this.world = new World(level, difficulty);
     this.object.add(this.world.object);
 
@@ -40,9 +49,17 @@ export class LevelScene {
     this.diamonds = level.diamonds.map((at) => new Diamond(at));
     for (const d of this.diamonds) this.object.add(d.object);
 
-    this.enemies = level.enemies
-      .filter((e) => atLeast(difficulty.id, e.from))
-      .map((e) => createEnemy(e, this.world, difficulty));
+    // Übernommene Gegner ersetzen ihren Eintrag im Level; wer aus einem herausgefallenen Stück kommt, bleibt einfach dabei
+    const kept = new Map(carried.enemies.map((e) => [e.id, e]));
+    this.enemies = [
+      ...level.enemies
+        .filter((e) => atLeast(difficulty.id, e.from) && !(e.id !== undefined && kept.has(e.id)))
+        .map((e) => createEnemy(e, this.world, difficulty)),
+      ...carried.enemies,
+    ];
+    for (const e of carried.enemies) e.useWorld(this.world);
+    this.projectiles.push(...carried.projectiles);
+    for (const p of carried.projectiles) this.object.add(p.object);
     for (const e of this.enemies) this.object.add(e.object);
 
     if (this.world.lavaSurfaces.size > 0) this.particles.push(lavaSparks(this.world.lavaSurfaces, focus));

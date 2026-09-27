@@ -8,7 +8,7 @@ import type { Level, Point } from '../levels/format';
 import { animateBlocks } from '../textures/blocks';
 import { Overlay, type FadeKind } from '../ui/overlay';
 import { BASE_DISTANCE, CameraRig } from './cameraRig';
-import { BLAST_RADIUS } from './enemies';
+import { BLAST_RADIUS, type Enemy, type Projectile } from './enemies';
 import { BoxSteve, type Character } from './character';
 import { DIFFICULTIES, type Difficulty, type DifficultyId } from './difficulty';
 import { FIGURE_ORDER, FIGURES, type FigureId } from './figures';
@@ -342,12 +342,12 @@ export class Game {
     history.replaceState(null, '', `#endlos=${run.seed}`);
   }
 
-  /** Baut die Szene aus dem aktuellen Fenster des Endlos-Laufs (neu). */
-  private buildEndlessScene() {
+  /** Baut die Szene aus dem aktuellen Fenster des Endlos-Laufs (neu). `carried` wird übernommen statt neu erzeugt. */
+  private buildEndlessScene(carried?: { enemies: Enemy[]; projectiles: Projectile[] }) {
     const e = this.endless!;
     e.level = e.run.level(e.biome);
     this.scene?.dispose();
-    this.scene = new LevelScene(e.level, this.cameraRig.focus, this.difficulty);
+    this.scene = new LevelScene(e.level, this.cameraRig.focus, this.difficulty, carried);
     this.stage.scene.add(this.scene.object);
     this.cameraRig.setLevel(e.level.width, 2);
   }
@@ -398,8 +398,16 @@ export class Game {
     const scene = this.scene!;
     for (const enemy of scene.enemies) if (!enemy.alive && enemy.id) e.run.defeated.add(enemy.id);
     for (const d of scene.diamonds) if (d.collected) e.run.collected.add(e.run.key(d.at.x, d.at.y));
+    // Gegner und Geschosse, die im Fenster bleiben, samt Zustand mitnehmen: aus der alten Szene lösen und verschieben
+    const enemies = scene.enemies.filter((enemy) => enemy.alive && enemy.pos.x >= CHUNK);
+    const projectiles = scene.projectiles.filter((p) => p.alive && p.pos.x >= CHUNK);
+    for (const thing of [...enemies, ...projectiles]) {
+      thing.object.removeFromParent();
+      thing.shift(-CHUNK);
+    }
+    scene.projectiles.length = 0;
     e.run.advance();
-    this.buildEndlessScene();
+    this.buildEndlessScene({ enemies, projectiles });
     this.player.moveToWorld(this.scene!.world, -CHUNK);
     this.cameraRig.shift(-CHUNK, e.level.width);
     this.spawnPoint = { x: Math.max(e.level.start.x, this.spawnPoint.x - CHUNK), y: this.spawnPoint.y };
