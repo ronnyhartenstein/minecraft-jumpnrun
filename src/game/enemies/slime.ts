@@ -31,7 +31,7 @@ export class Slime extends Enemy {
 
   override reset(): void {
     super.reset();
-    this.timer = Math.random() * this.difficulty.slimePause;
+    this.timer = this.rng() * this.difficulty.slimePause;
   }
 
   protected think() {

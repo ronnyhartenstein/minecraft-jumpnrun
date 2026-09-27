@@ -122,7 +122,7 @@ export class Enderman extends Enemy {
       }
     }
     if (spots.length === 0) return false;
-    this.target.copy(spots[Math.floor(Math.random() * spots.length)]);
+    this.target.copy(spots[Math.floor(this.rng() * spots.length)]);
     return true;
   }
 

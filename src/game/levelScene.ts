@@ -34,7 +34,7 @@ export class LevelScene {
     if (this.goal) this.object.add(this.goal.object);
 
     // Auf Schwer gibt es keine Checkpoints
-    this.checkpoints = difficulty.checkpoints ? level.checkpoints.map((at) => new Checkpoint(at)) : [];
+    this.checkpoints = difficulty.checkpoints || level.alwaysCheckpoints ? level.checkpoints.map((at) => new Checkpoint(at)) : [];
     for (const cp of this.checkpoints) this.object.add(cp.object);
 
     this.diamonds = level.diamonds.map((at) => new Diamond(at));

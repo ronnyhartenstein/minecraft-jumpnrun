@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import type { Point } from '../../levels/format';
+import type { EnemySpawn, Point } from '../../levels/format';
+import { mulberry32, type Rng } from '../../textures/pixel';
 import type { Difficulty } from '../difficulty';
 import type { World } from '../world';
 import type { Projectile } from './projectile';
@@ -37,6 +38,8 @@ export abstract class Enemy {
   protected timer = 0;
   protected dying = 0;
   protected readonly model = new THREE.Group();
+  /** Zufall des Gegners. Im Endlos-Lauf aus dem Seed, damit gleiche Seeds gleich ablaufen. */
+  protected readonly rng: Rng;
 
   constructor(
     readonly kind: string,
@@ -47,6 +50,8 @@ export abstract class Enemy {
     protected readonly difficulty: Difficulty,
   ) {
     this.object.add(this.model);
+    const seed = (start as Partial<EnemySpawn>).seed;
+    this.rng = seed === undefined ? Math.random : mulberry32(seed);
   }
 
   reset(): void {
@@ -55,7 +60,7 @@ export abstract class Enemy {
     this.dir = -1;
     this.alive = true;
     this.dying = 0;
-    this.timer = Math.random();
+    this.timer = this.rng();
     this.object.visible = true;
     this.model.visible = true;
     this.model.scale.set(1, 1, 1);

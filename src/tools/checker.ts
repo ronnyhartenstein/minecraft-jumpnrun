@@ -1,6 +1,7 @@
 import type { Input } from '../engine/input';
 import type { Game } from '../game/game';
 import type { Level } from '../levels/format';
+import { BotBrain } from './bot';
 
 /*
  * Level-Prüfung: Öffne das Spiel mit ?pruefen an der Adresse, z. B.
@@ -106,43 +107,20 @@ export function checkRules(level: Level): string[] {
 /** Lässt den Bot das Level in einer schnellen Simulation durchspielen. */
 export function runBot(game: Game, input: Input, index: number): BotResult {
   game.start(index);
-  const level = game.level;
-  const at = (x: number, y: number) => (y >= 0 && y < level.height ? level.blocks[y][x] : null);
-  const solid = (x: number, y: number) => { const b = at(x, y); return b !== null && b !== 'lava'; };
-  const lava = (x: number, y: number) => at(x, y) === 'lava';
+  const brain = new BotBrain(game.level);
   const deaths: string[] = [];
-  let hold = 0;
   let steps = 0;
   let wasPlaying = true;
 
   while (steps < BOT_TIMEOUT / STEP && game.status !== 'won') {
-    const p = game.player;
     const scene = game.levelScene!;
-    if (hold === 0 && p.onGround && game.status === 'playing') {
-      const gy = Math.round(p.pos.y);
-      const front = Math.floor(p.pos.x + 0.55);
-      const blocked = solid(front, gy) || solid(front, gy + 1);
-      const sea = level.biome.lavaSea !== null && !solid(front, gy - 1);
-      const danger = sea || lava(front, gy - 1) || lava(front, gy - 2) || (!solid(front, gy - 1) && !solid(front, gy - 2));
-      const enemy = scene.enemies.some((e) => e.alive && e.pos.x > p.pos.x && e.pos.x - p.pos.x < 2.2 && Math.abs(e.pos.y - p.pos.y) < 1.5);
-      // Geschosse: abschätzen, wann und in welcher Höhe sie ankommen, und kurz vorher drüberspringen
-      const incoming = scene.projectiles.some((q) => {
-        if (!q.flying || Math.abs(q.vel.x) < 0.1) return false;
-        const dx = q.pos.x - p.pos.x;
-        if (Math.sign(q.vel.x) !== -Math.sign(dx)) return false;
-        const t = Math.abs(dx / q.vel.x);
-        const yAtArrival = q.pos.y + q.vel.y * t;
-        return t < 0.4 && yAtArrival < p.pos.y + 1.8 && yAtArrival > p.pos.y - 0.5;
-      });
-      if (blocked || danger || enemy || incoming) {
-        input.release('Space');
-        input.press('Space');
-        hold = 21; // Sprungtaste gut 1/3 Sekunde halten = voller Sprung
-      }
-    }
+    const move = brain.step(game.player, scene.enemies, scene.projectiles, game.status === 'playing');
+    // Über die echte Tastatur-Eingabe, damit das Spiel genau so reagiert wie beim Spielen
+    if (move.jumpPressed) {
+      input.release('Space');
+      input.press('Space');
+    } else if (!move.jumpHeld) input.release('Space');
     input.press('ArrowRight');
-    if (hold > 0) hold--;
-    else input.release('Space');
     game.update(STEP);
     if (game.status === 'respawning' && wasPlaying) deaths.push(`x=${game.player.pos.x.toFixed(0)}`);
     wasPlaying = game.status === 'playing';

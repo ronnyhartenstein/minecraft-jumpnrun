@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { DecoKind } from '../levels/biomes';
-import type { Level, Point } from '../levels/format';
+import type { DecoPoint, Level, Point } from '../levels/format';
 import { blockMaterials, type BlockId } from '../textures/blocks';
 import type { Difficulty } from './difficulty';
 
@@ -39,7 +39,9 @@ export class World {
   readonly lavaSurfaces = new Map<number, THREE.Vector3[]>();
 
   /** Wie gnädig die Lava ist, hängt von der Schwierigkeit ab (siehe difficulty.ts). */
-  constructor(readonly level: Level, private readonly difficulty: Difficulty) {
+  constructor(readonly level: Level, private readonly difficulty: Difficulty, { render = true } = {}) {
+    // Ohne Grafik nur zum Abfragen der Blöcke, z. B. für den Sprungtest des Endlos-Laufs
+    if (!render) return;
     const positions = new Map<BlockId, THREE.Vector4[]>();
     const add: AddBlock = (id, x, y, z, h = 1) => {
       if (!positions.has(id)) positions.set(id, []);
@@ -59,7 +61,7 @@ export class World {
     }
     if (level.biome.enclosed) this.addCaveSides(add);
 
-    for (const point of level.deco) this.addDeco(add, level.biome.deco, point);
+    for (const point of level.deco) this.addDeco(add, point.kind ?? level.biome.deco, point);
     if (level.biome.lavaSea !== null) this.addLavaSea(add, level.biome.lavaSea);
     this.addLavaLights();
     level.torches.slice(0, MAX_TORCH_LIGHTS).forEach((p) => this.addTorch(p));
@@ -85,7 +87,7 @@ export class World {
 
   /** Höhe des durchgehenden Bodens ab der untersten Reihe (0 = Abgrund). Lava und Eis zählen dazu, so entstehen Seen. */
   groundHeight(x: number): number {
-    const ground: (BlockId | null)[] = [this.level.biome.surface, this.level.biome.subsoil, 'lava', 'ice', 'soulSand'];
+    const ground: (BlockId | null)[] = [...(this.level.groundBlocks ?? [this.level.biome.surface, this.level.biome.subsoil]), 'lava', 'ice', 'soulSand'];
     let y = 0;
     while (y < this.level.height && ground.includes(this.level.blocks[y][x])) y++;
     return y;
@@ -207,7 +209,7 @@ export class World {
     for (let y = 1; y <= UNDERGROUND; y++) add(y > 3 ? lower : upper, x, -y, z);
   }
 
-  private addDeco(add: AddBlock, kind: DecoKind, { x, y }: Point) {
+  private addDeco(add: AddBlock, kind: DecoKind, { x, y }: DecoPoint) {
     switch (kind) {
       case 'oak':
         return this.addOak(add, x, y);

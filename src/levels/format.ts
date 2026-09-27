@@ -1,6 +1,6 @@
 import type { DifficultyId } from '../game/difficulty';
 import type { BlockId } from '../textures/blocks';
-import { BIOMES, type Biome, type BiomeId } from './biomes';
+import { BIOMES, type Biome, type BiomeId, type DecoKind } from './biomes';
 
 /**
  * Level-Format: ein Text-Raster, eine Zeile = eine Blockreihe, oben ist oben.
@@ -65,6 +65,15 @@ export interface EnemySpawn extends Point {
   kind: 'creeper' | 'slime' | 'zombie' | 'spider' | 'skeleton' | 'witch' | 'blaze' | 'enderman' | 'shulker' | 'endermite';
   /** Ab dieser Schwierigkeit ist der Gegner dabei. */
   from: DifficultyId;
+  /** Endlos-Lauf: eindeutige Kennung (besiegte Gegner kommen nicht wieder) … */
+  id?: string;
+  /** … und Startwert für den Zufall des Gegners, damit Läufe mit gleichem Seed vergleichbar sind. */
+  seed?: number;
+}
+
+/** Deko-Punkt; `kind` nur im Endlos-Lauf, wo jedes Stück sein eigenes Biom hat. */
+export interface DecoPoint extends Point {
+  kind?: DecoKind;
 }
 
 /** Gegner-Zeichen: welche Art und ab welcher Schwierigkeit. */
@@ -105,8 +114,12 @@ export interface Level {
   checkpoints: Point[];
   diamonds: Point[];
   enemies: EnemySpawn[];
-  deco: Point[];
+  deco: DecoPoint[];
   torches: Point[];
+  /** Endlos-Lauf: diese Blöcke zählen als durchgehender Boden (Oberfläche und Untergrund aller Biome). */
+  groundBlocks?: BlockId[];
+  /** Endlos-Lauf: Checkpoints auch auf Schwer. */
+  alwaysCheckpoints?: boolean;
 }
 
 /** Biom-Namen, wie man sie in eine Level-Datei schreiben kann. */
