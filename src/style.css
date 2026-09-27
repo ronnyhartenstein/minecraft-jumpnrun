@@ -117,6 +117,16 @@ button { touch-action: manipulation; }
 }
 .seed-form input.invalid { border-color: #ff5a5a; }
 .seed-form button { padding: 6px 8px; font-size: 10px; }
+.seed-list { display: flex; flex-direction: column; gap: 3px; width: 124px; }
+.panel .seed-list .seed-link, .panel .all-seeds { width: 124px; padding: 4px 6px; font-size: 8px; text-align: left; white-space: nowrap; }
+.panel .seed-list .seed-link { display: flex; justify-content: space-between; }
+.panel .seed-link b { color: #ffe14d; font-weight: normal; letter-spacing: 1px; }
+.panel.seeds { text-align: center; }
+.panel.seeds table { margin: 0 auto 12px; border-collapse: collapse; }
+.panel.seeds th, .panel.seeds td { padding: 3px 6px; font-size: 11px; }
+.panel.seeds tbody th { color: #ffe14d; letter-spacing: 1px; }
+.panel.seeds td button { min-width: 80px; padding: 4px 8px; font-size: 10px; }
+.panel.seeds td button.empty { opacity: 0.45; }
 .hud .hearts { font-family: system-ui, sans-serif; font-size: 18px; color: #ff4a4a; letter-spacing: 1px; vertical-align: -2px; }
 .hud .hearts .lost { color: rgb(255 255 255 / 0.25); }
 .hud .meters { margin: 0 8px; }

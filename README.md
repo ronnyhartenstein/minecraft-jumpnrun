@@ -64,6 +64,7 @@ Neben den Welten gibt es den **Endlos-Lauf**: eine Strecke, die nie aufhört. Si
 - **Meter:** Gezählt wird, wie weit man kommt. Die Bestweite merkt sich der Browser.
 - **Zeitlimit auf Mittel und Schwer:** Auf Mittel startet man mit 90 Sekunden und bekommt alle 300 Blöcke 75 dazu, auf Schwer 60 und 55. Leicht hat keine Uhr.
 - **Seed:** Jeder Lauf hat eine 6-stellige Zahl. Gleicher Seed heißt gleiche Strecke – und auf gleicher Schwierigkeit auch dieselben Monster an denselben Stellen. Am Ende kann man den Lauf **wiederholen** oder **neu starten**. Im Menü kann man einen Seed eingeben: So laufen Freunde dieselbe Strecke und vergleichen ihre Meter. Direkt-Link: `#endlos=123456`.
+- **Bestenliste:** Unter dem Endlos-Lauf stehen deine besten Seeds der gewählten Stufe, „🏆 Alle Seeds“ zeigt die ganze Tabelle mit Leicht, Mittel und Schwer. Ein Klick auf einen Seed bzw. eine Weite spielt genau diesen Lauf.
 
 Der Generator steht in `src/endless/`.
 

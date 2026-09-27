@@ -57,6 +57,17 @@ export class Progress {
     return all.length ? Math.max(...all) : undefined;
   }
 
+  /** Alle gespielten Seeds mit der Bestweite je Schwierigkeit. */
+  endlessSeeds(): { seed: number; best: Partial<Record<DifficultyId, number>> }[] {
+    const seeds = new Map<number, Partial<Record<DifficultyId, number>>>();
+    for (const [key, meters] of Object.entries(this.endless)) {
+      const [seed, difficulty] = key.split('|');
+      if (!seeds.has(Number(seed))) seeds.set(Number(seed), {});
+      seeds.get(Number(seed))![difficulty as DifficultyId] = meters;
+    }
+    return [...seeds].map(([seed, best]) => ({ seed, best }));
+  }
+
   /** Merkt sich die Weite eines Laufs. Liefert true bei neuem Rekord für diesen Seed. */
   saveEndless(seed: number, difficulty: DifficultyId, meters: number): boolean {
     const key = `${seed}|${difficulty}`;

@@ -40,6 +40,8 @@ export interface EndlessResult {
 
 /** So viele Herzen hat man zu Beginn; leere werden bis hierhin angezeigt, Extra-Herzen darüber hinaus. */
 const START_HEARTS = 5;
+/** So viele eigene Seeds stehen direkt im Menü. */
+const TOP_SEEDS = 5;
 
 /** Was die Ziel-Anzeige über den Durchlauf wissen muss. */
 export interface WinStats {
@@ -88,6 +90,7 @@ export class Overlay {
   private readonly win = el('div', 'panel win hidden');
   private readonly menuPanel = el('div', 'panel menu hidden');
   private readonly infoPanel = el('div', 'panel info hidden', INFO_HTML);
+  private readonly seedsPanel = el('div', 'panel info seeds hidden');
   private readonly soundButton = el('button', 'corner-button sound-toggle') as HTMLButtonElement;
   private readonly musicButton = el('button', 'corner-button music-toggle', '🎵') as HTMLButtonElement;
   private readonly menuButton = el('button', 'corner-button menu-button', '☰') as HTMLButtonElement;
@@ -116,7 +119,7 @@ export class Overlay {
     });
     parent.append(
       this.fade, this.hud, this.warningBox, this.hint, this.banner, this.toastEl,
-      this.win, this.menuPanel, this.infoPanel, this.soundButton, this.musicButton, this.menuButton,
+      this.win, this.menuPanel, this.infoPanel, this.seedsPanel, this.soundButton, this.musicButton, this.menuButton,
     );
   }
 
@@ -303,8 +306,15 @@ export class Overlay {
     });
     // Eigene Level stehen als eigene Spalte neben den Welten
     if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
-    // Endlos-Lauf: eigene Spalte mit Start-Knopf und Seed-Eingabe
+    // Endlos-Lauf: eigene Spalte mit Start-Knopf, Seed-Eingabe und den besten eigenen Seeds
     const endlessBest = progress.endlessBest(difficulty);
+    const seeds = progress.endlessSeeds();
+    const topSeeds = seeds
+      .filter((s) => s.best[difficulty] !== undefined)
+      .sort((a, b) => b.best[difficulty]! - a.best[difficulty]!)
+      .slice(0, TOP_SEEDS)
+      .map((s) => `<button type="button" class="seed-link" data-seed="${s.seed}"><b>${s.seed}</b> ${s.best[difficulty]} m</button>`)
+      .join('');
     worlds.set('<small>Immer neu</small>∞ Endlos', [`
       <button type="button" class="card endless-card">
         <span class="num">∞</span>
@@ -314,7 +324,9 @@ export class Overlay {
       <form class="seed-form">
         <input type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Seed" aria-label="Seed (6 Ziffern)">
         <button type="submit">Los</button>
-      </form>`]);
+      </form>
+      ${topSeeds ? `<div class="seed-list">${topSeeds}</div>` : ''}
+      ${seeds.length ? `<button type="button" class="all-seeds">🏆 Alle Seeds (${seeds.length})</button>` : ''}`]);
     // Spielfiguren: Steve und die Tiere, die man für geschaffte Welten bekommt
     const current = progress.currentFigure(this.levels);
     const figures = FIGURE_ORDER.map((id) => {
@@ -347,6 +359,16 @@ export class Overlay {
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.figure-tabs button').forEach((tab) => {
       tab.addEventListener('click', () => this.actions.setFigure(tab.dataset.figure as FigureId));
     });
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('.seed-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        link.blur();
+        this.actions.startEndless(Number(link.dataset.seed));
+      });
+    });
+    this.menuPanel.querySelector<HTMLButtonElement>('.all-seeds')?.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLButtonElement).blur();
+      this.showSeeds(progress);
+    });
     this.menuPanel.querySelector<HTMLButtonElement>('.endless-card')!.addEventListener('click', (e) => {
       (e.currentTarget as HTMLButtonElement).blur();
       this.actions.startEndless(null);
@@ -374,12 +396,42 @@ export class Overlay {
     });
     this.win.classList.add('hidden');
     this.infoPanel.classList.add('hidden');
+    this.seedsPanel.classList.add('hidden');
     this.hint.classList.add('hidden');
     this.hud.classList.add('hidden');
     this.warningBox.classList.add('hidden');
     this.banner.classList.remove('show');
     this.setFade(false);
     this.menuPanel.classList.remove('hidden');
+  }
+
+  /** Tabelle aller gespielten Seeds mit Bestweite je Stufe. Ein Klick auf eine Weite spielt den Seed auf dieser Stufe. */
+  private showSeeds(progress: Progress) {
+    const current = progress.difficulty;
+    const rows = progress.endlessSeeds()
+      .sort((a, b) => (b.best[current] ?? -1) - (a.best[current] ?? -1) || Math.max(...Object.values(b.best)) - Math.max(...Object.values(a.best)))
+      .map(({ seed, best }) => `<tr><th>${seed}</th>${DIFFICULTY_ORDER.map((d) => `
+        <td><button type="button" data-seed="${seed}" data-difficulty="${d}" class="${best[d] !== undefined ? '' : 'empty'}">${best[d] !== undefined ? `${best[d]} m` : '–'}</button></td>`).join('')}</tr>`)
+      .join('');
+    this.seedsPanel.innerHTML = `
+      <h1>🏆 Deine Seeds</h1>
+      <p>Bestweite je Seed und Schwierigkeit. Klick auf eine Weite, um den Seed auf dieser Stufe zu spielen.</p>
+      <table><thead><tr><th>Seed</th>${DIFFICULTY_ORDER.map((d) => `<th>${DIFFICULTIES[d].label}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+      <div class="buttons"><button type="button" class="primary back">Zurück</button></div>`;
+    this.seedsPanel.querySelector('.back')!.addEventListener('click', () => {
+      this.seedsPanel.classList.add('hidden');
+      this.menuPanel.classList.remove('hidden');
+    });
+    this.seedsPanel.querySelectorAll<HTMLButtonElement>('button[data-seed]').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.blur();
+        this.seedsPanel.classList.add('hidden');
+        this.actions.setDifficulty(button.dataset.difficulty as DifficultyId);
+        this.actions.startEndless(Number(button.dataset.seed));
+      });
+    });
+    this.menuPanel.classList.add('hidden');
+    this.seedsPanel.classList.remove('hidden');
   }
 
   private bindButtons(root: HTMLElement) {
