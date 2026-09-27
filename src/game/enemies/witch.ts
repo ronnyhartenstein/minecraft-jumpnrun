@@ -17,6 +17,8 @@ export class Witch extends Enemy {
   private readonly body: Humanoid;
   private cooldown = 1.2;
   private throwing = 0;
+  /** So lange zielt die Hexe schon in die aktuelle Richtung auf Steve (Sekunden). */
+  private aiming = 0;
 
   constructor(start: Point, world: World, difficulty: Difficulty) {
     super('witch', 0.3, 2, start, world, difficulty);
@@ -47,16 +49,26 @@ export class Witch extends Enemy {
     this.reset();
   }
 
+  /** Beim Neustart auch neu zielen, sonst wirft sie direkt nach „Nochmal“. */
+  override reset(): void {
+    super.reset();
+    this.aiming = 0;
+  }
+
   protected think(dt: number, ctx: EnemyContext) {
     this.cooldown -= dt;
     this.throwing = Math.max(0, this.throwing - dt);
     if (!this.sees(ctx.player, RANGE, 5)) {
+      this.aiming = 0;
       this.patrol(WALK_SPEED);
       return;
     }
     this.vel.x = 0;
+    // Nach dem Entdecken oder Umdrehen erst zielen, damit Steve Zeit zum Ausweichen hat
+    const dir = this.dir;
     this.face(ctx.player);
-    if (this.cooldown > 0) return;
+    this.aiming = this.dir === dir ? this.aiming + dt : 0;
+    if (this.cooldown > 0 || this.aiming < this.difficulty.witchAim) return;
     this.cooldown = this.difficulty.witchCooldown;
     this.throwing = 0.3;
     const from = new THREE.Vector2(this.pos.x + this.dir * 0.3, this.pos.y + 1.7);

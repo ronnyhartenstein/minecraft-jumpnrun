@@ -24,8 +24,10 @@ export interface Difficulty {
   /** Pause zwischen zwei Pfeilen eines Skeletts und Tempo der Pfeile. */
   skeletonCooldown: number;
   arrowSpeed: number;
-  /** Pause zwischen zwei Giftwürfen einer Hexe. */
+  /** Pause zwischen zwei Giftwürfen einer Hexe … */
   witchCooldown: number;
+  /** … und so lange zielt sie, nachdem sie Steve entdeckt oder sich zu ihm umgedreht hat (Sekunden). */
+  witchAim: number;
   /** Pause zwischen zwei Feuer-Salven einer Lohe und Anzahl der Feuerbälle pro Salve. */
   blazeCooldown: number;
   blazeBurst: number;
@@ -61,6 +63,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     skeletonCooldown: 4,
     arrowSpeed: 7,
     witchCooldown: 3.0,
+    witchAim: 2,
     blazeCooldown: 4.5,
     blazeBurst: 1,
     fireballSpeed: 4.5,
@@ -87,6 +90,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     skeletonCooldown: 2.4,
     arrowSpeed: 10,
     witchCooldown: 2.3,
+    witchAim: 1,
     blazeCooldown: 2.8,
     blazeBurst: 2,
     fireballSpeed: 6,
@@ -113,6 +117,7 @@ export const DIFFICULTIES: Record<DifficultyId, Difficulty> = {
     skeletonCooldown: 1.7,
     arrowSpeed: 12,
     witchCooldown: 1.7,
+    witchAim: 0.5,
     blazeCooldown: 2.1,
     blazeBurst: 3,
     fireballSpeed: 7.5,
