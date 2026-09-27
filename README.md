@@ -48,22 +48,27 @@ In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige 
 
 **Schwierigkeitsgrade:** Jedes Level gibt es auf Leicht, Mittel und Schwer (Auswahl oben in der Levelauswahl). Auf Mittel und Schwer kommen zusätzliche Gegner dazu, Creeper zünden schneller, Slimes hüpfen öfter, die Lava ist weniger gnädig, und auf Schwer gibt es keine Checkpoints. Schwer gibt es für ein Level erst, wenn man es auf Mittel geschafft hat. Alle Werte stehen in `src/game/difficulty.ts`.
 
-**Spielfiguren:** Wer eine ganze Welt auf Mittel schafft, bekommt ein Tier, mit dem man statt Steve spielen kann (Auswahl in der Levelauswahl). Jedes Tier kann etwas besser als Steve, aber nichts schlechter. Die Figuren stehen in `src/game/figures.ts`.
-
-| Figur | Freischalten | Kann besonders gut |
-| --- | --- | --- |
-| 🧍 Steve | von Anfang an | – |
-| 🐑 Schaf | Welt 1 auf Mittel | federt weich: springt von Gegnern höher ab |
-| 🐔 Huhn | Welt 2 auf Mittel | flattert: Sprungtaste gedrückt halten, dann sinkt es langsam |
-| 🦊 Fuchs | Welt 3 auf Mittel | flink: läuft schneller |
-| 🐺 Wolf | Welt 4 auf Mittel | springt höher |
-| 🔥 Schreiter | Welt 5 auf Mittel | hitzefest: läuft über Lava, ohne Schaden (Feuerbälle treffen ihn trotzdem) |
-
 Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
 Direkt zu einem Level springen: `#level=2-3` an die Adresse anhängen.
 Alle Level automatisch prüfen (Regeln und ein Bot, der jedes Level durchspielt): `?pruefen` an die Adresse anhängen.
 
 **Eigene Level bauen:** Die Level sind einfache Textdateien im Ordner `levels/`. Eigene Level kommen nach `levels/eigene/` und erscheinen automatisch im Menü in der Spalte „Eigene“. Die Anleitung mit allen Zeichen steht in [LEVELS.md](LEVELS.md).
+
+## Spielfiguren
+
+Am Anfang spielt man Steve. Wer eine ganze Welt auf **Mittel** schafft, bekommt ein Tier dazu. Die Figur wählt man in der Levelauswahl.
+Jedes Tier kann etwas besser als Steve, aber nichts schlechter. So bleibt jedes Level mit jeder Figur schaffbar.
+
+| | | |
+| :---: | :---: | :---: |
+| ![Steve](docs/figuren/steve.png) | ![Schaf](docs/figuren/schaf.png) | ![Huhn](docs/figuren/huhn.png) |
+| **🧍 Steve** · von Anfang an | **🐑 Schaf** · Welt 1 auf Mittel | **🐔 Huhn** · Welt 2 auf Mittel |
+| Der Klassiker: läuft, springt und kann alles, was man für die Level braucht. | Federt weich: Springt es auf einen Gegner, hüpft es viel höher ab als Steve. Gut, um von Gegner zu Gegner zu springen. | Flattert: Hält man in der Luft die Sprungtaste gedrückt, schlägt es mit den Flügeln und sinkt ganz langsam. Rettet einen über breite Lücken. |
+| ![Fuchs](docs/figuren/fuchs.png) | ![Wolf](docs/figuren/wolf.png) | ![Schreiter](docs/figuren/schreiter.png) |
+| **🦊 Fuchs** · Welt 3 auf Mittel | **🐺 Wolf** · Welt 4 auf Mittel | **🔥 Schreiter** · Welt 5 auf Mittel |
+| Flink: läuft schneller als alle anderen. Ideal für die Jagd nach Bestzeiten. | Springt höher: kommt an Diamanten, die für Steve knapp zu hoch hängen. | Hitzefest: läuft über Lava, ohne Schaden zu nehmen. Nur Feuerbälle, Gegner und Abgründe sind noch gefährlich. |
+
+Alle Werte stehen in `src/game/figures.ts`, die Modelle in `src/game/animals.ts`.
 
 ## Entwickeln
 
