@@ -36,6 +36,14 @@ const MONSTERS: Record<BiomeId, EnemySpawn['kind'][]> = {
   end: ['enderman', 'endermite', 'shulker'],
 };
 
+/** Diese Gegner schießen oder werfen aus der Ferne. */
+const SHOOTERS = new Set<EnemySpawn['kind']>(['skeleton', 'witch', 'blaze', 'shulker']);
+/**
+ * Mindestabstand zwischen zwei Schützen, größer als ihre Reichweite (~10 Blöcke).
+ * Stehen zwei nah beieinander, kommt man aus dem Kreuzfeuer nicht mehr heraus.
+ */
+const SHOOTER_GAP = 14;
+
 /** So viele Gegner pro Stück. */
 const MONSTER_COUNT: Record<DifficultyId, number> = { leicht: 2, mittel: 3, schwer: 4 };
 
@@ -231,8 +239,12 @@ export function placeMonsters(seed: number, chunk: Chunk, difficulty: Difficulty
     const x = spots[Math.floor(rng() * spots.length)];
     // Abstand zwischen den Gegnern
     for (let i = spots.length - 1; i >= 0; i--) if (Math.abs(spots[i] - x) < 5) spots.splice(i, 1);
+    let kind = pick(rng, kinds);
+    if (SHOOTERS.has(kind) && monsters.some((m) => SHOOTERS.has(m.kind) && Math.abs(m.x - x) < SHOOTER_GAP)) {
+      kind = pick(rng, kinds.filter((k) => !SHOOTERS.has(k)));
+    }
     monsters.push({
-      kind: pick(rng, kinds),
+      kind,
       from: 'leicht',
       x,
       y: chunk.tops[x],
