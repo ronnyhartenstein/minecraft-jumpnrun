@@ -32,6 +32,8 @@ export const PHYSICS = {
   stompBounce: 10,
 };
 
+export type Physics = typeof PHYSICS;
+
 export interface PlayerInput {
   left: boolean;
   right: boolean;
@@ -56,12 +58,26 @@ export class Player {
   /** Der Block, auf dem Steve zuletzt gelandet ist. */
   ground: BlockId | null = null;
   facing: 1 | -1 = 1;
+  /** Werte der gewählten Spielfigur: Die Tiere können jeweils etwas mehr als Steve. */
+  physics: Physics = PHYSICS;
+  /** So langsam sinkt die Figur mit gehaltener Sprungtaste (Huhn), `null` = kann nicht gleiten. */
+  private glide: number | null = null;
+  /** Gleitet die Figur gerade? (für die Flügel) */
+  gliding = false;
+  /** Trägt die Lava die Figur wie Boden (Schreiter)? */
+  private lavaWalker = false;
   private coyote = 0;
   private buffer = 0;
   private jumpCutDone = true;
   private jumpStartY = 0;
 
   constructor(private readonly world: World) {}
+
+  setFigure({ physics, glide, lavaWalker }: { physics: Partial<Physics>; glide: number | null; lavaWalker: boolean }): void {
+    this.physics = { ...PHYSICS, ...physics };
+    this.glide = glide;
+    this.lavaWalker = lavaWalker;
+  }
 
   spawn(at: Point): void {
     this.pos.set(at.x + 0.5, at.y);
@@ -78,8 +94,10 @@ export class Player {
     this.walk(dt, input);
     this.jump(dt, input);
 
-    const gravity = PHYSICS.gravity * (this.vel.y < 0 ? PHYSICS.fallGravityMultiplier : 1);
-    this.vel.y = Math.max(this.vel.y - gravity * dt, -PHYSICS.maxFallSpeed);
+    const gravity = this.physics.gravity * (this.vel.y < 0 ? this.physics.fallGravityMultiplier : 1);
+    this.gliding = this.glide !== null && input.jumpHeld && this.vel.y < 0;
+    const maxFall = this.gliding ? this.glide! : this.physics.maxFallSpeed;
+    this.vel.y = Math.max(this.vel.y - gravity * dt, -maxFall);
 
     const dx = this.vel.x * dt;
     const dy = this.vel.y * dt;
@@ -93,7 +111,7 @@ export class Player {
 
   /** Abfedern nach dem Draufspringen auf einen Gegner. */
   bounce(): void {
-    this.vel.y = PHYSICS.stompBounce;
+    this.vel.y = this.physics.stompBounce;
     this.jumpCutDone = true;
   }
 
@@ -103,21 +121,21 @@ export class Player {
 
     const onIce = this.onGround && this.ground === 'ice';
     const onSoulSand = this.onGround && this.ground === 'soulSand';
-    const accel = onIce ? PHYSICS.iceAccel : this.onGround ? PHYSICS.groundAccel : PHYSICS.airAccel;
-    const decel = onIce ? PHYSICS.iceDecel : this.onGround ? PHYSICS.groundDecel : PHYSICS.airDecel;
+    const accel = onIce ? this.physics.iceAccel : this.onGround ? this.physics.groundAccel : this.physics.airAccel;
+    const decel = onIce ? this.physics.iceDecel : this.onGround ? this.physics.groundDecel : this.physics.airDecel;
     const turning = dir !== 0 && Math.sign(this.vel.x) === -dir;
     const rate = dir === 0 ? decel : turning ? accel + decel : accel;
-    const target = dir * PHYSICS.maxSpeed * (onSoulSand ? PHYSICS.soulSandSpeed : 1);
+    const target = dir * this.physics.maxSpeed * (onSoulSand ? this.physics.soulSandSpeed : 1);
     const diff = target - this.vel.x;
     this.vel.x += Math.sign(diff) * Math.min(Math.abs(diff), rate * dt);
   }
 
   private jump(dt: number, input: PlayerInput) {
-    this.coyote = this.onGround ? PHYSICS.coyoteTime : this.coyote - dt;
-    this.buffer = input.jumpPressed ? PHYSICS.jumpBuffer : this.buffer - dt;
+    this.coyote = this.onGround ? this.physics.coyoteTime : this.coyote - dt;
+    this.buffer = input.jumpPressed ? this.physics.jumpBuffer : this.buffer - dt;
 
     if (this.buffer > 0 && this.coyote > 0) {
-      this.vel.y = Math.sqrt(2 * PHYSICS.gravity * PHYSICS.jumpHeight);
+      this.vel.y = Math.sqrt(2 * this.physics.gravity * this.physics.jumpHeight);
       this.buffer = 0;
       this.coyote = 0;
       this.jumpCutDone = false;
@@ -125,9 +143,9 @@ export class Player {
       this.jumped = true;
     }
     // Variable Sprunghöhe: kurz tippen = kleiner Sprung, aber nie niedriger als minJumpHeight
-    const minReached = this.pos.y - this.jumpStartY >= PHYSICS.minJumpHeight;
+    const minReached = this.pos.y - this.jumpStartY >= this.physics.minJumpHeight;
     if (!this.jumpCutDone && !input.jumpHeld && this.vel.y > 0 && minReached) {
-      this.vel.y *= PHYSICS.jumpCut;
+      this.vel.y *= this.physics.jumpCut;
       this.jumpCutDone = true;
     }
   }
@@ -175,6 +193,17 @@ export class Player {
         this.vel.y = 0;
         return;
       }
+    }
+    // Der Schreiter landet auf der Lava-Oberfläche, die etwas tiefer liegt als ein Block
+    if (dy > 0 || !this.lavaWalker) return;
+    for (let x = x0; x <= x1; x++) {
+      const surface = this.world.lavaSurface(x, row);
+      if (surface === null || this.pos.y >= surface || this.pos.y - dy < surface - EPS) continue;
+      this.pos.y = surface;
+      this.onGround = true;
+      this.ground = 'lava';
+      this.vel.y = 0;
+      return;
     }
   }
 }

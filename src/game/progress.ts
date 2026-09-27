@@ -1,8 +1,10 @@
 import type { Level } from '../levels/format';
 import { DIFFICULTY_ORDER, type DifficultyId } from './difficulty';
+import { FIGURE_ORDER, FIGURES, type FigureId } from './figures';
 
 const KEY = 'minecraft-jumpnrun';
 const DIFFICULTY_KEY = 'minecraft-jumpnrun-difficulty';
+const FIGURE_KEY = 'minecraft-jumpnrun-figure';
 
 interface Saved {
   /** Bestzeiten in Sekunden. Wer eine Bestzeit hat, hat das Level auf dieser Stufe geschafft. */
@@ -19,6 +21,8 @@ export class Progress {
   private data: Saved = { best: {}, diamonds: {} };
   /** Die zuletzt gewählte Schwierigkeit. */
   difficulty: DifficultyId = 'leicht';
+  /** Die zuletzt gewählte Spielfigur, gilt nur, wenn sie freigeschaltet ist (siehe `currentFigure`). */
+  private figure: FigureId = 'steve';
 
   constructor() {
     try {
@@ -26,6 +30,8 @@ export class Progress {
       if (saved) this.data = { best: saved.best ?? {}, diamonds: saved.diamonds ?? {} };
       const difficulty = localStorage.getItem(DIFFICULTY_KEY) as DifficultyId | null;
       if (difficulty && DIFFICULTY_ORDER.includes(difficulty)) this.difficulty = difficulty;
+      const figure = localStorage.getItem(FIGURE_KEY) as FigureId | null;
+      if (figure && FIGURE_ORDER.includes(figure)) this.figure = figure;
     } catch {
       // Ohne Speicher geht es trotzdem
     }
@@ -38,6 +44,32 @@ export class Progress {
     } catch {
       // Ohne Speicher gilt die Auswahl nur bis zum Neuladen
     }
+  }
+
+  selectFigure(figure: FigureId): void {
+    this.figure = figure;
+    try {
+      localStorage.setItem(FIGURE_KEY, figure);
+    } catch {
+      // Ohne Speicher gilt die Auswahl nur bis zum Neuladen
+    }
+  }
+
+  /** Die gewählte Figur, oder Steve, falls sie (z. B. nach gelöschtem Spielstand) nicht mehr frei ist. */
+  currentFigure(levels: Level[]): FigureId {
+    return this.isFigureUnlocked(levels, this.figure) ? this.figure : 'steve';
+  }
+
+  /** Eine Welt gilt als geschafft, wenn alle ihre Level auf dieser Stufe geschafft sind. */
+  worldFinished(levels: Level[], world: number, difficulty: DifficultyId): boolean {
+    const inWorld = levels.filter((level) => !level.custom && level.world === world);
+    return inWorld.length > 0 && inWorld.every((level) => this.finished(level.name, difficulty));
+  }
+
+  /** Tiere gibt es für eine Welt, die auf Mittel geschafft ist (Schwer setzt Mittel voraus). */
+  isFigureUnlocked(levels: Level[], figure: FigureId): boolean {
+    const { world } = FIGURES[figure];
+    return world === null || this.worldFinished(levels, world, 'mittel');
   }
 
   /**

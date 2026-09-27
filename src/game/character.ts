@@ -7,10 +7,12 @@ export interface CharacterState {
   maxSpeed: number;
   onGround: boolean;
   facing: 1 | -1;
+  /** Sinkt die Figur gerade langsam mit gehaltener Sprungtaste (Huhn)? */
+  gliding?: boolean;
 }
 
 /**
- * Austauschbare Spielfigur. Heute Steve aus Boxen, später ein Blockbench-Modell (#13).
+ * Austauschbare Spielfigur: Steve oder eines der Tiere (siehe figures.ts).
  * `object` steht mit den Füßen im Ursprung und schaut nach +z.
  */
 export interface Character {
@@ -22,7 +24,7 @@ export interface Character {
 const P = 1.8 / 32;
 
 /** Seitlich laufen, aber etwas zur Kamera gedreht, damit man das Gesicht sieht. */
-const FACING_ANGLE = Math.PI / 2 - 0.45;
+export const FACING_ANGLE = Math.PI / 2 - 0.45;
 
 function skinBox(box: SkinBox, material: THREE.Material): THREE.Mesh {
   const geometry = new THREE.BoxGeometry(box.w * P, box.h * P, box.d * P);
@@ -51,7 +53,7 @@ function limb(box: SkinBox, material: THREE.Material, pivot: [number, number], o
   return joint;
 }
 
-const damp = (current: number, target: number, rate: number, dt: number) =>
+export const damp = (current: number, target: number, rate: number, dt: number) =>
   current + (target - current) * (1 - Math.exp(-rate * dt));
 
 export class BoxSteve implements Character {

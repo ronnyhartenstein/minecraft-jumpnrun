@@ -42,11 +42,22 @@ Fünf Welten mit je drei Leveln. Jede Welt bringt etwas Neues, x-3 ist jeweils d
 | 4 Schneeberge | Rutschiges Eis, viel Klettern | 4-1 Die Schneeberge · 4-2 Der Eissee · 4-3 Der Gipfel |
 | 5 Nether | Seelensand, Lavameer, Magmawürfel | 5-1 Der Nether · 5-2 Das Lavameer · 5-3 Die Netherfestung |
 
-Gegner: Creeper, Slimes (im Nether Magmawürfel), Zombies (in der Wüste Wüstenzombies), Spinnen (in der Höhle Höhlenspinnen), Skelette (im Schnee Eiswanderer) mit Pfeilen, Waldhexen mit Gift und im Nether Lohen mit Feuerbällen. Von oben draufspringen besiegt sie; seitlich berühren oder von einem Geschoss getroffen werden heißt zurück zum Checkpoint. Creeper, Skelette und Lohen sind dagegen bei Berührung harmlos, man kommt aber nicht durch sie hindurch. Kommt man ihnen zu nah, blinken sie weiß und explodieren nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
+Gegner: Creeper, Slimes (im Nether Magmawürfel), Zombies (in der Wüste Wüstenzombies), Spinnen (in der Höhle Höhlenspinnen), Skelette (im Schnee Eiswanderer) mit Pfeilen, Waldhexen mit Gift und im Nether Lohen mit Feuerbällen. Von oben draufspringen besiegt sie; seitlich berühren oder von einem Geschoss getroffen werden heißt zurück zum Checkpoint. Creeper, Skelette und Lohen sind dagegen bei Berührung harmlos, man kommt aber nicht durch sie hindurch. Kommt man einem Creeper zu nah, blinkt er weiß und explodiert nach 1,5 Sekunden – schnell drüberspringen und weg, oder gleich draufspringen!
 
 In jedem Level liegen 10 Diamanten 💎: manche auf dem Weg, manche für Mutige über Lava und Abgründen.
 
 **Schwierigkeitsgrade:** Jedes Level gibt es auf Leicht, Mittel und Schwer (Auswahl oben in der Levelauswahl). Auf Mittel und Schwer kommen zusätzliche Gegner dazu, Creeper zünden schneller, Slimes hüpfen öfter, die Lava ist weniger gnädig, und auf Schwer gibt es keine Checkpoints. Schwer gibt es für ein Level erst, wenn man es auf Mittel geschafft hat. Alle Werte stehen in `src/game/difficulty.ts`.
+
+**Spielfiguren:** Wer eine ganze Welt auf Mittel schafft, bekommt ein Tier, mit dem man statt Steve spielen kann (Auswahl in der Levelauswahl). Jedes Tier kann etwas besser als Steve, aber nichts schlechter. Die Figuren stehen in `src/game/figures.ts`.
+
+| Figur | Freischalten | Kann besonders gut |
+| --- | --- | --- |
+| 🧍 Steve | von Anfang an | – |
+| 🐑 Schaf | Welt 1 auf Mittel | federt weich: springt von Gegnern höher ab |
+| 🐔 Huhn | Welt 2 auf Mittel | flattert: Sprungtaste gedrückt halten, dann sinkt es langsam |
+| 🦊 Fuchs | Welt 3 auf Mittel | flink: läuft schneller |
+| 🐺 Wolf | Welt 4 auf Mittel | springt höher |
+| 🔥 Schreiter | Welt 5 auf Mittel | hitzefest: läuft über Lava, ohne Schaden (Feuerbälle treffen ihn trotzdem) |
 
 Das nächste Level wird freigeschaltet, sobald das vorherige geschafft ist. Bestzeiten und gefundene Diamanten merkt sich der Browser.
 Direkt zu einem Level springen: `#level=2-3` an die Adresse anhängen.
@@ -77,7 +88,7 @@ Jeder Push auf `main` wird automatisch auf GitHub Pages veröffentlicht.
 ```
 src/
   engine/    Game-Loop, Tastatur
-  game/      Szene, Welt, Steve, Spieler-Physik, Kamera, Partikel
+  game/      Szene, Welt, Steve und Tiere, Spieler-Physik, Kamera, Partikel
   ui/        Menü, Hinweise, Ziel-Anzeige
   levels/    Level-Format, Biome, Laden der Level-Dateien
   textures/  Pixel-Texturen, im Code erzeugt

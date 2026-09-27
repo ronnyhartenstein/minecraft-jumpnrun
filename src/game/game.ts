@@ -8,8 +8,9 @@ import { BASE_DISTANCE, CameraRig } from './cameraRig';
 import { BLAST_RADIUS } from './enemies';
 import { BoxSteve, type Character } from './character';
 import { DIFFICULTIES, type Difficulty, type DifficultyId } from './difficulty';
+import { FIGURE_ORDER, FIGURES, type FigureId } from './figures';
 import { LevelScene } from './levelScene';
-import { PHYSICS, Player, type PlayerInput } from './player';
+import { Player, type PlayerInput } from './player';
 import { Progress } from './progress';
 import type { Stage } from './scene';
 
@@ -26,7 +27,8 @@ export class Game {
   player!: Player;
   private scene: LevelScene | null = null;
   private index = 0;
-  private readonly character: Character = new BoxSteve();
+  private character: Character = new BoxSteve();
+  private figureId: FigureId = 'steve';
   /** Kleines Licht, das Steve in dunklen Leveln mit sich trägt. */
   private readonly lantern = new THREE.PointLight('#ffd9a0', 10, 9, 1);
   private readonly cameraRig: CameraRig;
@@ -57,6 +59,7 @@ export class Game {
       menu: () => this.showMenu(),
       toggleSound: () => this.toggleSound(),
       setDifficulty: (id) => this.setDifficulty(id),
+      setFigure: (id) => this.setFigure(id),
     });
     this.overlay.setSoundIcon(this.sound.muted);
     input.onAnyInput = () => this.sound.unlock();
@@ -86,6 +89,30 @@ export class Game {
   /** Die gewählte Schwierigkeit. Die automatische Level-Prüfung spielt immer auf Leicht. */
   get difficulty(): Difficulty {
     return this.testMode ? DIFFICULTIES.leicht : DIFFICULTIES[this.progress.difficulty];
+  }
+
+  /** Die gewählte Spielfigur. Die automatische Level-Prüfung spielt immer mit Steve. */
+  get figure(): FigureId {
+    return this.testMode ? 'steve' : this.progress.currentFigure(this.levels);
+  }
+
+  private setFigure(id: FigureId) {
+    this.progress.selectFigure(id);
+    this.applyFigure();
+    if (this.state === 'menu') this.overlay.showMenu(this.progress);
+  }
+
+  /** Tauscht das Modell aus, falls nötig, und gibt dem Spieler die Werte der Figur. */
+  private applyFigure() {
+    const figure = FIGURES[this.figure];
+    if (figure.id !== this.figureId) {
+      this.stage.scene.remove(this.character.object);
+      this.character = figure.create();
+      this.character.object.add(this.lantern);
+      this.stage.scene.add(this.character.object);
+      this.figureId = figure.id;
+    }
+    this.player.setFigure(figure);
   }
 
   private setDifficulty(id: DifficultyId) {
@@ -133,6 +160,7 @@ export class Game {
 
   showMenu(): void {
     this.load(this.scene ? this.index : 0);
+    this.applyFigure();
     this.state = 'menu';
     this.resetCheckpoints();
     this.respawn();
@@ -147,6 +175,7 @@ export class Game {
   }
 
   restart(): void {
+    this.applyFigure();
     this.state = 'playing';
     this.playTime = 0;
     this.resetCheckpoints();
@@ -209,7 +238,11 @@ export class Game {
     const best = this.progress.best(name, d);
     // Das erste Mal auf Mittel geschafft: Schwer ist jetzt offen
     const hardUnlocked = d === 'mittel' && !this.testMode && !this.progress.finished(name, 'mittel');
+    // Die ganze Welt zum ersten Mal auf Mittel geschafft: Es gibt ein neues Tier
+    const reward = this.level.custom ? undefined : FIGURE_ORDER.find((f) => FIGURES[f].world === this.level.world);
+    const hadReward = reward === undefined || this.progress.isFigureUnlocked(this.levels, reward);
     const record = this.testMode ? false : this.progress.finish(name, d, this.playTime, this.diamonds);
+    const figureUnlocked = !hadReward && this.progress.isFigureUnlocked(this.levels, reward) ? reward : null;
     this.sound.play('win');
     this.overlay.showWin(this.index, {
       seconds: this.playTime,
@@ -220,6 +253,7 @@ export class Game {
       hasNext: this.hasNext,
       nextNeedsMedium: this.nextLevel !== undefined && !this.hasNext,
       hardUnlocked,
+      figureUnlocked,
       difficulty: this.difficulty.label,
     });
   }
@@ -308,7 +342,8 @@ export class Game {
         this.checkEnemies();
         if (this.state === 'playing') this.checkProjectiles();
         if (this.state !== 'playing') break;
-        if (this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8)) this.die('lava');
+        const lava = !FIGURES[this.figureId].lavaWalker && this.scene.world.touchesLava(pos.x - 0.3, pos.y, pos.x + 0.3, pos.y + 1.8);
+        if (lava) this.die('lava');
         else if (pos.y < FALL_LIMIT) this.die('fall');
         else if (this.scene.goal?.reached(pos.x)) this.win();
         break;
@@ -334,9 +369,10 @@ export class Game {
     this.character.object.visible = this.state !== 'playing' || this.invulnerable <= 0 || Math.floor(this.invulnerable * 10) % 2 === 0;
     this.character.update(dt, {
       speed: Math.abs(p.vel.x),
-      maxSpeed: PHYSICS.maxSpeed,
+      maxSpeed: p.physics.maxSpeed,
       onGround: p.onGround,
       facing: p.facing,
+      gliding: p.gliding,
     });
     // Beim Herunterfallen bleibt die Kamera oben, Steve fällt aus dem Bild
     if (this.state !== 'respawning') this.cameraRig.update(dt, pos, p.facing, Math.abs(p.vel.x) > 0.5);

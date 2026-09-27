@@ -103,6 +103,12 @@ export class World {
     return id !== null && id !== 'lava';
   }
 
+  /** Oberkante der Lava in dieser Zelle, auf der der Schreiter läuft, sonst `null`. */
+  lavaSurface(x: number, y: number): number | null {
+    if (this.blockAt(x, y) === 'lava') return this.blockAt(x, y + 1) === 'lava' ? null : y + LAVA_TOP;
+    return this.level.biome.lavaSea === y && !this.isSolid(x, y) ? y + LAVA_TOP : null;
+  }
+
   /** Berührt ein Rechteck (Steves Hitbox) die gefährliche Zone eines Lava-Blocks? */
   touchesLava(minX: number, minY: number, maxX: number, maxY: number): boolean {
     for (let y = Math.floor(minY); y <= Math.floor(maxY); y++) {

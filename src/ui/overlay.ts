@@ -1,5 +1,6 @@
 import type { Level } from '../levels/format';
 import { DIFFICULTIES, DIFFICULTY_ORDER, type DifficultyId } from '../game/difficulty';
+import { FIGURE_ORDER, FIGURES, type FigureId } from '../game/figures';
 import type { Progress } from '../game/progress';
 import { isTouchDevice } from './touch';
 
@@ -10,6 +11,7 @@ export interface OverlayActions {
   menu(): void;
   toggleSound(): void;
   setDifficulty(id: DifficultyId): void;
+  setFigure(id: FigureId): void;
 }
 
 /** Was die Ziel-Anzeige über den Durchlauf wissen muss. */
@@ -24,6 +26,8 @@ export interface WinStats {
   nextNeedsMedium: boolean;
   /** Gerade zum ersten Mal auf Mittel geschafft. */
   hardUnlocked: boolean;
+  /** Gerade die ganze Welt auf Mittel geschafft und dafür ein Tier bekommen. */
+  figureUnlocked: FigureId | null;
   difficulty: string;
 }
 
@@ -160,6 +164,7 @@ export class Overlay {
       <h1>${title}</h1>
       <p class="win-difficulty">${stats.difficulty}</p>
       ${stats.hardUnlocked ? '<p class="unlock">🔥 Schwer freigeschaltet! 🔥</p>' : ''}
+      ${stats.figureUnlocked ? `<p class="unlock figure-unlock">Neue Spielfigur: ${FIGURES[stats.figureUnlocked].icon} ${FIGURES[stats.figureUnlocked].label}!<small>Du findest sie in der Levelauswahl.</small></p>` : ''}
       ${last ? '<p class="trophy">🏆</p>' : ''}
       ${nextWorld}
       <p class="time">Zeit: ${formatTime(seconds)}</p>
@@ -214,6 +219,15 @@ export class Overlay {
     });
     // Eigene Level stehen als eigene Spalte neben den Welten
     if (own.length) worlds.set('<small>Selbst gebaut</small>Eigene', own);
+    // Spielfiguren: Steve und die Tiere, die man für geschaffte Welten bekommt
+    const current = progress.currentFigure(this.levels);
+    const figures = FIGURE_ORDER.map((id) => {
+      const f = FIGURES[id];
+      const free = progress.isFigureUnlocked(this.levels, id);
+      const lock = free ? '' : `<small>🔒 Welt ${f.world} auf Mittel</small>`;
+      return `<button type="button" data-figure="${id}" class="${id === current ? 'active' : ''}" ${free ? '' : 'disabled'} title="${f.trait}">
+        <span class="icon">${f.icon}</span>${f.label}${lock}</button>`;
+    }).join('');
     const columns = [...worlds].map(([title, cards]) => `<div class="world"><h3>${title}</h3>${cards.join('')}</div>`);
     this.menuPanel.innerHTML = `
       <h1>Steves Pixel Sprint<small>Ein Fan-Jump-'n'-Run für Minecraft-Fans</small></h1>
@@ -221,6 +235,8 @@ export class Overlay {
       <div class="difficulty-tabs">${DIFFICULTY_ORDER.map((d) => `
         <button type="button" data-difficulty="${d}" class="${d === difficulty ? 'active' : ''}">${DIFFICULTIES[d].label}</button>`).join('')}
       </div>
+      <div class="figure-tabs">${figures}</div>
+      <p class="figure-trait">${FIGURES[current].icon} ${FIGURES[current].label}: ${FIGURES[current].trait}</p>
       <div class="worlds">${columns.join('')}</div>
       <p class="keys">Level anklicken · Enter = weiterspielen</p>`;
     this.setScreen('menu');
@@ -231,6 +247,9 @@ export class Overlay {
     });
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.difficulty-tabs button').forEach((tab) => {
       tab.addEventListener('click', () => this.actions.setDifficulty(tab.dataset.difficulty as DifficultyId));
+    });
+    this.menuPanel.querySelectorAll<HTMLButtonElement>('.figure-tabs button').forEach((tab) => {
+      tab.addEventListener('click', () => this.actions.setFigure(tab.dataset.figure as FigureId));
     });
     this.menuPanel.querySelectorAll<HTMLButtonElement>('.card').forEach((card) => {
       card.addEventListener('click', () => {

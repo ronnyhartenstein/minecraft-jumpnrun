@@ -101,7 +101,7 @@ Jedes Level gibt es auf **Leicht**, **Mittel** und **Schwer**. Das Raster bleibt
 - Auf Mittel und Schwer zünden Creeper schneller, Slimes hüpfen öfter und weiter, und die Lava ist weniger gnädig.
 - Auf Schwer gibt es **keine Checkpoints**.
 
-Auf **Leicht** muss dein Level schaffbar sein – das prüft auch der Prüf-Roboter.
+Auf **Leicht** muss dein Level mit Steve schaffbar sein – das prüft auch der Prüf-Roboter. Die Tiere können alles, was Steve kann, und noch etwas mehr.
 
 ## Tipps für ein gutes Level
 
