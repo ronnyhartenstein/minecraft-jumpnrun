@@ -11,6 +11,12 @@ export interface PaletteEntry {
   block?: BlockId | 'surface' | 'subsoil';
   /** … oder ein Emoji, optional mit kleinem Zusatz (z. B. „M“ für „ab Mittel“). */
   emoji?: string;
+  /**
+   * … oder eine einfache gemalte Form statt Emoji. Manche Tablets/ältere Geräte haben
+   * kein Emoji-Glyph für 🟩/🟢 (erst 2019 dazugekommen) und zeigen dann nichts an,
+   * darum werden Creeper und Slime selbst gemalt statt per Schriftart dargestellt.
+   */
+  shape?: { kind: 'square' | 'circle'; color: string };
   badge?: string;
 }
 
@@ -53,8 +59,8 @@ export const PALETTE: PaletteGroup[] = [
   {
     title: 'Gegner',
     entries: [
-      { char: 'c', label: 'Creeper', emoji: '🟩' },
-      { char: 's', label: 'Slime', emoji: '🟢' },
+      { char: 'c', label: 'Creeper', shape: { kind: 'square', color: '#4c9a2a' } },
+      { char: 's', label: 'Slime', shape: { kind: 'circle', color: '#4cd137' } },
       { char: 'z', label: 'Zombie', emoji: '🧟' },
       { char: 'p', label: 'Spinne', emoji: '🕷️' },
       { char: 'k', label: 'Skelett', emoji: '💀' },
@@ -63,10 +69,10 @@ export const PALETTE: PaletteGroup[] = [
       { char: 'e', label: 'Enderman', emoji: '🕴️' },
       { char: 'q', label: 'Shulker', emoji: '📦' },
       { char: 'm', label: 'Endermite', emoji: '🐛' },
-      { char: '5', label: 'Creeper ab Mittel', emoji: '🟩', badge: 'M' },
-      { char: '6', label: 'Slime ab Mittel', emoji: '🟢', badge: 'M' },
-      { char: '7', label: 'Creeper nur Schwer', emoji: '🟩', badge: 'S' },
-      { char: '8', label: 'Slime nur Schwer', emoji: '🟢', badge: 'S' },
+      { char: '5', label: 'Creeper ab Mittel', shape: { kind: 'square', color: '#4c9a2a' }, badge: 'M' },
+      { char: '6', label: 'Slime ab Mittel', shape: { kind: 'circle', color: '#4cd137' }, badge: 'M' },
+      { char: '7', label: 'Creeper nur Schwer', shape: { kind: 'square', color: '#4c9a2a' }, badge: 'S' },
+      { char: '8', label: 'Slime nur Schwer', shape: { kind: 'circle', color: '#4cd137' }, badge: 'S' },
     ],
   },
 ];

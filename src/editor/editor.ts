@@ -382,15 +382,31 @@ function drawEntry(ctx: CanvasRenderingContext2D, entry: PaletteEntry, biome: Re
     ctx.drawImage(image, 0, 0, 16, 16, x, y, size, size);
     return;
   }
+  if (entry.shape) {
+    ctx.fillStyle = entry.shape.color;
+    if (entry.shape.kind === 'circle') {
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y + size / 2, size * 0.38, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      const pad = size * 0.12;
+      ctx.fillRect(x + pad, y + pad, size - pad * 2, size - pad * 2);
+    }
+    if (entry.badge) drawBadge(ctx, entry.badge, x, y, size);
+    return;
+  }
   ctx.font = `${Math.round(size * 0.8)}px system-ui, sans-serif`;
   ctx.fillText(entry.emoji ?? entry.char, x + size / 2, y + size / 2 + 1);
-  if (entry.badge) {
-    ctx.fillStyle = '#ffe14d';
-    ctx.fillRect(x + size * 0.6, y, size * 0.4, size * 0.4);
-    ctx.fillStyle = '#000';
-    ctx.font = `bold ${Math.round(size * 0.35)}px system-ui, sans-serif`;
-    ctx.fillText(entry.badge, x + size * 0.8, y + size * 0.21);
-  }
+  if (entry.badge) drawBadge(ctx, entry.badge, x, y, size);
+}
+
+/** Kleines gelbes „ab Mittel“/„nur Schwer“-Eckchen oben rechts auf einer Kachel. */
+function drawBadge(ctx: CanvasRenderingContext2D, badge: string, x: number, y: number, size: number) {
+  ctx.fillStyle = '#ffe14d';
+  ctx.fillRect(x + size * 0.6, y, size * 0.4, size * 0.4);
+  ctx.fillStyle = '#000';
+  ctx.font = `bold ${Math.round(size * 0.35)}px system-ui, sans-serif`;
+  ctx.fillText(badge, x + size * 0.8, y + size * 0.21);
 }
 
 /** Kleines Bild für ein Palettenfeld. */
