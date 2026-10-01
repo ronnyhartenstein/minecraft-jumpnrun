@@ -13,8 +13,6 @@
 
 Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](https://threejs.org/).
 
-**Spielen:** https://blog.rh-flow.de/minecraft-jumpnrun/
-
 ## Steuerung
 
 | Taste | Aktion |
@@ -102,8 +100,6 @@ Build prüfen (TypeScript-Check und Produktions-Build):
 ```sh
 docker compose run --rm dev npm run build
 ```
-
-Jeder Push auf `main` wird automatisch auf GitHub Pages veröffentlicht.
 
 ## Aufbau
 
