@@ -5,7 +5,7 @@ import { BotBrain } from './bot';
 
 /*
  * Level-Prüfung: Öffne das Spiel mit ?pruefen an der Adresse, z. B.
- * http://localhost:5173/minecraft-jumpnrun/?pruefen
+ * http://localhost:5173/?pruefen
  *
  * 1. Regeln: Anlauf nach hohen Stellen, Lücken nicht zu breit, Stufen nicht zu hoch,
  *    Platz nach oben vor Sprüngen, keine Gegner direkt hinter Sprüngen.

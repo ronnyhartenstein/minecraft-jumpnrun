@@ -43,7 +43,7 @@ DDDDDDDDDDDDDD..DDDDDDDDD
 1. Öffne den Ordner `levels/eigene/`. Dort liegt schon `mein-erstes-level.txt`.
 2. **Kopiere** die Datei und gib ihr einen neuen Namen, zum Beispiel `drachenburg.txt`.
 3. Ändere oben die Zeile `Name:`, zum Beispiel `Name: Die Drachenburg`.
-4. Starte das Spiel mit `docker compose up` und öffne http://localhost:5173/minecraft-jumpnrun/
+4. Starte das Spiel mit `docker compose up` und öffne http://localhost:5173/
 5. In der Levelauswahl siehst du ganz rechts die Spalte **Eigene**. Da ist dein Level!
 6. Ändere etwas in der Datei und **speichere**. Das Spiel lädt sofort neu und du kannst es ausprobieren.
 
@@ -141,7 +141,7 @@ Alles, was höher oder weiter ist, schafft er nicht!
 
 Öffne das Spiel mit `?pruefen` am Ende der Adresse:
 
-http://localhost:5173/minecraft-jumpnrun/?pruefen
+http://localhost:5173/?pruefen
 
 Dann passiert zweierlei:
 

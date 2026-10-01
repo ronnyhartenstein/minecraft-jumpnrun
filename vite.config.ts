@@ -38,9 +38,9 @@ function reloadOnLevelChange(): Plugin {
   };
 }
 
-// GitHub Pages serviert das Spiel unter https://blog.rh-flow.de/minecraft-jumpnrun/
+// Das Spiel läuft unter https://mcjump.rh-flow.de/
 export default defineConfig({
-  base: '/minecraft-jumpnrun/',
+  base: '/',
   plugins: [reloadOnLevelChange()],
   server: { watch: { usePolling: true } },
   // Three.js allein ist schon ~500 kB, das ist okay.

@@ -13,6 +13,8 @@
 
 Ein 2.5D-Sidescroller im Minecraft-Stil für den Browser, gebaut mit [Three.js](https://threejs.org/).
 
+**Spielen:** https://mcjump.rh-flow.de/
+
 ## Steuerung
 
 | Taste | Aktion |
@@ -93,7 +95,7 @@ Node.js läuft im Docker-Container, auf dem Rechner muss nur Docker installiert 
 docker compose up
 ```
 
-Danach läuft das Spiel unter http://localhost:5173/minecraft-jumpnrun/. Änderungen am Code werden sofort neu geladen.
+Danach läuft das Spiel unter http://localhost:5173/. Änderungen am Code werden sofort neu geladen.
 
 Build prüfen (TypeScript-Check und Produktions-Build):
 
